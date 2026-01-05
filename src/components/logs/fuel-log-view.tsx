@@ -12,12 +12,14 @@ interface FuelLogViewProps {
 }
 
 export function FuelLogView({ logs, onDelete, onEdit }: FuelLogViewProps) {
+    const sortedLogs = [...logs].sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Fuel History</h2>
             <div className="space-y-3">
-                {logs.length === 0 && <p className="text-center text-slate-500 text-xs py-10">No fuel logs yet.</p>}
-                {logs.map((l, idx) => (
+                {sortedLogs.length === 0 && <p className="text-center text-slate-500 text-xs py-10">No fuel logs yet.</p>}
+                {sortedLogs.map((l, idx) => (
                     <div 
                         key={l.id} 
                         style={{animationDelay: `${idx * 50}ms`}} 
