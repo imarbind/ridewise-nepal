@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useMemo } from 'react';
@@ -86,9 +87,9 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
         />
         <Tooltip
             cursor={{fill: 'hsl(var(--muted))'}}
-            content={CustomTooltip}
+            content={<CustomTooltip />}
         />
-        <Legend content={CustomLegend} />
+        <Legend content={<CustomLegend />} />
         <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
         <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
       </>

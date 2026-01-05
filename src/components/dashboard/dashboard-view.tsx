@@ -43,14 +43,11 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
   return (
     <div className="pb-32 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="mb-4 flex justify-between items-start z-10 relative">
-        <div>
-          <h1 className="text-3xl font-black text-slate-800 tracking-tighter italic drop-shadow-sm flex items-center gap-2">
-            <span className="text-primary">RIDE</span>
-            <span className="text-foreground">LOG</span>
-            <span className="text-blue-600 text-sm border border-blue-600 px-2 py-0.5 rounded-md ml-1">NEPAL</span>
-          </h1>
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em] mt-1 pl-1">Vehicle Expense Tracker</p>
-        </div>
+        <h1 className="text-3xl font-black text-slate-800 tracking-tighter italic drop-shadow-sm flex items-center gap-2">
+          <span className="text-primary">RIDE</span>
+          <span className="text-foreground">LOG</span>
+          <span className="text-blue-600 text-sm border border-blue-600 px-2 py-0.5 rounded-md ml-1">NEPAL</span>
+        </h1>
         <Button onClick={onNavigateDocs} variant="outline" size="icon" className="bg-card border-slate-200 w-12 h-12 rounded-2xl text-slate-500 hover:text-primary hover:border-primary/50 hover:shadow-primary/10 transition-all shadow-lg active:scale-95">
           <FileText size={20} />
         </Button>
@@ -124,7 +121,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
 
             <div className="grid grid-cols-2 items-end">
                 <div>
-                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Total Distance</p>
+                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Odometer</p>
                     <h2 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">
                         {stats.lastOdo.toLocaleString()}
                         <span className="text-lg font-bold ml-2 opacity-50">KM</span>
