@@ -12,8 +12,8 @@ interface TripViewProps {
   stats: Stats;
   services: ServiceRecord[];
   onCreateTrip: (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => void;
-  onStartTrip: (id: string) => void;
-  onEndTrip: (id: string) => void;
+  onStartTrip: (id: string, startOdo: number) => void;
+  onEndTrip: (id: string, endOdo: number) => void;
   onDeleteTrip: (id: string) => void;
   onAddExpense: (tripId: string, item: string, cost: string) => void;
   onUpdateExpense: (tripId: string, updatedExpense: TripExpense) => void;
@@ -46,6 +46,7 @@ export function TripView({
           onAddExpense={onAddExpense}
           onUpdateExpense={onUpdateExpense}
           onDeleteExpense={onDeleteExpense}
+          lastOdo={stats.lastOdo}
         />
       ) : (
         <>
@@ -70,6 +71,7 @@ export function TripView({
                         trip={trip} 
                         onStart={onStartTrip} 
                         onDelete={onDeleteTrip}
+                        lastOdo={stats.lastOdo}
                     />
                 ))}
             </div>

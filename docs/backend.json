@@ -82,6 +82,8 @@
         "start": { "type": "string", "format": "date-time" },
         "end": { "type": "string", "format": "date-time" },
         "distance": { "type": "string" },
+        "startOdo": { "type": "number" },
+        "endOdo": { "type": "number" },
         "status": { "type": "string", "enum": ["planned", "active", "completed"] },
         "expenses": {
           "type": "array",

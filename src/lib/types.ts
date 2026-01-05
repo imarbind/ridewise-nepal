@@ -50,7 +50,9 @@ export interface Trip {
     destination: string;
     start: string; // ISO 8601 format
     end?: string; // ISO 8601 format, optional
-    distance: string;
+    distance: string; // Estimated distance
+    startOdo?: number;
+    endOdo?: number;
     status: 'planned' | 'active' | 'completed';
     expenses: TripExpense[];
 }

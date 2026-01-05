@@ -156,7 +156,7 @@ export function MainApp() {
     addDocumentNonBlocking(tripsCollectionRef, newTripObj);
   };
   
-  const startTrip = (id: string) => {
+  const startTrip = (id: string, startOdo: number) => {
      if (!user || !tripsCollectionRef) return;
      // Deactivate any currently active trip
      (trips || []).forEach(t => {
@@ -168,23 +168,32 @@ export function MainApp() {
 
     // Activate the selected trip
     const tripRef = doc(tripsCollectionRef, id);
-    updateDocumentNonBlocking(tripRef, { status: 'active', start: new Date().toISOString() });
+    updateDocumentNonBlocking(tripRef, { status: 'active', start: new Date().toISOString(), startOdo });
   }
 
-  const endTrip = (id: string) => {
+  const endTrip = (id: string, endOdo: number) => {
     if(window.confirm("End this trip? This will move it to history.") && tripsCollectionRef) {
       const tripRef = doc(tripsCollectionRef, id);
       const trip = (trips || []).find(t => t.id === id);
-      if (trip && user) {
-        updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString() });
+      if (trip && user && trip.startOdo) {
+        const distanceTraveled = endOdo - trip.startOdo;
+        if (distanceTraveled < 0) {
+            alert("Ending odometer cannot be less than the starting odometer.");
+            return;
+        }
+
+        updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString(), endOdo });
         
         // Update rider board
         const riderBoardRef = doc(firestore, 'rider_board', user.uid);
         getDoc(riderBoardRef).then(docSnap => {
           const currentData = docSnap.data() || { totalKilometers: 0 };
-          const newTotal = currentData.totalKilometers + parseFloat(trip.distance);
+          const newTotal = currentData.totalKilometers + distanceTraveled;
           setDocumentNonBlocking(riderBoardRef, { userId: user.uid, totalKilometers: newTotal, userName: user.displayName }, { merge: true });
         });
+      } else {
+        // Fallback for trips without startOdo (legacy data)
+         updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString(), endOdo });
       }
     }
   };

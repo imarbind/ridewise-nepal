@@ -8,17 +8,20 @@ import { Input } from '@/components/ui/input';
 
 interface ActiveTripProps {
   trip: Trip;
-  onEndTrip: (id: string) => void;
+  onEndTrip: (id: string, endOdo: number) => void;
   onDeleteTrip: (id: string) => void;
   onAddExpense: (tripId: string, item: string, cost: string) => void;
   onUpdateExpense: (tripId: string, expense: TripExpense) => void;
   onDeleteExpense: (tripId: string, expenseId: number) => void;
+  lastOdo: number;
 }
 
-export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpdateExpense, onDeleteExpense }: ActiveTripProps) {
+export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpdateExpense, onDeleteExpense, lastOdo }: ActiveTripProps) {
   const [expenseItem, setExpenseItem] = useState('');
   const [expenseCost, setExpenseCost] = useState('');
   const [editingExpense, setEditingExpense] = useState<TripExpense | null>(null);
+  const [isEnding, setIsEnding] = useState(false);
+  const [endOdo, setEndOdo] = useState<number | ''>('');
   
   const now = new Date();
   const start = new Date(trip.start);
@@ -53,6 +56,14 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
     setExpenseCost('');
   }
 
+  const handleEndTripSubmit = () => {
+    if (typeof endOdo === 'number' && endOdo > (trip.startOdo || lastOdo)) {
+        onEndTrip(trip.id, endOdo);
+    } else {
+        alert(`Ending odometer must be greater than starting odometer (${trip.startOdo || lastOdo}).`);
+    }
+  }
+
   return (
     <div>
       <div className="bg-gradient-to-br from-blue-900 to-slate-900 rounded-[2.5rem] p-8 text-white mb-6 relative overflow-hidden shadow-xl">
@@ -69,16 +80,31 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
           </div>
         </div>
         <div className="mt-6 flex gap-2">
-            {isTripStarted ? (
-                 <Button onClick={() => onEndTrip(trip.id)} className="bg-primary/20 hover:bg-primary border border-primary/50 text-red-200 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all w-full h-auto flex items-center gap-2">
+            {isTripStarted && !isEnding && (
+                 <Button onClick={() => setIsEnding(true)} className="bg-primary/20 hover:bg-primary border border-primary/50 text-red-200 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all w-full h-auto flex items-center gap-2">
                     <FlagOff size={14} /> End Trip
                 </Button>
-            ) : (
-                <div className="w-full text-center text-xs text-blue-200 p-2 rounded-lg bg-black/20">Trip has not started yet.</div>
             )}
-          <Button onClick={() => onDeleteTrip(trip.id)} variant="destructive" size="icon" className="w-12 h-auto rounded-xl bg-red-900/50 border border-red-500/50 text-red-300 hover:bg-red-800">
-            <Trash2 size={16} />
-          </Button>
+            {isEnding && (
+                <div className="w-full space-y-2">
+                    <Input 
+                        type="number"
+                        placeholder={`Ending Odometer (current: ${lastOdo})`}
+                        value={endOdo}
+                        onChange={(e) => setEndOdo(e.target.value === '' ? '' : Number(e.target.value))}
+                        className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                    />
+                    <div className="flex gap-2">
+                        <Button onClick={handleEndTripSubmit} className="bg-primary hover:bg-red-700 w-full">Confirm & End</Button>
+                        <Button onClick={() => setIsEnding(false)} variant="secondary" className="bg-white/20 hover:bg-white/30 text-white">Cancel</Button>
+                    </div>
+                </div>
+            )}
+            {!isEnding && (
+                <Button onClick={() => onDeleteTrip(trip.id)} variant="destructive" size="icon" className="w-12 h-auto rounded-xl bg-red-900/50 border border-red-500/50 text-red-300 hover:bg-red-800">
+                    <Trash2 size={16} />
+                </Button>
+            )}
         </div>
       </div>
 
