@@ -12,25 +12,25 @@ interface MaintenanceStatusProps {
 
 const getProgressProps = (progress: number) => {
     if (progress >= 100) {
-        return { 
+        return {
             className: '[&>div]:bg-red-600',
             statusText: 'Service due now.'
         };
     }
     if (progress > 85) {
-        return { 
-            className: '[&>div]:bg-gradient-to-r from-orange-500 to-red-600',
+        return {
+            className: '[&>div]:bg-gradient-to-r from-blue-500 to-orange-600',
             statusText: 'Service recommended soon.'
         };
     }
     if (progress > 60) {
-        return { 
-            className: '[&>div]:bg-gradient-to-r from-blue-500 to-orange-500',
+        return {
+            className: '[&>div]:bg-gradient-to-r from-green-500 to-blue-500',
             statusText: 'Approaching service interval.'
         };
     }
-    return { 
-        className: '[&>div]:bg-gradient-to-r from-green-500 to-blue-500',
+    return {
+        className: '[&>div]:bg-green-500',
         statusText: 'Recently serviced. All good.'
     };
 };
