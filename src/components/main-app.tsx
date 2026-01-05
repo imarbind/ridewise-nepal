@@ -20,6 +20,19 @@ import { FuelLogView } from './logs/fuel-log-view';
 
 const APP_ID = 'ridelog-nepal-v3';
 
+const defaultLogs: FuelLog[] = [];
+const defaultServices: ServiceRecord[] = [];
+const defaultDocs: Doc[] = [];
+const defaultTrips: Trip[] = [];
+const defaultBikeDetails: BikeDetails = { 
+  name: "My Bike", 
+  number: "BA 01-001 PA",
+  make: "",
+  model: "",
+  year: "",
+  engineCc: "126-250",
+};
+
 export function MainApp() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
   const [modalType, setModalType] = useState<ModalType>(null);
@@ -27,18 +40,11 @@ export function MainApp() {
   const [editingFuel, setEditingFuel] = useState<FuelLog | null>(null);
   const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
 
-  const [logs, setLogs] = useLocalStorage<FuelLog[]>(`${APP_ID}_logs`, []);
-  const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, []);
-  const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, []);
-  const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, []);
-  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, { 
-    name: "My Bike", 
-    number: "BA 01-001 PA",
-    make: "",
-    model: "",
-    year: "",
-    engineCc: "126-250",
-  });
+  const [logs, setLogs] = useLocalStorage<FuelLog[]>(`${APP_ID}_logs`, defaultLogs);
+  const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, defaultServices);
+  const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, defaultDocs);
+  const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, defaultTrips);
+  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, defaultBikeDetails);
 
   const stats = useMemo(() => calculateStats(logs, services, bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
   const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
