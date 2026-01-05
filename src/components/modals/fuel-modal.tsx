@@ -59,10 +59,22 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
       const numericLiters = parseFloat(String(liters));
       const numericPrice = parseFloat(String(price));
 
-      if (changedField === 'amount' || changedField === 'liters') {
-        if (!isNaN(numericAmount) && numericAmount > 0 && !isNaN(numericLiters) && numericLiters > 0) {
-          setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
+      if (changedField === 'amount') {
+        if (!isNaN(numericAmount) && numericAmount > 0) {
+            if (!isNaN(numericLiters) && numericLiters > 0) {
+                setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
+            } else if (!isNaN(numericPrice) && numericPrice > 0) {
+                setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
+            }
         }
+      } else if (changedField === 'liters') {
+          if (!isNaN(numericLiters) && numericLiters > 0) {
+              if (!isNaN(numericAmount) && numericAmount > 0) {
+                  setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
+              } else if (!isNaN(numericPrice) && numericPrice > 0) {
+                  setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
+              }
+          }
       } else if (changedField === 'price') {
         if (!isNaN(numericPrice) && numericPrice > 0) {
             if (!isNaN(numericLiters) && numericLiters > 0) {
@@ -111,7 +123,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
               <div className="flex items-center gap-2 mb-2">
                   <div className="w-1 h-4 bg-primary rounded-full"></div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations (fill any 2)</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <FormField control={form.control} name="amount" render={({ field }) => (
