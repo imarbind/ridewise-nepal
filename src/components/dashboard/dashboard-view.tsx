@@ -8,18 +8,9 @@ import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import type { ExpenseChartData } from "./expense-chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ConditionRatingCard } from "./condition-rating-card";
-import dynamic from 'next/dynamic';
-import { Skeleton } from "../ui/skeleton";
 import { UpcomingTripCard } from "./upcoming-trip-card";
-
-const ExpenseChart = dynamic(() => import('./expense-chart').then(mod => mod.ExpenseChart), {
-  ssr: false,
-  loading: () => <Skeleton className="h-[320px] w-full rounded-[2rem]" />,
-});
-
 
 interface DashboardViewProps {
   stats: Stats;
@@ -27,11 +18,10 @@ interface DashboardViewProps {
   onNavigateDocs: () => void;
   bikeDetails: BikeDetails;
   setBikeDetails: (details: BikeDetails) => void;
-  expenseChartData: ExpenseChartData[];
   upcomingTrip: Trip | null;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData, upcomingTrip }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, upcomingTrip }: DashboardViewProps) {
   const [isEditingBike, setIsEditingBike] = useState(false);
   const [editableBikeDetails, setEditableBikeDetails] = useState(bikeDetails);
 
@@ -156,8 +146,6 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         <StatCard delay={400} label="Parts Changed" value={`${stats.totalPartsChanged}`} icon={ListChecks} color="bg-green-600" />
         <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" colSpan="col-span-2" />
       </div>
-
-      <ExpenseChart data={expenseChartData} />
 
       <MaintenanceStatus activeReminders={activeReminders} />
     </div>
