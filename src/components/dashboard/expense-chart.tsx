@@ -37,8 +37,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       return (
         <div className="bg-background p-3 border border-slate-200 rounded-2xl shadow-lg">
           <p className="font-bold text-sm text-slate-800">{label}</p>
-          <p className="text-xs text-green-600">Fuel: रू {payload[0].value.toLocaleString()}</p>
-          <p className="text-xs text-primary">Service: रू {payload[1].value.toLocaleString()}</p>
+          <p className="text-xs text-green-600">Fuel: रू {payload.find(p => p.dataKey === 'fuel')?.value?.toLocaleString() || 0}</p>
+          <p className="text-xs text-primary">Service: रू {payload.find(p => p.dataKey === 'service')?.value?.toLocaleString() || 0}</p>
         </div>
       );
     }
@@ -93,7 +93,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                         cursor={{fill: 'hsl(var(--muted))'}}
                         content={CustomTooltip}
                     />
-                    <Legend content={CustomLegend} />
+                    <Legend content={<CustomLegend />} />
                     <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
                     <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
                 </BarChart>
