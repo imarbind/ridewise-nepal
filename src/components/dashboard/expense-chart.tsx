@@ -31,11 +31,11 @@ interface ExpenseChartProps {
 const chartConfig = {
   fuel: {
     label: "Fuel",
-    color: "hsl(142.1 76.2% 36.3%)", // Updated from var(--color-fuel)
+    color: "hsl(142.1 76.2% 36.3%)",
   },
   service: {
     label: "Service",
-    color: "hsl(var(--primary))", // This one is fine as it's not directly in a `fill`
+    color: "hsl(346 100% 41%)",
   },
 } satisfies {
     [key: string]: { label: string; color: string }
@@ -87,7 +87,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                         </div>
                     )} />
                     <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="service" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
         </ChartContainer>
