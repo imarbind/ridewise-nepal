@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { calculateStats, getActiveReminders, getExpenseChartData } from '@/lib/calculations';
-import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc } from '@/lib/types';
+import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc, BikeDetails } from '@/lib/types';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
 import { MainNavigation } from '@/components/layout/main-navigation';
@@ -31,7 +31,7 @@ export function MainApp() {
   const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, []);
   const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, []);
   const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, []);
-  const [bikeName, setBikeName] = useLocalStorage<string>(`${APP_ID}_bikeName`, "My Bike");
+  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, { name: "My Bike", number: "BA 01-001 PA" });
   const [engineCc, setEngineCc] = useLocalStorage<EngineCc>(`${APP_ID}_engineCc`, '126-250');
 
   const stats = useMemo(() => calculateStats(logs, services, engineCc), [logs, services, engineCc]);
@@ -178,7 +178,7 @@ export function MainApp() {
   const renderActiveTab = () => {
     switch(activeTab) {
         case 'dashboard':
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
         case 'fuel':
             return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
         case 'service':
@@ -207,7 +207,7 @@ export function MainApp() {
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
     }
   }
 

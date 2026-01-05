@@ -1,7 +1,7 @@
 "use client";
 
 import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info } from "lucide-react";
-import type { Stats, Reminder, EngineCc } from "@/lib/types";
+import type { Stats, Reminder, EngineCc, BikeDetails } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
@@ -15,20 +15,20 @@ interface DashboardViewProps {
   stats: Stats;
   activeReminders: Reminder[];
   onNavigateDocs: () => void;
-  bikeName: string;
-  setBikeName: (name: string) => void;
+  bikeDetails: BikeDetails;
+  setBikeDetails: (details: BikeDetails) => void;
   expenseChartData: ExpenseChartData[];
   engineCc: EngineCc;
   setEngineCc: (cc: EngineCc) => void;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName, expenseChartData, engineCc, setEngineCc }: DashboardViewProps) {
-  const [isEditingBikeName, setIsEditingBikeName] = useState(false);
-  const [editableBikeName, setEditableBikeName] = useState(bikeName);
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData, engineCc, setEngineCc }: DashboardViewProps) {
+  const [isEditingBike, setIsEditingBike] = useState(false);
+  const [editableBikeDetails, setEditableBikeDetails] = useState(bikeDetails);
 
-  const handleBikeNameSave = () => {
-    setBikeName(editableBikeName);
-    setIsEditingBikeName(false);
+  const handleBikeDetailsSave = () => {
+    setBikeDetails(editableBikeDetails);
+    setIsEditingBike(false);
   };
   
   const ccOptions: EngineCc[] = ['50-125', '126-250', '251-500', '501-1000', '>1000'];
@@ -49,25 +49,35 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
         </Button>
       </div>
 
-       <div className="mb-8 flex flex-wrap items-center gap-2">
-        {isEditingBikeName ? (
-          <div className="flex gap-2 w-full">
+       <div className="mb-8 p-4 bg-card/50 rounded-2xl border border-slate-100 backdrop-blur-sm">
+        {isEditingBike ? (
+          <div className="space-y-3">
             <Input 
-              value={editableBikeName} 
-              onChange={(e) => setEditableBikeName(e.target.value)} 
-              className="bg-card font-bold text-lg"
+              placeholder="Bike Name (e.g. Pulsar 220F)"
+              value={editableBikeDetails.name} 
+              onChange={(e) => setEditableBikeDetails(prev => ({...prev, name: e.target.value}))} 
+              className="bg-slate-50 font-bold"
             />
-            <Button onClick={handleBikeNameSave} size="sm">Save</Button>
+            <Input 
+              placeholder="Bike Number (e.g. BA 01-001 PA)"
+              value={editableBikeDetails.number} 
+              onChange={(e) => setEditableBikeDetails(prev => ({...prev, number: e.target.value}))} 
+              className="bg-slate-50 font-medium"
+            />
+            <Button onClick={handleBikeDetailsSave} size="sm" className="w-full">Save Details</Button>
           </div>
         ) : (
-          <div className="flex items-center">
-            <h2 className="text-xl font-bold text-slate-700">{bikeName}</h2>
-            <Button onClick={() => setIsEditingBikeName(true)} variant="ghost" size="icon" className="w-8 h-8 text-slate-400">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-slate-700">{bikeDetails.name}</h2>
+              <p className="text-xs font-mono text-slate-400 bg-slate-100 inline-block px-2 py-0.5 rounded mt-1">{bikeDetails.number}</p>
+            </div>
+            <Button onClick={() => { setIsEditingBike(true); setEditableBikeDetails(bikeDetails); }} variant="ghost" size="icon" className="w-8 h-8 text-slate-400">
               <Edit size={16} />
             </Button>
           </div>
         )}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200">
            <Select value={engineCc} onValueChange={(value: EngineCc) => setEngineCc(value)}>
             <SelectTrigger className="w-[150px] bg-card h-8 text-xs font-bold border-slate-200 rounded-lg">
               <SelectValue placeholder="Engine CC" />

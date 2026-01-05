@@ -1,6 +1,11 @@
 export type ActiveTab = 'dashboard' | 'fuel' | 'service' | 'trip' | 'history' | 'docs';
 export type ModalType = 'fuel' | 'service' | null;
 
+export interface BikeDetails {
+  name: string;
+  number: string;
+}
+
 export interface FuelLog {
   id: number;
   date: string;
