@@ -10,18 +10,22 @@ interface StatCardProps {
   icon: LucideIcon;
   color: string;
   delay: number;
+  colSpan?: string;
 }
 
-export const StatCard = ({ label, value, sub, icon: Icon, color, delay }: StatCardProps) => (
+export const StatCard = ({ label, value, sub, icon: Icon, color, delay, colSpan = 'col-span-1' }: StatCardProps) => (
   <div 
-    className="relative group [perspective:1000px] animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards"
+    className={cn(
+        "relative group [perspective:1000px] animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards",
+        colSpan
+    )}
     style={{ animationDelay: `${delay}ms` }}
   >
     <div className={`
       bg-card/90 backdrop-blur-md border-b-4 border-r-4 border-slate-200 
       p-4 rounded-2xl shadow-xl transition-all duration-300 transform 
       group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:border-blue-200/50
-      relative overflow-hidden
+      relative overflow-hidden h-full
     `}>
       <div className={cn("absolute -right-4 -top-4 w-16 h-16 rounded-full opacity-10 blur-xl", color)} />
       

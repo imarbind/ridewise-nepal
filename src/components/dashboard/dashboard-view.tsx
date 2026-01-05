@@ -1,11 +1,10 @@
 "use client";
 
-import { FileText, Mountain, TrendingUp, Edit } from "lucide-react";
+import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets } from "lucide-react";
 import type { Stats, Reminder } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
-import { Fuel, Wrench, CircleDollarSign } from 'lucide-react';
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { ExpenseChart, ExpenseChartData } from "./expense-chart";
@@ -108,8 +107,10 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
 
       <div className="grid grid-cols-2 gap-4 mb-8">
         <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-primary" />
-        <StatCard delay={200} label="Service" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
-        <StatCard delay={300} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
+        <StatCard delay={200} label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
+        <StatCard delay={300} label="Total Fuel Logs" value={`${stats.logsCount}`} icon={Droplets} color="bg-orange-500" />
+        <StatCard delay={400} label="Total Services" value={`${stats.serviceCount}`} icon={ListChecks} color="bg-green-600" />
+        <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" colSpan="col-span-2" />
       </div>
 
       <ExpenseChart data={expenseChartData} />
