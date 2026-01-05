@@ -105,23 +105,25 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 pt-4">
-             <FormField control={form.control} name="date" render={({ field }) => (
-                <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
+             <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="date" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
+                        <FormControl>
+                            <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FormField control={form.control} name="odo" render={({ field }) => (
+                    <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
                     <FormControl>
-                        <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
-                    </FormControl>
-                    <FormMessage />
-                </FormItem>
-              )} />
-            <FormField control={form.control} name="odo" render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
-                  </FormControl><FormMessage />
-                </FormItem>
-              )} />
+                        <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                    </FormControl><FormMessage />
+                    </FormItem>
+                )} />
+             </div>
             
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 relative overflow-hidden">
               <div className="absolute -bottom-8 -right-8 text-primary/10">
