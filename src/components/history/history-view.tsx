@@ -41,7 +41,18 @@ export function HistoryView({
         Vehicle Timeline
       </h2>
       <div className="relative">
-         {combinedHistory.length > 1 && <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200"></div>}
+         {combinedHistory.length > 1 && 
+          <div className="absolute left-3 top-4 bottom-4 w-6 rounded-full bg-slate-700 shadow-inner overflow-hidden">
+            <div 
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 10px, #94a3b8 10px, #94a3b8 20px)',
+                backgroundSize: '2px 30px',
+                backgroundPosition: 'center',
+              }}
+            />
+          </div>
+         }
 
         {combinedHistory.length === 0 && (
           <div className="text-center text-slate-500 text-xs py-10 bg-slate-50/50 rounded-2xl border border-slate-200 border-dashed">No history records yet.</div>
@@ -50,14 +61,14 @@ export function HistoryView({
         <div className="space-y-6">
           {combinedHistory.map((item, idx) => (
             <div key={`${item.type}-${item.data.id}`} style={{ animationDelay: `${idx * 50}ms` }} className="group relative flex items-start gap-4 animate-in slide-in-from-bottom-4 fill-mode-backwards">
-              <div className="relative z-10">
+              <div className="relative z-10 flex flex-col items-center">
                 <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-white shadow-md",
+                    "w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-slate-50",
                     item.type === 'fuel' ? 'bg-primary' : 'bg-blue-600'
                 )}>
-                  {item.type === 'fuel' ? <Fuel size={14} /> : <Wrench size={14} />}
+                  {item.type === 'fuel' ? <Fuel size={20} /> : <Wrench size={20} />}
                 </div>
-                <p className="text-[9px] font-black text-slate-500 text-center mt-1">{item.odo.toLocaleString()}<br/>KM</p>
+                <p className="text-[9px] font-black text-slate-100 text-center mt-1.5 bg-slate-600 px-1.5 py-0.5 rounded">{item.odo.toLocaleString()} KM</p>
               </div>
 
               <div className="flex-1 pt-0.5">
