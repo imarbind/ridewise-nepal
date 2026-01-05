@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useMemo } from 'react';
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
@@ -32,7 +33,7 @@ const chartConfig = {
   },
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = React.memo(({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background p-3 border border-slate-200 rounded-2xl shadow-lg">
@@ -43,10 +44,11 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       );
     }
     return null;
-};
+});
+CustomTooltip.displayName = 'CustomTooltip';
 
-const CustomLegend = (props: any) => {
-    const { payload } = props;
+
+const CustomLegend = React.memo(({ payload }: any) => {
     return (
         <div className="flex gap-4 justify-center mt-4">
         {payload?.map((entry: any, index: number) => (
@@ -57,9 +59,42 @@ const CustomLegend = (props: any) => {
         ))}
     </div>
     );
-}
+});
+CustomLegend.displayName = 'CustomLegend';
+
 
 export function ExpenseChart({ data }: ExpenseChartProps) {
+  const chartContent = useMemo(() => {
+    return (
+      <>
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
+        <XAxis 
+            dataKey="month" 
+            tickLine={false}
+            axisLine={false}
+            tickMargin={10}
+            fontSize={10}
+            className="text-muted-foreground"
+        />
+        <YAxis
+            tickLine={false}
+            axisLine={false}
+            tickMargin={10}
+            fontSize={10}
+            tickFormatter={(value) => `रू${Number(value) / 1000}k`}
+            className="text-muted-foreground"
+        />
+        <Tooltip
+            cursor={{fill: 'hsl(var(--muted))'}}
+            content={CustomTooltip}
+        />
+        <Legend content={CustomLegend} />
+        <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
+        <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
+      </>
+    );
+  }, [data]);
+
   return (
     <Card className="border-slate-200 shadow-xl rounded-[2rem] bg-card/80 backdrop-blur-md mb-8 animate-in fade-in slide-in-from-bottom-4">
       <CardHeader>
@@ -72,30 +107,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
         <div className="w-full h-[250px]">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
-                    <XAxis 
-                        dataKey="month" 
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        fontSize={10}
-                        className="text-muted-foreground"
-                    />
-                    <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        fontSize={10}
-                        tickFormatter={(value) => `रू${Number(value) / 1000}k`}
-                        className="text-muted-foreground"
-                    />
-                    <Tooltip
-                        cursor={{fill: 'hsl(var(--muted))'}}
-                        content={CustomTooltip}
-                    />
-                    <Legend content={CustomLegend} />
-                    <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
+                  {chartContent}
                 </BarChart>
             </ResponsiveContainer>
         </div>
