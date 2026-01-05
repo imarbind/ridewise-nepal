@@ -1,9 +1,15 @@
 export type ActiveTab = 'dashboard' | 'fuel' | 'service' | 'trip' | 'history' | 'docs';
 export type ModalType = 'fuel' | 'service' | null;
 
+export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
+
 export interface BikeDetails {
   name: string;
   number: string;
+  make: string;
+  model: string;
+  year: string;
+  engineCc: EngineCc;
 }
 
 export interface FuelLog {
@@ -54,8 +60,6 @@ export interface Doc {
     type: string;
     // Add other doc properties like image URL, expiry date etc.
 }
-
-export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
 
 export type ConditionRating = 'Mint Condition' | 'Solid Rider' | 'Fair Runner' | 'Worn Beater' | 'Basket Case' | 'Not Enough Data';
 

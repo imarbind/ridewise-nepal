@@ -18,11 +18,9 @@ interface DashboardViewProps {
   bikeDetails: BikeDetails;
   setBikeDetails: (details: BikeDetails) => void;
   expenseChartData: ExpenseChartData[];
-  engineCc: EngineCc;
-  setEngineCc: (cc: EngineCc) => void;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData, engineCc, setEngineCc }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData }: DashboardViewProps) {
   const [isEditingBike, setIsEditingBike] = useState(false);
   const [editableBikeDetails, setEditableBikeDetails] = useState(bikeDetails);
 
@@ -52,8 +50,22 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
        <div className="mb-8 p-4 bg-card/50 rounded-2xl border border-slate-100 backdrop-blur-sm">
         {isEditingBike ? (
           <div className="space-y-3">
-            <Input 
-              placeholder="Bike Name (e.g. Pulsar 220F)"
+             <div className="grid grid-cols-2 gap-3">
+              <Input 
+                placeholder="Make (e.g. Bajaj)"
+                value={editableBikeDetails.make} 
+                onChange={(e) => setEditableBikeDetails(prev => ({...prev, make: e.target.value}))} 
+                className="bg-slate-50 font-medium"
+              />
+              <Input 
+                placeholder="Model (e.g. Pulsar 220F)"
+                value={editableBikeDetails.model} 
+                onChange={(e) => setEditableBikeDetails(prev => ({...prev, model: e.target.value}))} 
+                className="bg-slate-50 font-medium"
+              />
+             </div>
+             <Input 
+              placeholder="Bike Nickname"
               value={editableBikeDetails.name} 
               onChange={(e) => setEditableBikeDetails(prev => ({...prev, name: e.target.value}))} 
               className="bg-slate-50 font-bold"
@@ -64,6 +76,23 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
               onChange={(e) => setEditableBikeDetails(prev => ({...prev, number: e.target.value}))} 
               className="bg-slate-50 font-medium"
             />
+            <div className="grid grid-cols-2 gap-3">
+               <Input 
+                placeholder="Year"
+                type="number"
+                value={editableBikeDetails.year} 
+                onChange={(e) => setEditableBikeDetails(prev => ({...prev, year: e.target.value}))} 
+                className="bg-slate-50 font-medium"
+              />
+              <Select value={editableBikeDetails.engineCc} onValueChange={(value: EngineCc) => setEditableBikeDetails(prev => ({...prev, engineCc: value}))}>
+                <SelectTrigger className="w-full bg-slate-50 h-auto text-sm font-bold border-slate-200 rounded-lg">
+                  <SelectValue placeholder="Engine CC" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ccOptions.map(cc => <SelectItem key={cc} value={cc} className="text-sm">{cc} cc</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
             <Button onClick={handleBikeDetailsSave} size="sm" className="w-full">Save Details</Button>
           </div>
         ) : (
@@ -77,23 +106,6 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
             </Button>
           </div>
         )}
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-200">
-           <Select value={engineCc} onValueChange={(value: EngineCc) => setEngineCc(value)}>
-            <SelectTrigger className="w-[150px] bg-card h-8 text-xs font-bold border-slate-200 rounded-lg">
-              <SelectValue placeholder="Engine CC" />
-            </SelectTrigger>
-            <SelectContent>
-              {ccOptions.map(cc => <SelectItem key={cc} value={cc} className="text-xs">{cc} cc</SelectItem>)}
-            </SelectContent>
-          </Select>
-           <div className="group relative flex items-center">
-             <Info size={14} className="text-slate-400"/>
-             <div className="absolute bottom-full mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Select your engine size for accurate condition rating.
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-800"></div>
-             </div>
-           </div>
-        </div>
       </div>
 
       <div className="group relative mb-8 [perspective:1000px]">

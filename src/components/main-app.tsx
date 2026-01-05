@@ -31,10 +31,16 @@ export function MainApp() {
   const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, []);
   const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, []);
   const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, []);
-  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, { name: "My Bike", number: "BA 01-001 PA" });
-  const [engineCc, setEngineCc] = useLocalStorage<EngineCc>(`${APP_ID}_engineCc`, '126-250');
+  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, { 
+    name: "My Bike", 
+    number: "BA 01-001 PA",
+    make: "",
+    model: "",
+    year: "",
+    engineCc: "126-250",
+  });
 
-  const stats = useMemo(() => calculateStats(logs, services, engineCc), [logs, services, engineCc]);
+  const stats = useMemo(() => calculateStats(logs, services, bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
   const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
   const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
 
@@ -178,7 +184,7 @@ export function MainApp() {
   const renderActiveTab = () => {
     switch(activeTab) {
         case 'dashboard':
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} />;
         case 'fuel':
             return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
         case 'service':
@@ -207,7 +213,7 @@ export function MainApp() {
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} engineCc={engineCc} setEngineCc={setEngineCc} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} />;
     }
   }
 
