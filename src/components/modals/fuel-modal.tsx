@@ -146,7 +146,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                       )} />
                     <FormField control={form.control} name="price" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price/Liter</FormLabel>
+                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Rate/Liter</FormLabel>
                         <FormControl>
                             <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl><FormMessage />

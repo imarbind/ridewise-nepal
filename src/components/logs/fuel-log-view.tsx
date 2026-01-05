@@ -58,16 +58,16 @@ export function FuelLogView({ logs, onDelete, onEdit }: FuelLogViewProps) {
                                 </div>
                                 <div className="mt-3 grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 text-center">
                                     <div>
-                                        <p className="text-[10px] text-slate-500 font-bold uppercase">Cost</p>
-                                        <p className="font-black text-slate-800 text-sm">रू {log.amount.toLocaleString()}</p>
-                                    </div>
-                                    <div>
                                         <p className="text-[10px] text-slate-500 font-bold uppercase">Liters</p>
                                         <p className="font-black text-slate-800 text-sm">{log.liters.toFixed(2)}L</p>
                                     </div>
                                     <div>
                                         <p className="text-[10px] text-slate-500 font-bold uppercase">Rate</p>
                                         <p className="font-black text-slate-800 text-sm">@{log.price.toFixed(2)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase">Cost</p>
+                                        <p className="font-black text-slate-800 text-sm">रू {log.amount.toLocaleString()}</p>
                                     </div>
                                 </div>
                             </div>
