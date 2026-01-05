@@ -114,24 +114,24 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
               </div>
             )}
 
-            <div className="flex justify-end items-start">
-              <div className="space-y-2 text-right">
+            <div className="grid grid-cols-2 items-end">
                 <div>
-                  <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
-                  <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
+                    <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Total Distance</p>
+                    <h2 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">
+                        {stats.lastOdo.toLocaleString()}
+                        <span className="text-lg font-bold ml-2 opacity-50">KM</span>
+                    </h2>
                 </div>
-                 <div>
-                  <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Daily Average</p>
-                  <p className="text-xl font-black text-white">{stats.dailyAvg} <span className="text-xs font-normal opacity-70">km/day</span></p>
+                <div className="space-y-2 text-right">
+                    <div>
+                        <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
+                        <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Daily Average</p>
+                        <p className="text-xl font-black text-white">{stats.dailyAvg} <span className="text-xs font-normal opacity-70">km/day</span></p>
+                    </div>
                 </div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">Total Distance</p>
-              <h2 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">
-                {stats.lastOdo.toLocaleString()}
-                <span className="text-lg font-bold ml-2 opacity-50">KM</span>
-              </h2>
             </div>
           </div>
         </div>
