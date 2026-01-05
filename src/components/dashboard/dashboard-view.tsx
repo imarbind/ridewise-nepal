@@ -1,3 +1,4 @@
+
 "use client";
 
 import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info, CalendarDays } from "lucide-react";
@@ -113,10 +114,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
               </div>
             )}
 
-            <div className="flex justify-between items-start">
-              <div className="bg-black/20 backdrop-blur-md p-2 rounded-xl border border-white/10 inline-block mb-2">
-                <Mountain size={20} className="text-white/90" />
-              </div>
+            <div className="flex justify-end items-start">
               <div className="space-y-2 text-right">
                 <div>
                   <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
