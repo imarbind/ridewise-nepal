@@ -10,7 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { cn } from "@/lib/utils"
 
 export type ExpenseChartData = {
   month: string;
@@ -31,10 +30,34 @@ const chartConfig = {
     label: "Service",
     color: "hsl(346 100% 41%)",
   },
-} satisfies {
-    [key: string]: { label: string; color: string }
+}
+
+const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-background p-3 border border-slate-200 rounded-2xl shadow-lg">
+          <p className="font-bold text-sm text-slate-800">{label}</p>
+          <p className="text-xs text-green-600">Fuel: रू {payload[0].value.toLocaleString()}</p>
+          <p className="text-xs text-primary">Service: रू {payload[1].value.toLocaleString()}</p>
+        </div>
+      );
+    }
+    return null;
 };
 
+const CustomLegend = (props: any) => {
+    const { payload } = props;
+    return (
+        <div className="flex gap-4 justify-center mt-4">
+        {payload?.map((entry: any, index: number) => (
+        <div key={`item-${index}`} className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="text-xs font-medium text-slate-600">{entry.value}</span>
+        </div>
+        ))}
+    </div>
+    );
+}
 
 export function ExpenseChart({ data }: ExpenseChartProps) {
   return (
@@ -68,22 +91,9 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                     />
                     <Tooltip
                         cursor={{fill: 'hsl(var(--muted))'}}
-                        contentStyle={{
-                            backgroundColor: 'hsl(var(--background))',
-                            borderRadius: 'var(--radius)',
-                            border: '1px solid hsl(var(--border))',
-                        }}
+                        content={<CustomTooltip />}
                     />
-                    <Legend content={({ payload }) => (
-                         <div className="flex gap-4 justify-center mt-4">
-                            {payload?.map((entry, index) => (
-                            <div key={`item-${index}`} className="flex items-center gap-1.5">
-                                <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                                <span className="text-xs font-medium text-slate-600">{entry.value}</span>
-                            </div>
-                            ))}
-                        </div>
-                    )} />
+                    <Legend content={<CustomLegend />} />
                     <Bar dataKey="fuel" fill={chartConfig.fuel.color} radius={[4, 4, 0, 0]} />
                     <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
                 </BarChart>
