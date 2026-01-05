@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Wrench } from 'lucide-react';
+import { Fuel, Wrench } from 'lucide-react';
 import type { ModalType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
@@ -25,7 +25,7 @@ export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProp
                 className="group relative bg-primary hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all hover:-translate-y-1"
             >
                 <div className="absolute inset-0 bg-white rounded-full opacity-0 group-hover:opacity-20 transition-opacity animate-ping-slow-once"></div>
-                <Plus size={24}/>
+                <Fuel size={24}/>
             </Button>
       </div>
     );

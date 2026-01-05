@@ -15,6 +15,7 @@ import { DocsView } from '@/components/docs/docs-view';
 import { FuelModal } from '@/components/modals/fuel-modal';
 import { ServiceModal } from '@/components/modals/service-modal';
 import { HistoryView } from './history/history-view';
+import { FuelLogView } from './logs/fuel-log-view';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -177,6 +178,19 @@ export function MainApp() {
     switch(activeTab) {
         case 'dashboard':
             return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} expenseChartData={expenseChartData} />;
+        case 'fuel':
+            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
+        case 'service':
+            return <ServiceLogView logs={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
+        case 'history':
+            return <HistoryView 
+                        fuelLogs={logs} 
+                        serviceLogs={services} 
+                        onEditFuel={handleEditFuel}
+                        onDeleteFuel={handleDeleteFuel}
+                        onEditService={handleEditService}
+                        onDeleteService={handleDeleteService}
+                    />;
         case 'trip':
             return <TripView 
               trips={trips} 
@@ -189,17 +203,6 @@ export function MainApp() {
               onUpdateExpense={updateTripExpense}
               onDeleteExpense={deleteTripExpense}
             />;
-        case 'service':
-            return <ServiceLogView logs={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
-        case 'history':
-            return <HistoryView 
-                        fuelLogs={logs} 
-                        serviceLogs={services} 
-                        onEditFuel={handleEditFuel}
-                        onDeleteFuel={handleDeleteFuel}
-                        onEditService={handleEditService}
-                        onDeleteService={handleDeleteService}
-                    />;
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
@@ -237,5 +240,3 @@ export function MainApp() {
     </>
   );
 };
-
-    

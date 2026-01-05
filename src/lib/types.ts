@@ -1,4 +1,4 @@
-export type ActiveTab = 'dashboard' | 'service' | 'trip' | 'history' | 'docs';
+export type ActiveTab = 'dashboard' | 'fuel' | 'service' | 'trip' | 'history' | 'docs';
 export type ModalType = 'fuel' | 'service' | null;
 
 export interface FuelLog {
