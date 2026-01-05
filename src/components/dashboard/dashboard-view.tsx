@@ -5,9 +5,10 @@ import type { Stats, Reminder } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
-import { Fuel, Wrench, History, CircleDollarSign, Coins } from 'lucide-react';
+import { Fuel, Wrench, CircleDollarSign } from 'lucide-react';
 import { useState } from "react";
 import { Input } from "../ui/input";
+import { ExpenseChart, ExpenseChartData } from "./expense-chart";
 
 interface DashboardViewProps {
   stats: Stats;
@@ -15,9 +16,10 @@ interface DashboardViewProps {
   onNavigateDocs: () => void;
   bikeName: string;
   setBikeName: (name: string) => void;
+  expenseChartData: ExpenseChartData[];
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName, expenseChartData }: DashboardViewProps) {
   const [isEditingBikeName, setIsEditingBikeName] = useState(false);
   const [editableBikeName, setEditableBikeName] = useState(bikeName);
 
@@ -109,6 +111,8 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
         <StatCard delay={200} label="Service" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
         <StatCard delay={300} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
       </div>
+
+      <ExpenseChart data={expenseChartData} />
 
       <MaintenanceStatus activeReminders={activeReminders} />
     </div>

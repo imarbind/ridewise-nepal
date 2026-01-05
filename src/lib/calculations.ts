@@ -1,4 +1,5 @@
 import type { FuelLog, ServiceRecord, Stats, Reminder } from './types';
+import { ExpenseChartData } from '@/components/dashboard/expense-chart';
 
 export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stats {
   const sortedLogs = [...logs].sort((a, b) => b.odo - a.odo);
@@ -113,4 +114,46 @@ export function getActiveReminders(services: ServiceRecord[], lastOdo: number): 
       });
     });
     return reminders;
+}
+
+
+export function getExpenseChartData(logs: FuelLog[], services: ServiceRecord[]): ExpenseChartData[] {
+  const expenses: { [key: string]: { fuel: number; service: number } } = {};
+  const today = new Date();
+  const last12Months: string[] = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const month = d.toLocaleString('default', { month: 'short' });
+    const year = d.getFullYear();
+    const key = `${month} '${String(year).slice(-2)}`;
+    last12Months.push(key);
+    expenses[key] = { fuel: 0, service: 0 };
+  }
+
+  logs.forEach(log => {
+    const date = new Date(log.date);
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    const key = `${month} '${String(year).slice(-2)}`;
+    if (expenses[key]) {
+      expenses[key].fuel += parseFloat(String(log.amount)) || 0;
+    }
+  });
+
+  services.forEach(service => {
+    const date = new Date(service.date);
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.getFullYear();
+    const key = `${month} '${String(year).slice(-2)}`;
+    if (expenses[key]) {
+      expenses[key].service += parseFloat(String(service.totalCost)) || 0;
+    }
+  });
+
+  return last12Months.map(month => ({
+    month,
+    fuel: expenses[month].fuel,
+    service: expenses[month].service,
+  }));
 }

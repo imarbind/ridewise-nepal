@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { calculateStats, getActiveReminders } from '@/lib/calculations';
+import { calculateStats, getActiveReminders, getExpenseChartData } from '@/lib/calculations';
 import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense } from '@/lib/types';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
@@ -34,6 +34,7 @@ export function MainApp() {
 
   const stats = useMemo(() => calculateStats(logs, services), [logs, services]);
   const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
+  const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
 
   const addExpenseToActiveTrip = (title: string, cost: number) => {
     const activeTrip = trips.find(t => t.status === 'active');
@@ -175,7 +176,7 @@ export function MainApp() {
   const renderActiveTab = () => {
     switch(activeTab) {
         case 'dashboard':
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} expenseChartData={expenseChartData} />;
         case 'trip':
             return <TripView 
               trips={trips} 
@@ -195,7 +196,7 @@ export function MainApp() {
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} expenseChartData={expenseChartData} />;
     }
   }
 
