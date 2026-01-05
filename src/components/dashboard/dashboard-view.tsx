@@ -131,12 +131,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
                 <span className="text-lg font-bold ml-2 opacity-50">KM</span>
               </h2>
             </div>
-            <div className="mt-6 grid grid-cols-3 gap-3">
-              <div className="bg-black/20 backdrop-blur-sm rounded-xl p-3 border border-white/10 flex flex-col items-center justify-center text-center">
-                <div className={`w-2 h-2 rounded-full mb-1.5 ${stats.efficiencyStatus === 'Excellent' ? 'bg-green-400' : 'bg-yellow-400'}`}></div>
-                <span className="text-xs font-bold text-white/90 leading-tight">{stats.efficiencyStatus}</span>
-                <span className="text-[9px] text-white/60">Condition</span>
-              </div>
+            <div className="mt-6 grid grid-cols-2 gap-3">
                <div className="bg-black/20 backdrop-blur-sm rounded-xl p-3 border border-white/10 flex flex-col items-center justify-center text-center">
                  <span className="text-xs font-bold text-white/90">{stats.dailyAvg}</span>
                 <span className="text-[9px] text-white/60">km/day</span>
