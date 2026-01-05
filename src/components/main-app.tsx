@@ -18,10 +18,11 @@ import { HistoryView } from './history/history-view';
 import { FuelLogView } from './logs/fuel-log-view';
 import { RiderBoardView } from './rider-board/rider-board-view';
 import { useFirebase } from '@/firebase';
-import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useCollection, useDoc } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
+import { OnboardingView } from './onboarding/onboarding-view';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -45,13 +46,13 @@ export function MainApp() {
   const { firestore, user } = useFirebase();
 
   const userRef = useMemoFirebase(() => user ? doc(firestore, 'users', user.uid) : null, [firestore, user]);
-  const { data: bikeDetailsDoc } = useDoc<BikeDetails>(userRef);
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<{bikeDetails?: BikeDetails}>(userRef);
 
-  const bikeDetails = bikeDetailsDoc || defaultBikeDetails;
+  const bikeDetails = userProfile?.bikeDetails || null;
 
   const setBikeDetails = (details: BikeDetails) => {
     if (userRef) {
-      setDocumentNonBlocking(userRef, { bikeDetails: details }, { merge: true });
+      updateDocumentNonBlocking(userRef, { bikeDetails: details });
     }
   };
   
@@ -64,7 +65,7 @@ export function MainApp() {
   const tripsCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'trips') : null, [firestore, user]);
   const { data: trips, isLoading: tripsLoading } = useCollection<Trip>(tripsCollectionRef);
 
-  const stats = useMemo(() => calculateStats(logs || [], services || [], bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
+  const stats = useMemo(() => calculateStats(logs || [], services || [], bikeDetails?.engineCc || '126-250'), [logs, services, bikeDetails]);
   const activeReminders = useMemo(() => getActiveReminders(services || [], stats.lastOdo), [services, stats.lastOdo]);
   const expenseChartData = useMemo(() => getExpenseChartData(logs || [], services || []), [logs, services]);
   
@@ -180,10 +181,10 @@ export function MainApp() {
         
         // Update rider board
         const riderBoardRef = doc(firestore, 'rider_board', user.uid);
-        onSnapshot(riderBoardRef, (docSnap) => {
+        getDoc(riderBoardRef).then(docSnap => {
           const currentData = docSnap.data() || { totalKilometers: 0 };
           const newTotal = currentData.totalKilometers + parseFloat(trip.distance);
-          setDocumentNonBlocking(riderBoardRef, { userId: user.uid, totalKilometers: newTotal }, { merge: true });
+          setDocumentNonBlocking(riderBoardRef, { userId: user.uid, totalKilometers: newTotal, userName: user.displayName }, { merge: true });
         });
       }
     }
@@ -230,6 +231,34 @@ export function MainApp() {
 
   const openModal = (type: NonNullable<ModalType>) => {
     setModalType(type);
+  }
+
+  const handleOnboardingSubmit = (details: BikeDetails, initialOdo: number) => {
+    if (userRef) {
+      updateDocumentNonBlocking(userRef, { bikeDetails: details });
+    }
+    if (logsCollectionRef && initialOdo > 0) {
+      const initialLog: Omit<FuelLog, 'id'> = {
+        date: new Date().toISOString(),
+        odo: initialOdo,
+        liters: 0,
+        amount: 0,
+        price: 0,
+      };
+      addDocumentNonBlocking(logsCollectionRef, initialLog);
+    }
+  };
+
+  if (isProfileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading your garage...</p>
+      </div>
+    );
+  }
+
+  if (!bikeDetails) {
+    return <OnboardingView onSubmit={handleOnboardingSubmit} />;
   }
 
   const renderActiveTab = () => {

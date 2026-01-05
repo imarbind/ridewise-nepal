@@ -6,9 +6,11 @@ import { collection, query, orderBy, limit } from 'firebase/firestore';
 import type { RiderBoardEntry } from '@/lib/types';
 import { Trophy, Award } from 'lucide-react';
 import { useMemoFirebase } from '@/firebase/provider';
+import { useUser } from '@/firebase';
 
 export function RiderBoardView() {
   const { firestore } = useFirebase();
+  const { user } = useUser();
 
   const riderBoardCollection = useMemoFirebase(() => collection(firestore, 'rider_board'), [firestore]);
   const riderBoardQuery = useMemoFirebase(() => query(riderBoardCollection, orderBy('totalKilometers', 'desc'), limit(50)), [riderBoardCollection]);
@@ -39,7 +41,7 @@ export function RiderBoardView() {
         {(riderBoard || []).map((entry, index) => (
           <div
             key={entry.id}
-            className="bg-card border-l-4 border-yellow-400 p-4 rounded-r-2xl shadow-md flex items-center justify-between"
+            className={`bg-card border-l-4 p-4 rounded-r-2xl shadow-md flex items-center justify-between ${user?.uid === entry.userId ? 'border-blue-500 bg-blue-50' : 'border-yellow-400'}`}
             style={{ animationDelay: `${index * 50}ms` }}
           >
             <div className="flex items-center gap-4">
@@ -47,7 +49,7 @@ export function RiderBoardView() {
                 {index + 1}
               </span>
               <div>
-                <p className="font-bold text-slate-800">{entry.userName || 'Anonymous Rider'}</p>
+                <p className="font-bold text-slate-800">{entry.userName || 'Anonymous Rider'}{user?.uid === entry.userId ? ' (You)' : ''}</p>
                 <p className="text-xs text-slate-500">{entry.totalKilometers.toLocaleString()} km traveled</p>
               </div>
             </div>
