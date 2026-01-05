@@ -35,8 +35,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     resolver: zodResolver(fuelSchema),
   });
   
-  const { watch, setValue, reset } = form;
-  const [amount, liters, price] = watch(['amount', 'liters', 'price']);
+  const { watch, setValue, reset, getValues } = form;
 
   useEffect(() => {
     if (isOpen) {
@@ -54,10 +53,12 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     }
   }, [isOpen, editingFuel, lastOdo, lastPrice, reset]);
 
-  const handleValueChange = (changedField: 'amount' | 'liters' | 'price') => {
-      const numericAmount = parseFloat(String(amount));
-      const numericLiters = parseFloat(String(liters));
-      const numericPrice = parseFloat(String(price));
+  const handleValueChange = (changedValue: string, changedField: 'amount' | 'liters' | 'price') => {
+      const [amount, liters, price] = getValues(['amount', 'liters', 'price']);
+      
+      const numericAmount = parseFloat(String(changedField === 'amount' ? changedValue : amount));
+      const numericLiters = parseFloat(String(changedField === 'liters' ? changedValue : liters));
+      const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
 
       if (changedField === 'amount') {
         if (!isNaN(numericAmount) && numericAmount > 0) {
@@ -139,7 +140,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Liters</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
@@ -147,7 +148,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price/Liter</FormLabel>
                         <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl><FormMessage />
                         </FormItem>
                     )} />
@@ -156,7 +157,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
                         <FormControl>
-                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
+                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl><FormMessage />
                     </FormItem>
                     )} />
