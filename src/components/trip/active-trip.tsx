@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MapPin, Wallet } from 'lucide-react';
+import { MapPin, Trash2, Wallet } from 'lucide-react';
 import type { Trip } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ export function ActiveTrip({ trip, onEndTrip, onAddExpense }: ActiveTripProps) {
 
   const handleAddExpense = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!expenseItem || !expenseCost) return;
     onAddExpense(trip.id, expenseItem, expenseCost);
     setExpenseItem('');
     setExpenseCost('');

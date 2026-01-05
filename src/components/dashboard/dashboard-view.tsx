@@ -58,6 +58,9 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs }: Dashbo
                 <div className={`w-2 h-2 rounded-full ${stats.efficiencyStatus === 'Excellent' ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`}></div>
                 <span className="text-xs font-bold text-white/90">{stats.efficiencyStatus} Condition</span>
               </div>
+               <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
+                <span className="text-xs font-bold text-white/90">{stats.dailyAvg} km/day</span>
+              </div>
             </div>
           </div>
         </div>

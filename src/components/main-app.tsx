@@ -93,7 +93,7 @@ export function MainApp() {
 
       <MainNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeTab !== 'docs' && activeTab !== 'trip' && (
+      {activeTab !== 'docs' && (
         <FloatingActionButtons onOpenModal={openModal} />
       )}
       

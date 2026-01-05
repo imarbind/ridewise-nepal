@@ -33,6 +33,12 @@ export function TripView({ trips, setTrips, stats, services }: TripViewProps) {
     }
   };
 
+  const deleteTrip = (id: number) => {
+    if (confirm("Are you sure you want to delete this trip? This action cannot be undone.")) {
+      setTrips(prev => prev.filter(t => t.id !== id));
+    }
+  };
+
   const addTripExpense = (tripId: number, item: string, cost: string) => {
     if (!item || !cost) return;
     const updatedTrips = trips.map((t) => {
@@ -62,9 +68,9 @@ export function TripView({ trips, setTrips, stats, services }: TripViewProps) {
             stats={stats}
             services={services}
           />
-          <PastTrips trips={pastTrips} />
         </>
       )}
+      <PastTrips trips={pastTrips} onDeleteTrip={deleteTrip} />
     </div>
   );
 }
