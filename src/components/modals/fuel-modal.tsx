@@ -60,29 +60,22 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
       const numericLiters = parseFloat(String(changedField === 'liters' ? changedValue : liters));
       const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
 
-      if (changedField === 'amount') {
-        if (!isNaN(numericAmount) && numericAmount > 0) {
-            if (!isNaN(numericLiters) && numericLiters > 0) {
-                setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
-            } else if (!isNaN(numericPrice) && numericPrice > 0) {
-                setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
-            }
-        }
-      } else if (changedField === 'liters') {
-          if (!isNaN(numericLiters) && numericLiters > 0) {
-              if (!isNaN(numericAmount) && numericAmount > 0) {
-                  setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
-              } else if (!isNaN(numericPrice) && numericPrice > 0) {
-                  setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
-              }
-          }
-      } else if (changedField === 'price') {
+      if (changedField === 'price') {
+        // When price changes, if liters or amount is present, recalculate amount
         if (!isNaN(numericPrice) && numericPrice > 0) {
             if (!isNaN(numericLiters) && numericLiters > 0) {
                 setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
-            } else if (!isNaN(numericAmount) && numericAmount > 0) {
-                setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
             }
+        }
+      } else if (changedField === 'liters') {
+          // When liters change, if price is present, recalculate amount
+          if (!isNaN(numericLiters) && numericLiters > 0 && !isNaN(numericPrice) && numericPrice > 0) {
+            setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
+          }
+      } else if (changedField === 'amount') {
+        // When amount changes, if price is present, recalculate liters
+        if (!isNaN(numericAmount) && numericAmount > 0 && !isNaN(numericPrice) && numericPrice > 0) {
+          setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
         }
       }
   };
@@ -132,9 +125,17 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
               </div>
               <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-green-600 rounded-full"></div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations (fill any 2)</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations</p>
               </div>
               <div className="space-y-3 relative z-10">
+                <FormField control={form.control} name="price" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Rate/Liter</FormLabel>
+                    <FormControl>
+                        <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
+                    </FormControl><FormMessage />
+                    </FormItem>
+                )} />
                 <div className="grid grid-cols-2 gap-4">
                     <FormField control={form.control} name="liters" render={({ field }) => (
                         <FormItem>
@@ -144,23 +145,15 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
-                    <FormField control={form.control} name="price" render={({ field }) => (
+                     <FormField control={form.control} name="amount" render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Rate/Liter</FormLabel>
-                        <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                        </FormControl><FormMessage />
+                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
+                            <FormControl>
+                            <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
+                            </FormControl><FormMessage />
                         </FormItem>
-                    )} />
+                        )} />
                 </div>
-                <FormField control={form.control} name="amount" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
-                        <FormControl>
-                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
-                        </FormControl><FormMessage />
-                    </FormItem>
-                    )} />
               </div>
             </div>
 
