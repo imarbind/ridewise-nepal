@@ -54,14 +54,15 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModa
     },
   });
 
+  const { control, reset } = form;
   const { fields, append, remove } = useFieldArray({
-    control: form.control,
+    control: control,
     name: "parts",
   });
   
   useEffect(() => {
     if (isOpen) {
-      form.reset({
+      reset({
         date: new Date().toISOString().split('T')[0],
         work: '',
         labor: 0,
@@ -69,7 +70,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModa
         parts: [{ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' }],
       });
     }
-  }, [isOpen, form, lastOdo]);
+  }, [isOpen, lastOdo, reset]);
 
   const onFormSubmit = (data: z.infer<typeof serviceSchema>) => {
     const partsTotal = data.parts.reduce((sum, p) => sum + p.cost, 0);

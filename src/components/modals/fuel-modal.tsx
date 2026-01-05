@@ -39,18 +39,20 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: Fue
     },
   });
   
-  const { watch, setValue } = form;
+  const { watch, setValue, reset } = form;
   const [price, liters, amount] = watch(['price', 'liters', 'amount']);
 
   useEffect(() => {
-    form.reset({
-      date: new Date().toISOString().split('T')[0],
-      odo: lastOdo > 0 ? lastOdo : undefined,
-      price: lastPrice,
-      liters: undefined,
-      amount: undefined,
-    });
-  }, [isOpen, lastPrice, lastOdo, form]);
+    if (isOpen) {
+      reset({
+        date: new Date().toISOString().split('T')[0],
+        odo: lastOdo > 0 ? lastOdo : undefined,
+        price: lastPrice,
+        liters: undefined,
+        amount: undefined,
+      });
+    }
+  }, [isOpen, lastPrice, lastOdo, reset]);
 
   const handleValueChange = (changedField: 'price' | 'liters' | 'amount', value: number) => {
     if (isNaN(value) || value <= 0) return;
