@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { Wrench, X, Plus } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { ServiceRecord } from '@/lib/types';
@@ -94,17 +94,29 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 pt-4">
             <div className="grid grid-cols-2 gap-4">
                 <FormField control={form.control} name="date" render={({ field }) => (
-                    <FormItem><FormControl><Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage /></FormItem>
+                    <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
+                        <FormControl><Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )} />
                 <FormField control={form.control} name="odo" render={({ field }) => (
-                    <FormItem><FormControl><Input type="number" placeholder="Odo (KM)" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage /></FormItem>
+                    <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
+                        <FormControl><Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                        <FormMessage />
+                    </FormItem>
                 )} />
             </div>
             <FormField control={form.control} name="work" render={({ field }) => (
-                <FormItem><FormControl><Input placeholder="Service Title (e.g. Oil Change)" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage /></FormItem>
+                <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Service Title</FormLabel>
+                    <FormControl><Input placeholder="e.g. Regular Servicing" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                    <FormMessage />
+                </FormItem>
             )} />
 
             <div className="space-y-3">
@@ -116,12 +128,18 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
                 <div key={field.id} className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-3 animate-in slide-in-from-left-4 fade-in duration-300">
                     <div className="flex gap-2">
                         <FormField control={form.control} name={`parts.${index}.name`} render={({ field }) => (
-                            <FormItem className="flex-1"><FormControl><Input placeholder="Item name" {...field} className="flex-1 bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage className="text-xs px-1" /></FormItem>
+                            <FormItem className="flex-1">
+                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Item Name</FormLabel>
+                                <FormControl><Input {...field} className="flex-1 bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage className="text-xs px-1" />
+                            </FormItem>
                         )} />
                         <FormField control={form.control} name={`parts.${index}.cost`} render={({ field }) => (
-                            <FormItem className="w-24"><FormControl><Input type="number" placeholder="Cost" {...field} className="w-full bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl></FormItem>
+                            <FormItem className="w-24">
+                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Cost</FormLabel>
+                                <FormControl><Input type="number" {...field} className="w-full bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                            </FormItem>
                         )} />
-                        {fields.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="text-red-500 hover:bg-red-50 p-2 h-auto w-auto rounded-lg transition-colors shrink-0"><X size={16}/></Button>}
+                        {fields.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="text-red-500 hover:bg-red-50 p-2 h-auto w-auto rounded-lg transition-colors shrink-0 self-end mb-1"><X size={16}/></Button>}
                     </div>
                      <div className="flex gap-2 items-start">
                         <FormField control={form.control} name={`parts.${index}.reminderType`} render={({ field }) => (
@@ -145,7 +163,11 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
 
             <div className="pt-2">
               <FormField control={form.control} name="labor" render={({ field }) => (
-                  <FormItem><FormControl><Input type="number" placeholder="Labor Charge (रू)" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500 placeholder:text-slate-400" /></FormControl><FormMessage /></FormItem>
+                  <FormItem>
+                      <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Labor Charge (optional)</FormLabel>
+                      <FormControl><Input type="number" placeholder="रू" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                      <FormMessage />
+                  </FormItem>
               )} />
             </div>
 

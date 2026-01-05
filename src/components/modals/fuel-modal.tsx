@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { Fuel } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import type { FuelLog } from '@/lib/types';
 
@@ -104,47 +104,53 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
-            <FormField control={form.control} name="date" render={({ field }) => (
+          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 pt-4">
+             <FormField control={form.control} name="date" render={({ field }) => (
                 <FormItem>
-                  <FormControl>
-                    <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
-                  </FormControl><FormMessage />
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
+                    <FormControl>
+                        <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                    </FormControl>
+                    <FormMessage />
                 </FormItem>
               )} />
             <FormField control={form.control} name="odo" render={({ field }) => (
                 <FormItem>
+                  <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="Odometer (KM)" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                    <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
                   </FormControl><FormMessage />
                 </FormItem>
               )} />
             
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
-              <div className="flex items-center gap-2 mb-2">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
+              <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-primary rounded-full"></div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations (fill any 2)</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <FormField control={form.control} name="amount" render={({ field }) => (
                     <FormItem>
+                      <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
                       <FormControl>
-                        <Input type="number" placeholder="Total Cost (रू)" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
                       </FormControl><FormMessage />
                     </FormItem>
                   )} />
                 <FormField control={form.control} name="liters" render={({ field }) => (
                     <FormItem>
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Liters</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="Liters" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                        <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
                       </FormControl><FormMessage />
                     </FormItem>
                   )} />
                 <div className="col-span-2">
                     <FormField control={form.control} name="price" render={({ field }) => (
                         <FormItem>
+                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price Per Liter (रू)</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" placeholder="Price Per Liter (रू)" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
