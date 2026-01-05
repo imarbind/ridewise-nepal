@@ -16,7 +16,7 @@ export function ServiceLogView({ logs, onDelete, onEdit }: ServiceLogViewProps) 
     
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
-            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">Service History</h2>
+            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-red-700">Service History</h2>
             <div className="space-y-3">
                 {sortedLogs.length === 0 && <p className="text-center text-slate-500 text-xs py-10">No service logs yet.</p>}
                 {sortedLogs.map((l, idx) => (
@@ -47,8 +47,8 @@ export function ServiceLogView({ logs, onDelete, onEdit }: ServiceLogViewProps) 
 
                         <div className="mt-3 bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-2">
                              <div className="flex justify-between items-center text-xs">
-                                <p className="font-bold text-blue-900">{l.work}</p>
-                                <p className="font-black text-blue-900">Total: रू {l.totalCost.toLocaleString()}</p>
+                                <p className="font-bold text-primary">{l.work}</p>
+                                <p className="font-black text-primary">Total: रू {l.totalCost.toLocaleString()}</p>
                              </div>
                             {l.parts.map((p, pIdx) => (
                                 <div key={pIdx} className="flex justify-between text-xs py-1 border-b border-slate-200 last:border-b-0">

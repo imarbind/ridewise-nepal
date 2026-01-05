@@ -16,7 +16,7 @@ export function FuelLogView({ logs, onDelete, onEdit }: FuelLogViewProps) {
 
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
-            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Fuel History</h2>
+            <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-800">Fuel History</h2>
             <div className="space-y-3">
                 {sortedLogs.length === 0 && <p className="text-center text-slate-500 text-xs py-10">No fuel logs yet.</p>}
                 {sortedLogs.map((l, idx) => (
