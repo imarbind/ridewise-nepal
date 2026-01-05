@@ -1,16 +1,24 @@
 
 "use client";
 
-import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info, CalendarDays } from "lucide-react";
+import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets } from "lucide-react";
 import type { Stats, Reminder, EngineCc, BikeDetails } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
-import { ExpenseChart, ExpenseChartData } from "./expense-chart";
+import type { ExpenseChartData } from "./expense-chart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ConditionRatingCard } from "./condition-rating-card";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "../ui/skeleton";
+
+const ExpenseChart = dynamic(() => import('./expense-chart').then(mod => mod.ExpenseChart), {
+  ssr: false,
+  loading: () => <Skeleton className="h-[320px] w-full rounded-[2rem]" />,
+});
+
 
 interface DashboardViewProps {
   stats: Stats;
