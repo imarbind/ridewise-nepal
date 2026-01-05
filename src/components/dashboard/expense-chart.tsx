@@ -10,12 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
 import { cn } from "@/lib/utils"
 
 export type ExpenseChartData = {
@@ -52,8 +46,8 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
         <CardDescription className="text-xs">Last 12 months</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <ResponsiveContainer width="100%" height={250}>
+        <div className="w-full h-[250px]">
+            <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
                     <XAxis 
@@ -72,7 +66,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                         tickFormatter={(value) => `रू${Number(value) / 1000}k`}
                         className="text-muted-foreground"
                     />
-                     <Tooltip
+                    <Tooltip
                         cursor={{fill: 'hsl(var(--muted))'}}
                         contentStyle={{
                             backgroundColor: 'hsl(var(--background))',
@@ -94,7 +88,7 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                     <Bar dataKey="service" fill={chartConfig.service.color} radius={[4, 4, 0, 0]} />
                 </BarChart>
             </ResponsiveContainer>
-        </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   )
