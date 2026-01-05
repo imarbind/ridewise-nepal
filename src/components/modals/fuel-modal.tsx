@@ -95,10 +95,10 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="rounded-[2rem] p-6 border-slate-200 max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary to-red-400"></div>
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-600 to-green-400"></div>
         <DialogHeader className="mt-2">
           <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
-            <Fuel className="text-primary"/>
+            <Fuel className="text-green-600"/>
             {editingFuel ? 'Edit Fuel Log' : 'New Fuel Log'}
           </DialogTitle>
         </DialogHeader>
@@ -110,7 +110,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
                         <FormControl>
-                            <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                            <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -119,18 +119,18 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                     <FormItem>
                     <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
                     <FormControl>
-                        <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                        <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                     </FormControl><FormMessage />
                     </FormItem>
                 )} />
              </div>
             
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 relative overflow-hidden">
-              <div className="absolute -bottom-8 -right-8 text-primary/10">
+              <div className="absolute -bottom-8 -right-8 text-green-600/10">
                 <Droplets size={100} strokeWidth={1} />
               </div>
               <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  <div className="w-1 h-4 bg-green-600 rounded-full"></div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations (fill any 2)</p>
               </div>
               <div className="space-y-3 relative z-10">
@@ -139,7 +139,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Liters</FormLabel>
                           <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
@@ -147,7 +147,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price/Liter</FormLabel>
                         <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl><FormMessage />
                         </FormItem>
                     )} />
@@ -156,14 +156,14 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
                         <FormControl>
-                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-primary transition-all" />
+                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl><FormMessage />
                     </FormItem>
                     )} />
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-red-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide">
+            <Button type="submit" className="w-full bg-gradient-to-r from-green-600 to-green-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-green-600/20 hover:shadow-green-600/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide">
               {editingFuel ? 'Update Fuel Log' : 'Add Fuel Log'}
             </Button>
           </form>

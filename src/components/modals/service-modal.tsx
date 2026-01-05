@@ -85,10 +85,10 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="rounded-[2rem] p-6 border-slate-200 max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 to-blue-400"></div>
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary to-red-400"></div>
         <DialogHeader className="mt-2">
           <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
-            <Wrench className="text-blue-500"/>
+            <Wrench className="text-primary"/>
             {editingService ? 'Edit Service' : 'New Service'}
           </DialogTitle>
         </DialogHeader>
@@ -99,14 +99,14 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
                 <FormField control={form.control} name="date" render={({ field }) => (
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
-                        <FormControl><Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                        <FormControl><Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
                 <FormField control={form.control} name="odo" render={({ field }) => (
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
-                        <FormControl><Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                        <FormControl><Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -114,7 +114,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
             <FormField control={form.control} name="work" render={({ field }) => (
                 <FormItem>
                     <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Service Title</FormLabel>
-                    <FormControl><Input placeholder="e.g. Regular Servicing" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                    <FormControl><Input placeholder="e.g. Regular Servicing" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                     <FormMessage />
                 </FormItem>
             )} />
@@ -122,7 +122,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Parts & Items</p>
-                <Button type="button" size="sm" variant="ghost" onClick={() => append({ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' })} className="text-blue-500 text-[10px] font-bold flex items-center gap-1 bg-blue-50 px-3 py-1.5 h-auto rounded-full hover:bg-blue-100 transition-colors"><Plus size={12}/> ADD ITEM</Button>
+                <Button type="button" size="sm" variant="ghost" onClick={() => append({ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' })} className="text-primary text-[10px] font-bold flex items-center gap-1 bg-red-50 px-3 py-1.5 h-auto rounded-full hover:bg-red-100 transition-colors"><Plus size={12}/> ADD ITEM</Button>
               </div>
               {fields.map((field, index) => (
                 <div key={field.id} className="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-3 animate-in slide-in-from-left-4 fade-in duration-300">
@@ -130,13 +130,13 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
                         <FormField control={form.control} name={`parts.${index}.name`} render={({ field }) => (
                             <FormItem className="flex-1">
                                 <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Item Name</FormLabel>
-                                <FormControl><Input {...field} className="flex-1 bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl><FormMessage className="text-xs px-1" />
+                                <FormControl><Input {...field} className="flex-1 bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-primary" /></FormControl><FormMessage className="text-xs px-1" />
                             </FormItem>
                         )} />
                         <FormField control={form.control} name={`parts.${index}.cost`} render={({ field }) => (
                             <FormItem className="w-24">
                                 <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Cost</FormLabel>
-                                <FormControl><Input type="number" {...field} className="w-full bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                                <FormControl><Input type="number" {...field} className="w-full bg-white p-3 h-auto rounded-xl border-slate-200 font-bold text-xs text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                             </FormItem>
                         )} />
                         {fields.length > 1 && <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="text-red-500 hover:bg-red-50 p-2 h-auto w-auto rounded-lg transition-colors shrink-0 self-end mb-1"><X size={16}/></Button>}
@@ -144,7 +144,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
                      <div className="flex gap-2 items-start">
                         <FormField control={form.control} name={`parts.${index}.reminderType`} render={({ field }) => (
                             <FormItem><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl>
-                                <SelectTrigger className="bg-white p-2 h-auto rounded-xl border-slate-200 text-[10px] font-bold text-slate-500 focus:outline-none focus:border-blue-500"><SelectValue /></SelectTrigger>
+                                <SelectTrigger className="bg-white p-2 h-auto rounded-xl border-slate-200 text-[10px] font-bold text-slate-500 focus:outline-none focus:border-primary"><SelectValue /></SelectTrigger>
                             </FormControl><SelectContent>
                                 <SelectItem value="none">No Reminder</SelectItem>
                                 <SelectItem value="km">Remind in (KM)</SelectItem>
@@ -153,7 +153,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
                         )} />
                         {form.watch(`parts.${index}.reminderType`) !== 'none' && (
                              <FormField control={form.control} name={`parts.${index}.reminderValue`} render={({ field }) => (
-                                <FormItem className="flex-1"><FormControl><Input type="number" placeholder="Value" {...field} className="w-full bg-white p-2 h-auto rounded-xl border-slate-200 font-bold text-[10px] text-slate-800 focus:outline-none focus:border-blue-500 animate-in fade-in" /></FormControl><FormMessage className="text-xs px-1" /></FormItem>
+                                <FormItem className="flex-1"><FormControl><Input type="number" placeholder="Value" {...field} className="w-full bg-white p-2 h-auto rounded-xl border-slate-200 font-bold text-[10px] text-slate-800 focus:outline-none focus:border-primary animate-in fade-in" /></FormControl><FormMessage className="text-xs px-1" /></FormItem>
                              )} />
                         )}
                     </div>
@@ -165,13 +165,13 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingServic
               <FormField control={form.control} name="labor" render={({ field }) => (
                   <FormItem>
                       <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Labor Charge (optional)</FormLabel>
-                      <FormControl><Input type="number" placeholder="रू" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-blue-500" /></FormControl>
+                      <FormControl><Input type="number" placeholder="रू" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                       <FormMessage />
                   </FormItem>
               )} />
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide mt-4">
+            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-red-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide mt-4">
               {editingService ? 'Update Service Record' : 'Save Service Record'}
             </Button>
           </form>
