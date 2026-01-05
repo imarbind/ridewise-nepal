@@ -1,6 +1,5 @@
 "use server";
 
-import { getTripMaintenanceAdvisory, TripMaintenanceAdvisoryInput, TripMaintenanceAdvisoryOutput } from "@/ai/flows/trip-maintenance-advisor";
 import { Reminder, ServiceRecord } from "@/lib/types";
 
 function getMaintenanceTasks(services: ServiceRecord[], lastOdo: number) {
@@ -34,41 +33,4 @@ function getMaintenanceTasks(services: ServiceRecord[], lastOdo: number) {
     });
     
     return Array.from(taskMap.entries()).map(([name, details]) => ({ name, ...details }));
-}
-
-
-export async function getTripMaintenanceAdviceAction(
-    destination: string,
-    startDate: string,
-    distance: number,
-    currentOdometer: number,
-    services: ServiceRecord[],
-    dailyAvgKm: number,
-    durationDays: number,
-): Promise<TripMaintenanceAdvisoryOutput | { error: string }> {
-
-    if (!destination || !startDate || !distance || !currentOdometer) {
-        return { error: "Missing trip details." };
-    }
-
-    try {
-        const maintenanceTasks = getMaintenanceTasks(services, currentOdometer);
-        
-        const input: TripMaintenanceAdvisoryInput = {
-            destination,
-            startDate,
-            distance,
-            currentOdometer,
-            maintenanceTasks,
-            dailyAvgKm,
-            durationDays,
-        };
-        
-        const result = await getTripMaintenanceAdvisory(input);
-        return result;
-
-    } catch (e) {
-        console.error("Error getting trip maintenance advice:", e);
-        return { error: "Failed to get maintenance advice from AI." };
-    }
 }
