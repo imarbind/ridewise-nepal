@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info } from "lucide-react";
+import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info, CalendarDays } from "lucide-react";
 import type { Stats, Reminder, EngineCc, BikeDetails } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
@@ -115,13 +115,19 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
           <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-blue-500/30 rounded-full blur-2xl"></div>
 
           <div className="relative z-10">
-            <div className="flex justify-between items-start">
+             <div className="flex justify-between items-start">
               <div className="bg-black/20 backdrop-blur-md p-2 rounded-xl border border-white/10 inline-block mb-2">
                 <Mountain size={20} className="text-white/90" />
               </div>
-              <div className="text-right">
-                <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
-                <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
+              <div className="space-y-2 text-right">
+                <div>
+                  <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
+                  <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Daily Average</p>
+                  <p className="text-xl font-black text-white">{stats.dailyAvg} <span className="text-xs font-normal opacity-70">km/day</span></p>
+                </div>
               </div>
             </div>
             <div className="mt-4">
@@ -130,16 +136,6 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
                 {stats.lastOdo.toLocaleString()}
                 <span className="text-lg font-bold ml-2 opacity-50">KM</span>
               </h2>
-            </div>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-3 border border-white/10 flex flex-col items-center justify-center text-center">
-                 <span className="text-xs font-bold text-white/90">{stats.dailyAvg}</span>
-                <span className="text-[9px] text-white/60">km/day</span>
-              </div>
-               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-3 border border-white/10 flex flex-col items-center justify-center text-center">
-                 <span className="text-xs font-bold text-white/90">रू {stats.costPerKm}</span>
-                 <span className="text-[9px] text-white/60">per km</span>
-              </div>
             </div>
           </div>
         </div>
