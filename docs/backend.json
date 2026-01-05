@@ -1,0 +1,313 @@
+{
+  "entities": {
+    "FuelLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FuelLog",
+      "type": "object",
+      "description": "Represents a single fuel log entry for a vehicle.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the fuel log entry."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the fuel log entry in ISO 8601 format (YYYY-MM-DD)."
+        },
+        "odo": {
+          "type": "number",
+          "description": "Odometer reading at the time of fueling (in kilometers)."
+        },
+        "liters": {
+          "type": "number",
+          "description": "Amount of fuel added (in liters)."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Total amount spent on fuel (in local currency)."
+        },
+        "price": {
+          "type": "number",
+          "description": "Price per liter of fuel."
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "odo",
+        "liters",
+        "amount",
+        "price"
+      ]
+    },
+    "ServiceLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ServiceLog",
+      "type": "object",
+      "description": "Represents a single service log entry for a vehicle.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the service log entry."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the service in ISO 8601 format (YYYY-MM-DD)."
+        },
+        "odo": {
+          "type": "number",
+          "description": "Odometer reading at the time of service (in kilometers)."
+        },
+        "work": {
+          "type": "string",
+          "description": "Description of the service performed."
+        },
+        "labor": {
+          "type": "number",
+          "description": "Cost of labor for the service."
+        },
+        "totalCost": {
+          "type": "number",
+          "description": "Total cost of the service (including parts and labor)."
+        },
+        "parts": {
+          "type": "array",
+          "description": "Array of parts used during the service.  Each element represents a `ServicePart` entity.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "date",
+        "odo",
+        "work",
+        "labor",
+        "totalCost",
+        "parts"
+      ]
+    },
+    "ServicePart": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ServicePart",
+      "type": "object",
+      "description": "Represents a part used in a service log entry.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the service part."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the part."
+        },
+        "cost": {
+          "type": "number",
+          "description": "Cost of the part."
+        },
+        "reminderType": {
+          "type": "string",
+          "description": "Type of reminder associated with the part ('none', 'km', or 'days').",
+          "format": "string"
+        },
+        "reminderValue": {
+          "type": "string",
+          "description": "Value for the reminder (in kilometers or days, depending on reminderType)."
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "cost",
+        "reminderType",
+        "reminderValue"
+      ]
+    },
+    "Trip": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Trip",
+      "type": "object",
+      "description": "Represents a trip planned or in progress.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trip."
+        },
+        "destination": {
+          "type": "string",
+          "description": "Destination of the trip."
+        },
+        "start": {
+          "type": "string",
+          "description": "Start date of the trip in ISO 8601 format (YYYY-MM-DD)."
+        },
+        "distance": {
+          "type": "number",
+          "description": "Total distance of the trip (in kilometers)."
+        },
+        "dailyUsage": {
+          "type": "number",
+          "description": "Estimated daily usage during the trip (in kilometers per day)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the trip ('active' or 'completed')."
+        },
+        "expenses": {
+          "type": "array",
+          "description": "Array of expenses incurred during the trip. Each element represents a `TripExpense` entity.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "destination",
+        "start",
+        "distance",
+        "dailyUsage",
+        "status",
+        "expenses"
+      ]
+    },
+    "TripExpense": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "TripExpense",
+      "type": "object",
+      "description": "Represents an expense incurred during a trip.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the trip expense."
+        },
+        "item": {
+          "type": "string",
+          "description": "Description of the expense item (e.g., 'Lunch', 'Accommodation')."
+        },
+        "cost": {
+          "type": "number",
+          "description": "Cost of the expense (in local currency)."
+        }
+      },
+      "required": [
+        "id",
+        "item",
+        "cost"
+      ]
+    },
+    "RiderBoard": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "RiderBoard",
+      "type": "object",
+      "description": "Leaderboard showing riders with the most kilometers covered during trips.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the rider entry."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User entity. (Relationship: User 1:N RiderBoard)"
+        },
+        "totalKilometers": {
+          "type": "number",
+          "description": "Total kilometers covered by the rider during trips."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "totalKilometers"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}/fuel_logs/{fuelLogId}",
+        "definition": {
+          "entityName": "FuelLog",
+          "schema": {
+            "$ref": "#/backend/entities/FuelLog"
+          },
+          "description": "Stores fuel log entries for a specific user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the fuel log."
+            },
+            {
+              "name": "fuelLogId",
+              "description": "The ID of the fuel log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/service_logs/{serviceLogId}",
+        "definition": {
+          "entityName": "ServiceLog",
+          "schema": {
+            "$ref": "#/backend/entities/ServiceLog"
+          },
+          "description": "Stores service log entries for a specific user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the service log."
+            },
+            {
+              "name": "serviceLogId",
+              "description": "The ID of the service log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/trips/{tripId}",
+        "definition": {
+          "entityName": "Trip",
+          "schema": {
+            "$ref": "#/backend/entities/Trip"
+          },
+          "description": "Stores trip entries for a specific user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The ID of the user who owns the trip."
+            },
+            {
+              "name": "tripId",
+              "description": "The ID of the trip entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/rider_board/{riderId}",
+        "definition": {
+          "entityName": "RiderBoard",
+          "schema": {
+            "$ref": "#/backend/entities/RiderBoard"
+          },
+          "description": "Stores the rider board data. Includes denormalized 'userId' for authorization independence.",
+          "params": [
+            {
+              "name": "riderId",
+              "description": "The ID of the rider."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore data structure is designed to support the RideLog Nepal application, focusing on fuel logs, service logs, trip planning, and a rider leaderboard. The structure prioritizes authorization independence, clarity, and scalability, adhering to the specified design principles.\n\n**Authorization Independence:**\n\n*   User-owned data (fuel logs, service logs, and trips) is stored under the `/users/{userId}` path, ensuring clear ownership and simplifying security rules based on `request.auth.uid`.\n*   Leaderboard data is stored in `/rider_board/{riderId}` and denormalizes the `userId` for simple rules.\n\n**Structural Segregation:**\n\n*   Each top-level collection (`fuel_logs`, `service_logs`, `trips`, `rider_board`) contains documents with homogeneous security requirements, simplifying rules.\n\n**Access Modeling:**\n\n*   Private user data: Path-based ownership is used for fuel logs (`/users/{userId}/fuel_logs/{fuelLogId}`), service logs (`/users/{userId}/service_logs/{serviceLogId}`), and trips (`/users/{userId}/trips/{tripId}`).\n*   Leaderboard data: The `/rider_board/{riderId}` collection stores leaderboard entries. Each entry includes the `userId` of the rider, enabling straightforward retrieval and ranking of riders based on their total kilometers traveled.\n\n**QAPs (Rules are not Filters):**\n\n*   Secure list operations are supported by segregating data based on ownership. Rules can efficiently filter data based on `request.auth.uid` without requiring complex logic.\n*   The leaderboard is stored in its own collection, where it can only be edited by a trusted process (e.g., a Firebase Function) to ensure data integrity. The leaderboard data itself is publicly readable, which makes sense given its function.\n\n**Invariants:**\n\n*   The structure supports the integrity of ownership by associating fuel logs, service logs and trips directly to user IDs in the path structure (`/users/{userId}`).\n\nThis structure enables a clear and maintainable security ruleset that can scale with the application's needs."
+  }
+}
