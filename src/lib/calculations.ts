@@ -1,0 +1,101 @@
+import type { FuelLog, ServiceRecord, Stats, Reminder } from './types';
+
+export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stats {
+  const sortedLogs = [...logs].sort((a, b) => b.odo - a.odo);
+  const lastFuelOdo = sortedLogs.length > 0 ? sortedLogs[0].odo : 0;
+  const lastServiceOdo = services.length > 0 ? Math.max(...services.map(s => s.odo)) : 0;
+  const lastOdo = Math.max(lastFuelOdo, lastServiceOdo);
+
+  const totalFuelCost = logs.reduce((sum, item) => sum + (parseFloat(String(item.amount)) || 0), 0);
+  const totalServiceCost = services.reduce((sum, item) => sum + (parseFloat(String(item.totalCost)) || 0), 0);
+
+  let avgMileage = 0;
+  if (logs.length > 1) {
+    const sortedByOdo = [...logs].sort((a, b) => a.odo - b.odo);
+    const totalDist = sortedByOdo[sortedByOdo.length - 1].odo - sortedByOdo[0].odo;
+    const fuelConsumed = logs.slice(0, -1).reduce((sum, item) => sum + (parseFloat(String(item.liters)) || 0), 0);
+    avgMileage = fuelConsumed > 0 ? (totalDist / fuelConsumed) : 0;
+  }
+
+  let dailyAvg = 0;
+  const allRecords = [...logs, ...services]
+    .map(r => ({ date: new Date(r.date).getTime(), odo: parseInt(String(r.odo)) }))
+    .filter(r => r.date && r.odo) // Filter out invalid records
+    .sort((a, b) => a.date - b.date);
+
+  if (allRecords.length >= 2) {
+    const first = allRecords[0];
+    const last = allRecords[allRecords.length - 1];
+    const daysDiff = (last.date - first.date) / (1000 * 60 * 60 * 24);
+    const distDiff = last.odo - first.odo;
+    if (daysDiff > 0 && distDiff > 0) {
+      dailyAvg = distDiff / daysDiff;
+    }
+  }
+
+  const efficiencyStatus = avgMileage > 40 ? "Excellent" : (avgMileage > 25 ? "Average" : "Poor");
+
+  return {
+    lastOdo,
+    totalFuelCost,
+    totalServiceCost,
+    totalOwnership: totalFuelCost + totalServiceCost,
+    avgMileage: avgMileage.toFixed(1),
+    efficiencyStatus,
+    logsCount: logs.length,
+    serviceCount: services.length,
+    dailyAvg: dailyAvg.toFixed(1)
+  };
+}
+
+export function getActiveReminders(services: ServiceRecord[], lastOdo: number): Reminder[] {
+    const reminders: Reminder[] = [];
+    const partMap: { [key: string]: Reminder['rawData'] } = {};
+
+    [...services].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
+      s.parts.forEach(p => {
+        if (p.reminderType && p.reminderType !== 'none' && p.reminderValue) {
+          partMap[p.name] = {
+            lastOdo: s.odo,
+            lastDate: s.date,
+            reminderType: p.reminderType,
+            reminderValue: parseFloat(p.reminderValue) || 0,
+            currentUsed: 0 // will be calculated later
+          };
+        }
+      });
+    });
+
+    Object.keys(partMap).forEach(name => {
+      const data = partMap[name];
+      let progress = 0;
+      let label = "";
+      let isDue = false;
+      let currentUsed = 0;
+
+      if (data.reminderType === 'km' && data.reminderValue > 0) {
+        const used = lastOdo - data.lastOdo;
+        currentUsed = used;
+        progress = (used / data.reminderValue) * 100;
+        label = `${used.toLocaleString()} / ${data.reminderValue.toLocaleString()} KM`;
+        isDue = used >= data.reminderValue;
+      } else if (data.reminderType === 'days' && data.reminderValue > 0) {
+        const days = Math.floor((new Date().getTime() - new Date(data.lastDate).getTime()) / (1000 * 60 * 60 * 24));
+        currentUsed = days;
+        progress = (days / data.reminderValue) * 100;
+        label = `${days} / ${data.reminderValue} Days`;
+        isDue = days >= data.reminderValue;
+      } else {
+        return; // Skip if reminderValue is not set
+      }
+
+      reminders.push({ 
+        name, 
+        progress: Math.min(100, Math.max(0, progress)), 
+        label, 
+        isDue,
+        rawData: { ...data, currentUsed }
+      });
+    });
+    return reminders;
+}
