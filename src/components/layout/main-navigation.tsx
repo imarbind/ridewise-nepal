@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Fuel, History, Navigation2 } from 'lucide-react';
+import { BarChart3, History, Navigation2, Wrench } from 'lucide-react';
 import type { ActiveTab } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -11,7 +11,7 @@ interface MainNavigationProps {
 
 const navItems: { id: ActiveTab; icon: React.ElementType, color: string, label: string }[] = [
     { id: 'dashboard', icon: BarChart3, color: 'primary', label: 'Dashboard' },
-    { id: 'logs', icon: Fuel, color: 'primary', label: 'Fuel Logs' },
+    { id: 'service', icon: Wrench, color: 'primary', label: 'Service' },
     { id: 'trip', icon: Navigation2, color: 'accent', label: 'Trip' },
     { id: 'history', icon: History, color: 'blue-600', label: 'History' },
 ];
@@ -31,7 +31,7 @@ export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps)
                             ? 'text-white shadow-lg -translate-y-2 scale-110'
                             : 'text-slate-400 hover:text-slate-600',
                         isActive && item.id === 'dashboard' && 'bg-primary shadow-primary/30',
-                        isActive && item.id === 'logs' && 'bg-primary shadow-primary/30',
+                        isActive && item.id === 'service' && 'bg-primary shadow-primary/30',
                         isActive && item.id === 'trip' && 'bg-accent shadow-accent/30',
                         isActive && item.id === 'history' && 'bg-blue-600 shadow-blue-600/30'
                     )}
@@ -45,3 +45,5 @@ export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps)
         </nav>
     );
 }
+
+    

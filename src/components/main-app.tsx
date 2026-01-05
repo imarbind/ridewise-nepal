@@ -10,7 +10,6 @@ import { MainNavigation } from '@/components/layout/main-navigation';
 import { FloatingActionButtons } from '@/components/layout/floating-action-buttons';
 import { DashboardView } from '@/components/dashboard/dashboard-view';
 import { TripView } from '@/components/trip/trip-view';
-import { FuelLogView } from '@/components/logs/fuel-log-view';
 import { ServiceLogView } from '@/components/service/service-log-view';
 import { DocsView } from '@/components/docs/docs-view';
 import { FuelModal } from '@/components/modals/fuel-modal';
@@ -190,8 +189,8 @@ export function MainApp() {
               onUpdateExpense={updateTripExpense}
               onDeleteExpense={deleteTripExpense}
             />;
-        case 'logs':
-            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
+        case 'service':
+            return <ServiceLogView logs={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
         case 'history':
             return <HistoryView 
                         fuelLogs={logs} 
@@ -238,3 +237,5 @@ export function MainApp() {
     </>
   );
 };
+
+    

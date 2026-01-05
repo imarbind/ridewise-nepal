@@ -1,4 +1,4 @@
-export type ActiveTab = 'dashboard' | 'logs' | 'trip' | 'history' | 'docs';
+export type ActiveTab = 'dashboard' | 'service' | 'trip' | 'history' | 'docs';
 export type ModalType = 'fuel' | 'service' | null;
 
 export interface FuelLog {
@@ -76,3 +76,5 @@ export type Reminder = {
         currentUsed: number;
     }
 }
+
+    

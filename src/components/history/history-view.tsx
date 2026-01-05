@@ -146,3 +146,4 @@ const ServiceHistoryItem = ({ service, onEdit, onDelete }: { service: ServiceRec
         </div>
     </div>
 );
+    
