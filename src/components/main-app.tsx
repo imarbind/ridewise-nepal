@@ -15,6 +15,7 @@ import { ServiceLogView } from '@/components/service/service-log-view';
 import { DocsView } from '@/components/docs/docs-view';
 import { FuelModal } from '@/components/modals/fuel-modal';
 import { ServiceModal } from '@/components/modals/service-modal';
+import { HistoryView } from './history/history-view';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -191,8 +192,15 @@ export function MainApp() {
             />;
         case 'logs':
             return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
-        case 'service':
-            return <ServiceLogView services={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
+        case 'history':
+            return <HistoryView 
+                        fuelLogs={logs} 
+                        serviceLogs={services} 
+                        onEditFuel={handleEditFuel}
+                        onDeleteFuel={handleDeleteFuel}
+                        onEditService={handleEditService}
+                        onDeleteService={handleDeleteService}
+                    />;
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:

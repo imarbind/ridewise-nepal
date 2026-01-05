@@ -9,11 +9,11 @@ interface MainNavigationProps {
     setActiveTab: (tab: ActiveTab) => void;
 }
 
-const navItems: { id: ActiveTab; icon: React.ElementType, color: string }[] = [
-    { id: 'dashboard', icon: BarChart3, color: 'primary' },
-    { id: 'logs', icon: Fuel, color: 'primary' },
-    { id: 'trip', icon: Navigation2, color: 'accent' },
-    { id: 'service', icon: History, color: 'blue-600' },
+const navItems: { id: ActiveTab; icon: React.ElementType, color: string, label: string }[] = [
+    { id: 'dashboard', icon: BarChart3, color: 'primary', label: 'Dashboard' },
+    { id: 'logs', icon: Fuel, color: 'primary', label: 'Fuel Logs' },
+    { id: 'trip', icon: Navigation2, color: 'accent', label: 'Trip' },
+    { id: 'history', icon: History, color: 'blue-600', label: 'History' },
 ];
 
 export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps) {
@@ -33,12 +33,12 @@ export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps)
                         isActive && item.id === 'dashboard' && 'bg-primary shadow-primary/30',
                         isActive && item.id === 'logs' && 'bg-primary shadow-primary/30',
                         isActive && item.id === 'trip' && 'bg-accent shadow-accent/30',
-                        isActive && item.id === 'service' && 'bg-blue-600 shadow-blue-600/30'
+                        isActive && item.id === 'history' && 'bg-blue-600 shadow-blue-600/30'
                     )}
                     aria-current={isActive ? 'page' : undefined}
                 >
                     <item.icon size={24} />
-                    <span className="sr-only">{item.id}</span>
+                    <span className="sr-only">{item.label}</span>
                 </button>
              )
            })}
