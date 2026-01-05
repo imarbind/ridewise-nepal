@@ -1,8 +1,9 @@
 "use client";
 
-import { MapPin, Trash2 } from "lucide-react";
+import { MapPin, Trash2, Calendar } from "lucide-react";
 import type { Trip } from "@/lib/types";
 import { Button } from "../ui/button";
+import { format } from "date-fns";
 
 interface PastTripsProps {
     trips: Trip[];
@@ -22,7 +23,9 @@ export function PastTrips({ trips, onDeleteTrip }: PastTripsProps) {
                         <div className="flex justify-between items-start mb-2">
                             <div>
                                 <span className="font-black text-lg text-slate-800">{t.destination}</span>
-                                <div className="text-[10px] font-bold bg-slate-100 px-2 py-1 rounded text-slate-500 uppercase inline-block ml-2">Ended</div>
+                                <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-1">
+                                    <Calendar size={12}/> {format(new Date(t.start), 'MMM d, yyyy')} - {t.end ? format(new Date(t.end), 'MMM d, yyyy') : 'Present'}
+                                </p>
                             </div>
                             <Button onClick={() => onDeleteTrip(t.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Trash2 size={16} />

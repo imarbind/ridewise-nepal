@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MapPin, Trash2, Wallet, Edit, X } from 'lucide-react';
+import { MapPin, Trash2, Wallet, Edit, X, Play, FlagOff } from 'lucide-react';
 import type { Trip, TripExpense } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,14 +20,12 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
   const [expenseCost, setExpenseCost] = useState('');
   const [editingExpense, setEditingExpense] = useState<TripExpense | null>(null);
   
-  const today = new Date();
-  today.setHours(0,0,0,0);
+  const now = new Date();
   const start = new Date(trip.start);
-  start.setHours(0,0,0,0);
-  const daysDiff = Math.ceil((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  const daysDiff = Math.ceil((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   const tripTotal = trip.expenses.reduce((s, e) => s + parseFloat(String(e.cost)), 0);
 
-  const canAddExpense = daysDiff >= 0;
+  const isTripStarted = now >= start;
 
   const handleAddOrUpdateExpense = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,9 +69,13 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
           </div>
         </div>
         <div className="mt-6 flex gap-2">
-          <Button onClick={() => onEndTrip(trip.id)} className="bg-primary/20 hover:bg-primary border border-primary/50 text-red-200 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all w-full h-auto">
-            End Trip
-          </Button>
+            {isTripStarted ? (
+                 <Button onClick={() => onEndTrip(trip.id)} className="bg-primary/20 hover:bg-primary border border-primary/50 text-red-200 hover:text-white px-4 py-2 rounded-xl text-xs font-bold transition-all w-full h-auto flex items-center gap-2">
+                    <FlagOff size={14} /> End Trip
+                </Button>
+            ) : (
+                <div className="w-full text-center text-xs text-blue-200 p-2 rounded-lg bg-black/20">Trip has not started yet.</div>
+            )}
           <Button onClick={() => onDeleteTrip(trip.id)} variant="destructive" size="icon" className="w-12 h-auto rounded-xl bg-red-900/50 border border-red-500/50 text-red-300 hover:bg-red-800">
             <Trash2 size={16} />
           </Button>
@@ -85,7 +87,7 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
           <Wallet size={18} className="text-green-600"/> Trip Wallet
         </h3>
         
-        {canAddExpense ? (
+        {isTripStarted ? (
           <form onSubmit={handleAddOrUpdateExpense} className="bg-card p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
             <div className="flex gap-2 mb-2">
               <Input 

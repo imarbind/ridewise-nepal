@@ -10,12 +10,12 @@ import { getTripMaintenanceAdviceAction } from '@/app/actions';
 import { TripMaintenanceAdvisoryOutput } from '@/ai/flows/trip-maintenance-advisor';
 
 interface TripPlannerProps {
-  onCreateTrip: (tripData: Omit<Trip, 'id'|'status'|'expenses'>) => void;
+  onCreateTrip: (tripData: Omit<Trip, 'id'|'status'|'expenses'|'end'>) => void;
   stats: Stats;
   services: ServiceRecord[];
 }
 
-const initialTripState = { destination: '', start: '', distance: '', dailyUsage: '' };
+const initialTripState = { destination: '', start: '', distance: '' };
 
 export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps) {
   const [newTrip, setNewTrip] = useState(initialTripState);
@@ -31,7 +31,7 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
     startTransition(async () => {
       const result = await getTripMaintenanceAdviceAction(
         newTrip.destination || "Trip",
-        startDate,
+        startDate.split('T')[0],
         parseFloat(distance),
         stats.lastOdo,
         services
@@ -87,11 +87,11 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
       <Input required value={newTrip.destination} onChange={e => setNewTrip({...newTrip, destination: e.target.value})} placeholder="Where to? (e.g. Mustang)" className="w-full bg-card p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 outline-none focus:border-blue-500 transition-all shadow-sm" />
       <div className="grid grid-cols-2 gap-4">
         <div className="col-span-2 sm:col-span-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 block">Trip Start Date</label>
-          <Input required type="date" value={newTrip.start} onChange={e => setNewTrip({...newTrip, start: e.target.value})} className="w-full bg-card p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 outline-none focus:border-blue-500 shadow-sm" />
+          <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 block">Start Date & Time (Optional)</label>
+          <Input required type="datetime-local" value={newTrip.start} onChange={e => setNewTrip({...newTrip, start: e.target.value})} className="w-full bg-card p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 outline-none focus:border-blue-500 shadow-sm" />
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 block">Trip Distance</label>
+          <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 ml-1 block">Trip Distance (KM)</label>
           <Input required type="number" value={newTrip.distance} onChange={e => setNewTrip({...newTrip, distance: e.target.value})} placeholder="Total Km" className="w-full bg-card p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 outline-none focus:border-blue-500 shadow-sm" />
         </div>
       </div>
@@ -131,7 +131,7 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
         </div>
       )}
 
-      <Button type="submit" className="w-full bg-slate-900 text-white py-4 h-auto rounded-2xl font-black text-lg shadow-xl shadow-slate-900/20 hover:scale-[1.02] active:scale-95 transition-all">Start Trip Mode</Button>
+      <Button type="submit" className="w-full bg-slate-900 text-white py-4 h-auto rounded-2xl font-black text-lg shadow-xl shadow-slate-900/20 hover:scale-[1.02] active:scale-95 transition-all">Plan My Trip</Button>
     </form>
   );
 }

@@ -51,16 +51,14 @@ export function MainApp() {
   const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
   
   const upcomingTrip = useMemo(() => {
-    const activeTrip = trips.find(t => t.status === 'active');
-    if (!activeTrip) return null;
+    const planned = trips.find(t => t.status === 'planned');
+    if (!planned) return null;
 
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const startDate = new Date(activeTrip.start);
-    startDate.setHours(0,0,0,0);
+    const now = new Date();
+    const startDate = new Date(planned.start);
     
-    if (startDate.getTime() > today.getTime()) {
-      return activeTrip;
+    if (startDate > now) {
+      return planned;
     }
     return null;
   }, [trips]);
@@ -69,11 +67,9 @@ export function MainApp() {
   const addExpenseToActiveTrip = (title: string, cost: number) => {
     const activeTrip = trips.find(t => t.status === 'active');
     if (activeTrip) {
+      const now = new Date();
       const start = new Date(activeTrip.start);
-      start.setHours(0,0,0,0);
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      if(today.getTime() < start.getTime()) return;
+      if(now < start) return;
 
       setTrips(prev => prev.map(t => {
         if (t.id === activeTrip.id) {
@@ -139,19 +135,27 @@ export function MainApp() {
     setEditingService(null);
   }
 
-  const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses'>) => {
+  const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => {
     const newTripObj: Trip = {
       id: Date.now(),
       ...newTripData,
-      status: 'active',
+      status: 'planned',
       expenses: []
     };
     setTrips(prev => [newTripObj, ...prev]);
   };
+  
+  const startTrip = (id: number) => {
+     setTrips(trips.map(t => {
+        if (t.id === id) return { ...t, status: 'active', start: new Date().toISOString() };
+        if (t.status === 'active') return { ...t, status: 'planned' }; // Ensure only one active trip
+        return t;
+     }));
+  }
 
   const endTrip = (id: number) => {
     if(window.confirm("End this trip? This will move it to history.")) {
-      setTrips(trips.map(t => t.id === id ? { ...t, status: 'completed' } : t));
+      setTrips(trips.map(t => t.id === id ? { ...t, status: 'completed', end: new Date().toISOString() } : t));
     }
   };
 
@@ -226,6 +230,7 @@ export function MainApp() {
               stats={stats} 
               services={services}
               onCreateTrip={createTrip}
+              onStartTrip={startTrip}
               onEndTrip={endTrip}
               onDeleteTrip={deleteTrip}
               onAddExpense={addTripExpense}

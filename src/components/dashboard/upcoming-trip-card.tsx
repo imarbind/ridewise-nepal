@@ -9,12 +9,12 @@ interface UpcomingTripCardProps {
 }
 
 export function UpcomingTripCard({ trip }: UpcomingTripCardProps) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
   const startDate = new Date(trip.start);
-  startDate.setHours(0, 0, 0, 0);
 
-  const daysToGo = differenceInDays(startDate, today);
+  const daysToGo = differenceInDays(startDate, now);
+
+  if (daysToGo < 0) return null;
 
   return (
     <div className="bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-3xl shadow-lg relative animate-in fade-in slide-in-from-bottom-4">

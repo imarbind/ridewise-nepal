@@ -48,10 +48,10 @@ export interface TripExpense {
 export interface Trip {
     id: number;
     destination: string;
-    start: string;
+    start: string; // ISO 8601 format
+    end?: string; // ISO 8601 format, optional
     distance: string;
-    dailyUsage: string;
-    status: 'active' | 'completed';
+    status: 'planned' | 'active' | 'completed';
     expenses: TripExpense[];
 }
 

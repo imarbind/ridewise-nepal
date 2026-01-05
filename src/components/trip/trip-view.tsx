@@ -5,12 +5,14 @@ import type { Trip, Stats, ServiceRecord, TripExpense } from "@/lib/types";
 import { ActiveTrip } from "./active-trip";
 import { TripPlanner } from "./trip-planner";
 import { PastTrips } from "./past-trips";
+import { PlannedTrip } from "./planned-trip";
 
 interface TripViewProps {
   trips: Trip[];
   stats: Stats;
   services: ServiceRecord[];
-  onCreateTrip: (newTripData: Omit<Trip, 'id' | 'status' | 'expenses'>) => void;
+  onCreateTrip: (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => void;
+  onStartTrip: (id: number) => void;
   onEndTrip: (id: number) => void;
   onDeleteTrip: (id: number) => void;
   onAddExpense: (tripId: number, item: string, cost: string) => void;
@@ -23,6 +25,7 @@ export function TripView({
   stats, 
   services,
   onCreateTrip,
+  onStartTrip,
   onEndTrip,
   onDeleteTrip,
   onAddExpense,
@@ -30,6 +33,7 @@ export function TripView({
   onDeleteExpense
 }: TripViewProps) {
   const activeTrip = trips.find(t => t.status === 'active');
+  const plannedTrips = trips.filter(t => t.status === 'planned');
   const pastTrips = trips.filter(t => t.status === 'completed');
 
   return (
@@ -55,6 +59,23 @@ export function TripView({
           />
         </>
       )}
+
+      {plannedTrips.length > 0 && !activeTrip && (
+        <div className="mt-8">
+            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Planned Trips</h3>
+            <div className="space-y-4">
+                {plannedTrips.map(trip => (
+                    <PlannedTrip 
+                        key={trip.id} 
+                        trip={trip} 
+                        onStart={onStartTrip} 
+                        onDelete={onDeleteTrip}
+                    />
+                ))}
+            </div>
+        </div>
+      )}
+      
       <PastTrips trips={pastTrips} onDeleteTrip={onDeleteTrip} />
     </div>
   );
