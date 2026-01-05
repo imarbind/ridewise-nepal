@@ -49,6 +49,22 @@ export function MainApp() {
   const stats = useMemo(() => calculateStats(logs, services, bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
   const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
   const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
+  
+  const upcomingTrip = useMemo(() => {
+    const activeTrip = trips.find(t => t.status === 'active');
+    if (!activeTrip) return null;
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const startDate = new Date(activeTrip.start);
+    startDate.setHours(0,0,0,0);
+    
+    if (startDate.getTime() > today.getTime()) {
+      return activeTrip;
+    }
+    return null;
+  }, [trips]);
+
 
   const addExpenseToActiveTrip = (title: string, cost: number) => {
     const activeTrip = trips.find(t => t.status === 'active');
@@ -190,7 +206,7 @@ export function MainApp() {
   const renderActiveTab = () => {
     switch(activeTab) {
         case 'dashboard':
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} upcomingTrip={upcomingTrip} />;
         case 'fuel':
             return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
         case 'service':
@@ -219,7 +235,7 @@ export function MainApp() {
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} upcomingTrip={upcomingTrip} />;
     }
   }
 

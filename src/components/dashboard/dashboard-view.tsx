@@ -2,7 +2,7 @@
 "use client";
 
 import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets } from "lucide-react";
-import type { Stats, Reminder, EngineCc, BikeDetails } from "@/lib/types";
+import type { Stats, Reminder, EngineCc, BikeDetails, Trip } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ConditionRatingCard } from "./condition-rating-card";
 import dynamic from 'next/dynamic';
 import { Skeleton } from "../ui/skeleton";
+import { UpcomingTripCard } from "./upcoming-trip-card";
 
 const ExpenseChart = dynamic(() => import('./expense-chart').then(mod => mod.ExpenseChart), {
   ssr: false,
@@ -27,9 +28,10 @@ interface DashboardViewProps {
   bikeDetails: BikeDetails;
   setBikeDetails: (details: BikeDetails) => void;
   expenseChartData: ExpenseChartData[];
+  upcomingTrip: Trip | null;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, expenseChartData, upcomingTrip }: DashboardViewProps) {
   const [isEditingBike, setIsEditingBike] = useState(false);
   const [editableBikeDetails, setEditableBikeDetails] = useState(bikeDetails);
 
@@ -54,6 +56,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
       </div>
 
       <div className="space-y-4 mb-8">
+        {upcomingTrip && <UpcomingTripCard trip={upcomingTrip} />}
         <div className="group [perspective:1000px]">
           <div className="relative bg-gradient-to-br from-red-700 via-red-800 to-blue-900 rounded-[2.5rem] p-8 shadow-2xl border-t border-white/20 transition-transform duration-500 transform group-hover:[transform:rotateX(2deg)] overflow-hidden">
             <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
