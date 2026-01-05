@@ -50,6 +50,18 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
 
   const efficiencyStatus = avgMileage > 40 ? "Excellent" : (avgMileage > 25 ? "Average" : "Poor");
 
+  let totalPartsChanged = 0;
+  let totalOilChanges = 0;
+  services.forEach(service => {
+    service.parts.forEach(part => {
+      if (part.name.toLowerCase().includes('oil')) {
+        totalOilChanges += 1;
+      } else {
+        totalPartsChanged += 1;
+      }
+    });
+  });
+
   return {
     lastOdo,
     totalFuelCost,
@@ -58,9 +70,9 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
     avgMileage: avgMileage.toFixed(1),
     costPerKm: costPerKm.toFixed(2),
     efficiencyStatus,
-    logsCount: logs.length,
-    serviceCount: services.length,
-    dailyAvg: dailyAvg.toFixed(1)
+    dailyAvg: dailyAvg.toFixed(1),
+    totalPartsChanged,
+    totalOilChanges,
   };
 }
 

@@ -58,9 +58,9 @@ export type Stats = {
     avgMileage: string;
     costPerKm: string;
     efficiencyStatus: 'Excellent' | 'Average' | 'Poor';
-    logsCount: number;
-    serviceCount: number;
     dailyAvg: string;
+    totalPartsChanged: number;
+    totalOilChanges: number;
 }
 
 export type Reminder = {
