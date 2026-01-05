@@ -42,13 +42,13 @@ export function HistoryView({
       </h2>
       <div className="relative">
          {combinedHistory.length > 1 && 
-          <div className="absolute left-3 top-4 bottom-4 w-6 rounded-full bg-slate-700 shadow-inner overflow-hidden">
+          <div className="absolute left-3.5 top-4 bottom-4 w-10 bg-slate-700 shadow-inner rounded-full overflow-hidden">
             <div 
-              className="absolute inset-0"
+              className="absolute inset-0 bg-repeat-y bg-center"
               style={{
-                backgroundImage: 'repeating-linear-gradient(to bottom, transparent, transparent 10px, #94a3b8 10px, #94a3b8 20px)',
-                backgroundSize: '2px 30px',
-                backgroundPosition: 'center',
+                backgroundImage: 'linear-gradient(white, white)',
+                backgroundSize: '2px 10px',
+                backgroundRepeat: 'space'
               }}
             />
           </div>
