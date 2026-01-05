@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { calculateStats, getActiveReminders, getExpenseChartData } from '@/lib/calculations';
 import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc, BikeDetails } from '@/lib/types';
-import { differenceInDays } from 'date-fns';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
 import { MainNavigation } from '@/components/layout/main-navigation';
@@ -17,14 +16,16 @@ import { FuelModal } from '@/components/modals/fuel-modal';
 import { ServiceModal } from '@/components/modals/service-modal';
 import { HistoryView } from './history/history-view';
 import { FuelLogView } from './logs/fuel-log-view';
+import { RiderBoardView } from './rider-board/rider-board-view';
+import { useFirebase } from '@/firebase';
+import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc } from 'firebase/firestore';
+import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { useCollection, useDoc } from '@/firebase';
+import { useMemoFirebase } from '@/firebase/provider';
 
 
 const APP_ID = 'ridelog-nepal-v3';
 
-const defaultLogs: FuelLog[] = [];
-const defaultServices: ServiceRecord[] = [];
-const defaultDocs: Doc[] = [];
-const defaultTrips: Trip[] = [];
 const defaultBikeDetails: BikeDetails = { 
   name: "My Bike", 
   number: "BA 01-001 PA",
@@ -41,18 +42,34 @@ export function MainApp() {
   const [editingFuel, setEditingFuel] = useState<FuelLog | null>(null);
   const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
 
-  const [logs, setLogs] = useLocalStorage<FuelLog[]>(`${APP_ID}_logs`, defaultLogs);
-  const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, defaultServices);
-  const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, defaultDocs);
-  const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, defaultTrips);
-  const [bikeDetails, setBikeDetails] = useLocalStorage<BikeDetails>(`${APP_ID}_bikeDetails`, defaultBikeDetails);
+  const { firestore, user } = useFirebase();
 
-  const stats = useMemo(() => calculateStats(logs, services, bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
-  const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
-  const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
+  const userRef = useMemoFirebase(() => user ? doc(firestore, 'users', user.uid) : null, [firestore, user]);
+  const { data: bikeDetailsDoc } = useDoc<BikeDetails>(userRef);
+
+  const bikeDetails = bikeDetailsDoc || defaultBikeDetails;
+
+  const setBikeDetails = (details: BikeDetails) => {
+    if (userRef) {
+      setDocumentNonBlocking(userRef, { bikeDetails: details }, { merge: true });
+    }
+  };
+  
+  const logsCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'fuel_logs') : null, [firestore, user]);
+  const { data: logs, isLoading: logsLoading } = useCollection<FuelLog>(logsCollectionRef);
+
+  const servicesCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'service_logs') : null, [firestore, user]);
+  const { data: services, isLoading: servicesLoading } = useCollection<ServiceRecord>(servicesCollectionRef);
+
+  const tripsCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'trips') : null, [firestore, user]);
+  const { data: trips, isLoading: tripsLoading } = useCollection<Trip>(tripsCollectionRef);
+
+  const stats = useMemo(() => calculateStats(logs || [], services || [], bikeDetails.engineCc), [logs, services, bikeDetails.engineCc]);
+  const activeReminders = useMemo(() => getActiveReminders(services || [], stats.lastOdo), [services, stats.lastOdo]);
+  const expenseChartData = useMemo(() => getExpenseChartData(logs || [], services || []), [logs, services]);
   
   const upcomingTrip = useMemo(() => {
-    const plannedTrips = trips.filter(t => t.status === 'planned');
+    const plannedTrips = (trips || []).filter(t => t.status === 'planned');
     if (plannedTrips.length === 0) return null;
 
     const sortedUpcoming = plannedTrips.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
@@ -69,57 +86,47 @@ export function MainApp() {
 
 
   const addExpenseToActiveTrip = (title: string, cost: number) => {
-    const activeTrip = trips.find(t => t.status === 'active');
-    if (activeTrip) {
-      const now = new Date();
-      const start = new Date(activeTrip.start);
-      if(now < start) return;
-
-      setTrips(prev => prev.map(t => {
-        if (t.id === activeTrip.id) {
-          return {
-            ...t,
-            expenses: [{ id: Date.now(), item: title, cost: parseFloat(String(cost)) }, ...t.expenses]
-          };
-        }
-        return t;
-      }));
+    const activeTrip = (trips || []).find(t => t.status === 'active');
+    if (activeTrip && activeTrip.id) {
+      const tripRef = doc(firestore, 'users', user!.uid, 'trips', String(activeTrip.id));
+      const updatedExpenses = [{ id: Date.now(), item: title, cost: parseFloat(String(cost)) }, ...(activeTrip.expenses || [])];
+      updateDocumentNonBlocking(tripRef, { expenses: updatedExpenses });
     }
   };
 
-  const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: number) => {
-    if (id) { // Editing existing
-      setLogs(prev => prev.map(log => log.id === id ? { ...log, ...fuelEntry } : log).sort((a,b) => b.odo - a.odo));
-    } else { // Adding new
-      const newLog = { id: Date.now(), ...fuelEntry };
-      setLogs(prev => [newLog, ...prev].sort((a, b) => b.odo - a.odo));
+  const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: string) => {
+    if (id && logsCollectionRef) { // Editing existing
+      const logRef = doc(logsCollectionRef, id);
+      updateDocumentNonBlocking(logRef, fuelEntry);
+    } else if (logsCollectionRef) { // Adding new
+      addDocumentNonBlocking(logsCollectionRef, fuelEntry);
       addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
     }
     setEditingFuel(null);
     setModalType(null);
   };
   
-  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id'>, id?: number) => {
-    if (id) {
-       setServices(prev => prev.map(service => service.id === id ? { ...service, ...serviceEntry } : service).sort((a,b) => b.odo - a.odo));
-    } else {
-      const newRecord = { id: Date.now(), ...serviceEntry };
-      setServices(prev => [newRecord, ...prev].sort((a, b) => b.odo - a.odo));
+  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id'>, id?: string) => {
+    if (id && servicesCollectionRef) {
+       const serviceRef = doc(servicesCollectionRef, id);
+       updateDocumentNonBlocking(serviceRef, serviceEntry);
+    } else if (servicesCollectionRef) {
+      addDocumentNonBlocking(servicesCollectionRef, serviceEntry);
       addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
     }
     setEditingService(null);
     setModalType(null);
   };
 
-  const handleDeleteFuel = (id: number) => {
-    if (window.confirm('Are you sure you want to delete this fuel log?')) {
-      setLogs(prev => prev.filter(log => log.id !== id));
+  const handleDeleteFuel = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this fuel log?') && logsCollectionRef) {
+      deleteDocumentNonBlocking(doc(logsCollectionRef, id));
     }
   };
 
-  const handleDeleteService = (id: number) => {
-    if (window.confirm('Are you sure you want to delete this service record?')) {
-      setServices(prev => prev.filter(service => service.id !== id));
+  const handleDeleteService = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this service record?') && servicesCollectionRef) {
+      deleteDocumentNonBlocking(doc(servicesCollectionRef, id));
     }
   };
 
@@ -140,75 +147,85 @@ export function MainApp() {
   }
 
   const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => {
-    const newTripObj: Trip = {
-      id: Date.now(),
+    if (!tripsCollectionRef) return;
+    const newTripObj: Omit<Trip, 'id'> = {
       ...newTripData,
       status: 'planned',
       expenses: []
     };
-    setTrips(prev => [newTripObj, ...prev]);
+    addDocumentNonBlocking(tripsCollectionRef, newTripObj);
   };
   
-  const startTrip = (id: number) => {
-     setTrips(trips.map(t => {
-        // Deactivate any currently active trip
-        if (t.status === 'active') return { ...t, status: 'completed', end: new Date().toISOString() }; 
-        return t;
-     }).map(t => {
-        // Activate the selected trip
-        if (t.id === id) return { ...t, status: 'active', start: new Date().toISOString() };
-        return t;
-     }));
+  const startTrip = (id: string) => {
+     if (!user || !tripsCollectionRef) return;
+     // Deactivate any currently active trip
+     (trips || []).forEach(t => {
+        if (t.status === 'active' && t.id) {
+          const tripRef = doc(tripsCollectionRef, String(t.id));
+          updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString() });
+        }
+     });
+
+    // Activate the selected trip
+    const tripRef = doc(tripsCollectionRef, id);
+    updateDocumentNonBlocking(tripRef, { status: 'active', start: new Date().toISOString() });
   }
 
-  const endTrip = (id: number) => {
-    if(window.confirm("End this trip? This will move it to history.")) {
-      setTrips(trips.map(t => t.id === id ? { ...t, status: 'completed', end: new Date().toISOString() } : t));
-    }
-  };
-
-  const deleteTrip = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this trip? This action cannot be undone.")) {
-      setTrips(prev => prev.filter(t => t.id !== id));
-    }
-  };
-
-  const addTripExpense = (tripId: number, item: string, cost: string) => {
-    if (!item || !cost) return;
-    const updatedTrips = trips.map((t) => {
-      if (t.id === tripId) { 
-        return { ...t, expenses: [{ id: Date.now(), item, cost: parseFloat(cost) }, ...t.expenses] };
+  const endTrip = (id: string) => {
+    if(window.confirm("End this trip? This will move it to history.") && tripsCollectionRef) {
+      const tripRef = doc(tripsCollectionRef, id);
+      const trip = (trips || []).find(t => t.id === id);
+      if (trip && user) {
+        updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString() });
+        
+        // Update rider board
+        const riderBoardRef = doc(firestore, 'rider_board', user.uid);
+        onSnapshot(riderBoardRef, (docSnap) => {
+          const currentData = docSnap.data() || { totalKilometers: 0 };
+          const newTotal = currentData.totalKilometers + parseFloat(trip.distance);
+          setDocumentNonBlocking(riderBoardRef, { userId: user.uid, totalKilometers: newTotal }, { merge: true });
+        });
       }
-      return t;
-    });
-    setTrips(updatedTrips);
+    }
   };
 
-  const updateTripExpense = (tripId: number, updatedExpense: TripExpense) => {
-    setTrips(prevTrips => prevTrips.map(trip => {
-      if (trip.id === tripId) {
-        return {
-          ...trip,
-          expenses: trip.expenses.map(expense => 
+  const deleteTrip = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this trip? This action cannot be undone.") && tripsCollectionRef) {
+      deleteDocumentNonBlocking(doc(tripsCollectionRef, id));
+    }
+  };
+
+  const addTripExpense = (tripId: string, item: string, cost: string) => {
+    if (!item || !cost || !tripsCollectionRef) return;
+    const trip = (trips || []).find(t => t.id === tripId);
+    if(trip) {
+      const tripRef = doc(tripsCollectionRef, tripId);
+      const newExpense = { id: Date.now(), item, cost: parseFloat(cost) };
+      const updatedExpenses = [newExpense, ...(trip.expenses || [])];
+      updateDocumentNonBlocking(tripRef, { expenses: updatedExpenses });
+    }
+  };
+
+  const updateTripExpense = (tripId: string, updatedExpense: TripExpense) => {
+    if (!tripsCollectionRef) return;
+     const trip = (trips || []).find(t => t.id === tripId);
+     if (trip) {
+        const tripRef = doc(tripsCollectionRef, tripId);
+        const updatedExpenses = (trip.expenses || []).map(expense => 
             expense.id === updatedExpense.id ? updatedExpense : expense
-          )
-        };
-      }
-      return trip;
-    }));
+        );
+        updateDocumentNonBlocking(tripRef, { expenses: updatedExpenses });
+     }
   };
   
-  const deleteTripExpense = (tripId: number, expenseId: number) => {
-     if (!window.confirm("Delete this expense?")) return;
-    setTrips(prevTrips => prevTrips.map(trip => {
-      if (trip.id === tripId) {
-        return {
-          ...trip,
-          expenses: trip.expenses.filter(expense => expense.id !== expenseId)
-        };
+  const deleteTripExpense = (tripId: string, expenseId: number) => {
+    if (!window.confirm("Delete this expense?") || !tripsCollectionRef) return;
+     const trip = (trips || []).find(t => t.id === tripId);
+      if (trip) {
+        const tripRef = doc(tripsCollectionRef, tripId);
+        const updatedExpenses = (trip.expenses || []).filter(expense => expense.id !== expenseId);
+        updateDocumentNonBlocking(tripRef, { expenses: updatedExpenses });
       }
-      return trip;
-    }));
   };
 
   const openModal = (type: NonNullable<ModalType>) => {
@@ -220,13 +237,13 @@ export function MainApp() {
         case 'dashboard':
             return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} expenseChartData={expenseChartData} upcomingTrip={upcomingTrip} />;
         case 'fuel':
-            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
+            return <FuelLogView logs={logs || []} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
         case 'service':
-            return <ServiceLogView logs={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
+            return <ServiceLogView logs={services || []} onDelete={handleDeleteService} onEdit={handleEditService} />;
         case 'history':
             return <HistoryView 
-                        fuelLogs={logs} 
-                        serviceLogs={services} 
+                        fuelLogs={logs || []} 
+                        serviceLogs={services || []} 
                         onEditFuel={handleEditFuel}
                         onDeleteFuel={handleDeleteFuel}
                         onEditService={handleEditService}
@@ -234,9 +251,9 @@ export function MainApp() {
                     />;
         case 'trip':
             return <TripView 
-              trips={trips} 
+              trips={trips || []} 
               stats={stats} 
-              services={services}
+              services={services || []}
               onCreateTrip={createTrip}
               onStartTrip={startTrip}
               onEndTrip={endTrip}
@@ -245,6 +262,8 @@ export function MainApp() {
               onUpdateExpense={updateTripExpense}
               onDeleteExpense={deleteTripExpense}
             />;
+        case 'rider-board':
+            return <RiderBoardView />;
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
@@ -262,14 +281,14 @@ export function MainApp() {
 
       <MainNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
       
-      {activeTab !== 'trip' && <FloatingActionButtons onOpenModal={openModal} />}
+      {activeTab !== 'trip' && activeTab !== 'rider-board' && <FloatingActionButtons onOpenModal={openModal} />}
       
       <FuelModal
         isOpen={modalType === 'fuel'}
         onClose={handleCloseModal}
         onSubmit={handleAddOrUpdateFuel}
         lastOdo={stats.lastOdo}
-        lastPrice={logs.length > 0 && logs[0].price ? logs[0].price : undefined}
+        lastPrice={(logs && logs.length > 0 && logs[0].price) ? logs[0].price : undefined}
         editingFuel={editingFuel}
       />
       <ServiceModal

@@ -12,12 +12,12 @@ interface TripViewProps {
   stats: Stats;
   services: ServiceRecord[];
   onCreateTrip: (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => void;
-  onStartTrip: (id: number) => void;
-  onEndTrip: (id: number) => void;
-  onDeleteTrip: (id: number) => void;
-  onAddExpense: (tripId: number, item: string, cost: string) => void;
-  onUpdateExpense: (tripId: number, updatedExpense: TripExpense) => void;
-  onDeleteExpense: (tripId: number, expenseId: number) => void;
+  onStartTrip: (id: string) => void;
+  onEndTrip: (id: string) => void;
+  onDeleteTrip: (id: string) => void;
+  onAddExpense: (tripId: string, item: string, cost: string) => void;
+  onUpdateExpense: (tripId: string, updatedExpense: TripExpense) => void;
+  onDeleteExpense: (tripId: string, expenseId: number) => void;
 }
 
 export function TripView({ 

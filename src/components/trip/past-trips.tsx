@@ -7,7 +7,7 @@ import { format } from "date-fns";
 
 interface PastTripsProps {
     trips: Trip[];
-    onDeleteTrip: (id: number) => void;
+    onDeleteTrip: (id: string) => void;
 }
 
 export function PastTrips({ trips, onDeleteTrip }: PastTripsProps) {
@@ -34,7 +34,7 @@ export function PastTrips({ trips, onDeleteTrip }: PastTripsProps) {
                         <div className="flex justify-between items-center text-xs">
                             <span className="text-slate-500 flex items-center gap-1"><MapPin size={12}/> {t.distance} km</span>
                             <span className="font-black text-slate-800 bg-slate-50 px-2 py-1 rounded">
-                                Total: रू {t.expenses.reduce((s, e) => s + parseFloat(String(e.cost)), 0).toLocaleString()}
+                                Total: रू {(t.expenses || []).reduce((s, e) => s + parseFloat(String(e.cost)), 0).toLocaleString()}
                             </span>
                         </div>
                     </div>

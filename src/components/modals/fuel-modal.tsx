@@ -14,7 +14,7 @@ import type { FuelLog } from '@/lib/types';
 interface FuelModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Omit<FuelLog, 'id'>, id?: number) => void;
+    onSubmit: (data: Omit<FuelLog, 'id'>, id?: string) => void;
     lastOdo: number;
     lastPrice?: number;
     editingFuel: FuelLog | null;

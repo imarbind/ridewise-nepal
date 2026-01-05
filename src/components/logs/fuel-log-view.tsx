@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 interface FuelLogViewProps {
     logs: FuelLog[];
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
     onEdit: (log: FuelLog) => void;
 }
 

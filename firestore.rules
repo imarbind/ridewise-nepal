@@ -1,110 +1,38 @@
-/**
- * @file firestore.rules
- * @description Security rules for the RideLog Nepal Firestore database.
- *
- * @section Core Philosophy
- * This ruleset enforces a strict user-ownership model. All personal data, such as
- * fuel logs, service records, and trips, is stored in a private data tree
- * accessible only to the authenticated owner.
- *
- * @section Data Structure
- * User data is hierarchically organized under `/users/{userId}`. A separate
- * top-level collection, `/rider_board`, stores publicly readable leaderboard data.
- *
- * @section Key Security Decisions
- * - **Private User Data**: All collections under `/users/{userId}` are strictly
- *   private. A user can only read and write their own documents. Listing of other
- *   users' data is disallowed.
- * - **Public Leaderboard**: The `/rider_board` collection is publicly readable by
- *   any client, allowing the app to display the leaderboard to all users.
- * - **Protected Writes**: Writes to the `/rider_board` are disallowed from the
- *   client. This data should be managed by a trusted backend process (e.g., Cloud
- *   Functions) that aggregates trip data to prevent cheating. This enforces data
- *   integrity for the leaderboard.
- * - **No User Listing**: The top-level `/users` collection is not defined,
- *   effectively preventing any client from listing all users in the application.
- *
- * @section Denormalization for Authorization
- * The security model relies on path-based authorization, where the user's UID is
- * part of the document path (e.g., `/users/{userId}`). This avoids the need for
- * slow and costly `get()` calls in rules to check for ownership.
- *
- * @section Structural Segregation
- * Private user data (logs, trips) is structurally segregated from public data
- * (leaderboard). This prevents accidental data leakage and allows for simple,
- * performant security rules for list operations.
- */
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // -------------------------------------------------------------------------
-    // Helper Functions
-    // -------------------------------------------------------------------------
-
-    /**
-     * Returns true if the user is authenticated.
-     */
+  
     function isSignedIn() {
       return request.auth != null;
     }
-
-    /**
-     * Returns true if the authenticated user's UID matches the provided userId.
-     * This is the primary function for enforcing data ownership.
-     */
+    
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
-
-    /**
-     * Returns true if the user is the owner of an existing document.
-     * Used for safe update and delete operations.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
+  
+    // User can read/write their own profile data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // Subcollections
+      match /fuel_logs/{logId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+      match /service_logs/{logId} {
+        allow read, write, delete: if isOwner(userId);
+      }
+      match /trips/{tripId} {
+        allow read, write, delete: if isOwner(userId);
+      }
     }
-
-    // -------------------------------------------------------------------------
-    // User Data Rules
-    // -------------------------------------------------------------------------
-
-    /**
-     * @description Rules for all user-specific data collections. This match
-     *              block enforces that only the authenticated user can access
-     *              their own data subtree.
-     * @path        /users/{userId}
-     * @allow       A user with uid 'user123' can access any path under /users/user123.
-     * @deny        A user with uid 'user456' attempting to access /users/user123.
-     * @principle   Restricts access to a user's own data tree.
-     */
-    match /users/{userId}/{collection}/{docId} {
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-
-    // -------------------------------------------------------------------------
-    // Public Data Rules
-    // -------------------------------------------------------------------------
-
-    /**
-     * @description A public leaderboard that can be read by anyone but cannot be
-     *              modified by clients. This prevents cheating and ensures that
-     *              leaderboard updates are handled by a trusted server process.
-     * @path        /rider_board/{riderId}
-     * @allow       (get, list) Any user (signed-in or anonymous) can read the leaderboard.
-     * @deny        (create, update, delete) A signed-in user trying to modify a record.
-     * @principle   Enforces data integrity for a public collection by delegating
-     *              writes to a trusted backend process.
-     */
-    match /rider_board/{riderId} {
+    
+    // Rider board is public readable, but only writable by the owner of the record
+    match /rider_board/{userId} {
       allow get: if true;
       allow list: if true;
-      allow create: if false;
-      allow update: if false;
+      allow create, update: if isOwner(userId);
       allow delete: if false;
     }
   }

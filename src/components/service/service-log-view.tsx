@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 interface ServiceLogViewProps {
     logs: ServiceRecord[];
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
     onEdit: (log: ServiceRecord) => void;
 }
 

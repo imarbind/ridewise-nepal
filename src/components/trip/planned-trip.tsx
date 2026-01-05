@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 
 interface PlannedTripProps {
   trip: Trip;
-  onStart: (id: number) => void;
-  onDelete: (id: number) => void;
+  onStart: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export function PlannedTrip({ trip, onStart, onDelete }: PlannedTripProps) {

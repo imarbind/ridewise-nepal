@@ -1,4 +1,4 @@
-export type ActiveTab = 'dashboard' | 'fuel' | 'service' | 'trip' | 'history' | 'docs';
+export type ActiveTab = 'dashboard' | 'fuel' | 'service' | 'trip' | 'history' | 'docs' | 'rider-board';
 export type ModalType = 'fuel' | 'service' | null;
 
 export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
@@ -13,7 +13,7 @@ export interface BikeDetails {
 }
 
 export interface FuelLog {
-  id: number;
+  id: string;
   date: string;
   odo: number;
   liters: number;
@@ -30,7 +30,7 @@ export interface ServicePart {
 }
 
 export interface ServiceRecord {
-  id: number;
+  id: string;
   date: string;
   odo: number;
   work: string;
@@ -46,7 +46,7 @@ export interface TripExpense {
 }
 
 export interface Trip {
-    id: number;
+    id: string;
     destination: string;
     start: string; // ISO 8601 format
     end?: string; // ISO 8601 format, optional
@@ -102,4 +102,11 @@ export type Reminder = {
         reminderValue: number;
         currentUsed: number;
     }
+}
+
+export interface RiderBoardEntry {
+  id: string;
+  userId: string;
+  userName?: string;
+  totalKilometers: number;
 }

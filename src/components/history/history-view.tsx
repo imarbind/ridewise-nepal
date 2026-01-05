@@ -15,9 +15,9 @@ interface HistoryViewProps {
   fuelLogs: FuelLog[];
   serviceLogs: ServiceRecord[];
   onEditFuel: (log: FuelLog) => void;
-  onDeleteFuel: (id: number) => void;
+  onDeleteFuel: (id: string) => void;
   onEditService: (service: ServiceRecord) => void;
-  onDeleteService: (id: number) => void;
+  onDeleteService: (id: string) => void;
 }
 
 export function HistoryView({
@@ -77,7 +77,7 @@ export function HistoryView({
   );
 }
 
-const FuelHistoryItem = ({ log, onEdit, onDelete }: { log: FuelLog; onEdit: (log: FuelLog) => void; onDelete: (id: number) => void; }) => (
+const FuelHistoryItem = ({ log, onEdit, onDelete }: { log: FuelLog; onEdit: (log: FuelLog) => void; onDelete: (id: string) => void; }) => (
     <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-green-500/50 border-slate-200">
         <div className="flex justify-between items-start">
             <div>
@@ -112,7 +112,7 @@ const FuelHistoryItem = ({ log, onEdit, onDelete }: { log: FuelLog; onEdit: (log
     </div>
 );
 
-const ServiceHistoryItem = ({ service, onEdit, onDelete }: { service: ServiceRecord; onEdit: (service: ServiceRecord) => void; onDelete: (id: number) => void; }) => (
+const ServiceHistoryItem = ({ service, onEdit, onDelete }: { service: ServiceRecord; onEdit: (service: ServiceRecord) => void; onDelete: (id: string) => void; }) => (
     <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/50 border-slate-200">
         <div className="flex justify-between items-start mb-3">
             <div>

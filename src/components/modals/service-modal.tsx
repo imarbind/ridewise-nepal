@@ -15,7 +15,7 @@ import type { ServiceRecord } from '@/lib/types';
 interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Omit<ServiceRecord, 'id'>, id?: number) => void;
+    onSubmit: (data: Omit<ServiceRecord, 'id'>, id?: string) => void;
     lastOdo: number;
     editingService: ServiceRecord | null;
 }
