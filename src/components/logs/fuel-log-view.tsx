@@ -3,6 +3,7 @@
 import { Droplets, Trash2, Edit } from 'lucide-react';
 import type { FuelLog } from '@/lib/types';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface FuelLogViewProps {
     logs: FuelLog[];
@@ -20,28 +21,41 @@ export function FuelLogView({ logs, onDelete, onEdit }: FuelLogViewProps) {
                     <div 
                         key={l.id} 
                         style={{animationDelay: `${idx * 50}ms`}} 
-                        className="bg-card border border-slate-200 p-4 rounded-2xl flex justify-between items-center shadow-md animate-in slide-in-from-bottom-2 fill-mode-backwards group"
+                        className={cn(
+                            "bg-card border border-slate-200 p-4 rounded-2xl shadow-md animate-in slide-in-from-bottom-2 fill-mode-backwards group",
+                            "flex flex-col"
+                        )}
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="bg-red-50 p-2 rounded-full text-primary">
-                                <Droplets size={18} />
-                            </div>
+                        <div className="flex justify-between items-start">
                             <div>
                                 <p className="font-black text-slate-800 text-sm">{l.odo.toLocaleString()} KM</p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold">
-                                {new Date(l.date).toLocaleDateString('en-CA')} • {l.liters}L 
-                                {l.price && <span className="text-blue-500 ml-1">@{l.price}</span>}
+                                    {new Date(l.date).toLocaleDateString('en-CA')}
                                 </p>
                             </div>
+                            <div className="flex items-center gap-1">
+                                <Button onClick={() => onEdit(l)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-blue-50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Edit size={16} />
+                                </Button>
+                                <Button onClick={() => onDelete(l.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Trash2 size={16} />
+                                </Button>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                            <p className="text-slate-800 font-black bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">रू {l.amount.toLocaleString()}</p>
-                            <Button onClick={() => onEdit(l)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-blue-50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Edit size={16} />
-                            </Button>
-                            <Button onClick={() => onDelete(l.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Trash2 size={16} />
-                            </Button>
+
+                        <div className="mt-3 grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div className="text-center">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase">Cost</p>
+                                <p className="font-black text-slate-800">रू {l.amount.toLocaleString()}</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase">Liters</p>
+                                <p className="font-black text-slate-800">{l.liters.toFixed(2)}L</p>
+                            </div>
+                            <div className="text-center">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase">Rate</p>
+                                <p className="font-black text-slate-800">@{l.price.toFixed(2)}</p>
+                            </div>
                         </div>
                     </div>
                 ))}
