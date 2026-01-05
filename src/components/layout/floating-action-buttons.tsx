@@ -14,7 +14,7 @@ export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProp
             <Button 
                 aria-label="Add Service Record"
                 onClick={() => onOpenModal('service')} 
-                className="group relative bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg shadow-blue-600/30 active:scale-90 transition-all hover:-translate-y-1"
+                className="group relative bg-primary hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all hover:-translate-y-1"
             >
                 <div className="absolute inset-0 bg-white rounded-full opacity-0 group-hover:opacity-20 transition-opacity animate-ping-slow-once"></div>
                 <Wrench size={24}/>
@@ -22,7 +22,7 @@ export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProp
             <Button 
                 aria-label="Add Fuel Log"
                 onClick={() => onOpenModal('fuel')} 
-                className="group relative bg-primary hover:bg-red-700 text-white w-14 h-14 rounded-full shadow-lg shadow-primary/30 active:scale-90 transition-all hover:-translate-y-1"
+                className="group relative bg-green-600 hover:bg-green-700 text-white w-14 h-14 rounded-full shadow-lg shadow-green-600/30 active:scale-90 transition-all hover:-translate-y-1"
             >
                 <div className="absolute inset-0 bg-white rounded-full opacity-0 group-hover:opacity-20 transition-opacity animate-ping-slow-once"></div>
                 <Fuel size={24}/>

@@ -42,16 +42,7 @@ export function HistoryView({
       </h2>
       <div className="relative">
          {combinedHistory.length > 1 && 
-          <div className="absolute left-3.5 top-4 bottom-4 w-10 bg-slate-700 shadow-inner rounded-full overflow-hidden">
-            <div 
-              className="absolute inset-0 bg-repeat-y bg-center"
-              style={{
-                backgroundImage: 'linear-gradient(white, white)',
-                backgroundSize: '2px 10px',
-                backgroundRepeat: 'space'
-              }}
-            />
-          </div>
+            <div className="absolute left-6 top-4 bottom-4 w-0.5 bg-slate-200"></div>
          }
 
         {combinedHistory.length === 0 && (
@@ -63,12 +54,12 @@ export function HistoryView({
             <div key={`${item.type}-${item.data.id}`} style={{ animationDelay: `${idx * 50}ms` }} className="group relative flex items-start gap-4 animate-in slide-in-from-bottom-4 fill-mode-backwards">
               <div className="relative z-10 flex flex-col items-center">
                 <div className={cn(
-                    "w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-slate-50",
-                    item.type === 'fuel' ? 'bg-primary' : 'bg-blue-600'
+                    "w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg border-4 border-background",
+                    item.type === 'fuel' ? 'bg-green-600' : 'bg-primary'
                 )}>
                   {item.type === 'fuel' ? <Fuel size={20} /> : <Wrench size={20} />}
                 </div>
-                <p className="text-[9px] font-black text-slate-100 text-center mt-1.5 bg-slate-600 px-1.5 py-0.5 rounded">{item.odo.toLocaleString()} KM</p>
+                <p className="text-[9px] font-black text-slate-500 text-center mt-1.5 bg-slate-100 px-1.5 py-0.5 rounded">{item.odo.toLocaleString()} KM</p>
               </div>
 
               <div className="flex-1 pt-0.5">
@@ -87,7 +78,7 @@ export function HistoryView({
 }
 
 const FuelHistoryItem = ({ log, onEdit, onDelete }: { log: FuelLog; onEdit: (log: FuelLog) => void; onDelete: (id: number) => void; }) => (
-    <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/50 border-slate-200">
+    <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-green-500/50 border-slate-200">
         <div className="flex justify-between items-start">
             <div>
                 <p className="font-black text-slate-800 text-base">Fuel Refill</p>
@@ -122,7 +113,7 @@ const FuelHistoryItem = ({ log, onEdit, onDelete }: { log: FuelLog; onEdit: (log
 );
 
 const ServiceHistoryItem = ({ service, onEdit, onDelete }: { service: ServiceRecord; onEdit: (service: ServiceRecord) => void; onDelete: (id: number) => void; }) => (
-    <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-blue-500/50 border-slate-200">
+    <div className="bg-card border p-4 rounded-2xl shadow-md relative overflow-hidden transition-all hover:shadow-lg hover:border-primary/50 border-slate-200">
         <div className="flex justify-between items-start mb-3">
             <div>
                 <p className="font-black text-slate-800 text-base">{service.work}</p>
@@ -144,7 +135,7 @@ const ServiceHistoryItem = ({ service, onEdit, onDelete }: { service: ServiceRec
             <div className="flex justify-between items-center">
                  <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest pl-1">Itemized Cost</p>
                  <div className="text-sm">
-                    <span className="font-black text-blue-800">रू {service.totalCost.toLocaleString()}</span>
+                    <span className="font-black text-primary">रू {service.totalCost.toLocaleString()}</span>
                  </div>
             </div>
             {service.parts.map((p, idx) => (

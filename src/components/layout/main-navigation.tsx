@@ -11,10 +11,10 @@ interface MainNavigationProps {
 
 const navItems: { id: ActiveTab; icon: React.ElementType, color: string, label: string }[] = [
     { id: 'dashboard', icon: BarChart3, color: 'primary', label: 'Dashboard' },
-    { id: 'fuel', icon: Fuel, color: 'primary', label: 'Fuel' },
-    { id: 'service', icon: Wrench, color: 'accent', label: 'Service' },
+    { id: 'fuel', icon: Fuel, color: 'green-600', label: 'Fuel' },
+    { id: 'service', icon: Wrench, color: 'primary', label: 'Service' },
     { id: 'history', icon: History, color: 'blue-600', label: 'History' },
-    { id: 'trip', icon: Navigation2, color: 'green-600', label: 'Trip' },
+    { id: 'trip', icon: Navigation2, color: 'purple-600', label: 'Trip' },
 ];
 
 export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps) {
@@ -31,11 +31,7 @@ export function MainNavigation({ activeTab, setActiveTab }: MainNavigationProps)
                         isActive
                             ? 'text-white shadow-lg -translate-y-2 scale-110'
                             : 'text-slate-400 hover:text-slate-600',
-                        isActive && item.id === 'dashboard' && 'bg-primary shadow-primary/30',
-                        isActive && item.id === 'fuel' && 'bg-primary shadow-primary/30',
-                        isActive && item.id === 'service' && 'bg-accent shadow-accent/30',
-                        isActive && item.id === 'history' && 'bg-blue-600 shadow-blue-600/30',
-                        isActive && item.id === 'trip' && 'bg-green-600 shadow-green-600/30'
+                        isActive && `bg-${item.color} shadow-${item.color}/30`
                     )}
                     aria-current={isActive ? 'page' : undefined}
                 >

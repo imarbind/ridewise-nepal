@@ -31,11 +31,11 @@ interface ExpenseChartProps {
 const chartConfig = {
   fuel: {
     label: "Fuel",
-    color: "hsl(var(--primary))",
+    color: "hsl(var(--chart-2))",
   },
   service: {
     label: "Service",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(var(--primary))",
   },
 }
 
