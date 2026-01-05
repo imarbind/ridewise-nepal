@@ -49,16 +49,28 @@ export function MainApp() {
 
   const handleAddFuel = (fuelEntry: Omit<FuelLog, 'id'>) => {
     const newLog = { id: Date.now(), ...fuelEntry };
-    setLogs(prev => [newLog, ...prev]);
+    setLogs(prev => [newLog, ...prev].sort((a, b) => b.odo - a.odo));
     addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
     setShowModal(false);
   };
   
   const handleAddService = (serviceEntry: Omit<ServiceRecord, 'id'>) => {
     const newRecord = { id: Date.now(), ...serviceEntry };
-    setServices(prev => [newRecord, ...prev]);
+    setServices(prev => [newRecord, ...prev].sort((a, b) => b.odo - a.odo));
     addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
     setShowModal(false);
+  };
+
+  const handleDeleteFuel = (id: number) => {
+    if (confirm('Are you sure you want to delete this fuel log?')) {
+      setLogs(prev => prev.filter(log => log.id !== id));
+    }
+  };
+
+  const handleDeleteService = (id: number) => {
+    if (confirm('Are you sure you want to delete this service record?')) {
+      setServices(prev => prev.filter(service => service.id !== id));
+    }
   };
 
   const openModal = (type: NonNullable<ModalType>) => {
@@ -73,9 +85,9 @@ export function MainApp() {
         case 'trip':
             return <TripView trips={trips} setTrips={setTrips} stats={stats} services={services} />;
         case 'logs':
-            return <FuelLogView logs={logs} />;
+            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} />;
         case 'service':
-            return <ServiceLogView services={services} />;
+            return <ServiceLogView services={services} onDelete={handleDeleteService} />;
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:

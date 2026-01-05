@@ -56,6 +56,7 @@ export type Stats = {
     totalServiceCost: number;
     totalOwnership: number;
     avgMileage: string;
+    costPerKm: string;
     efficiencyStatus: 'Excellent' | 'Average' | 'Poor';
     logsCount: number;
     serviceCount: number;

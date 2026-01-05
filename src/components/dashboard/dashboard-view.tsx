@@ -5,7 +5,7 @@ import type { Stats, Reminder } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
-import { Fuel, Wrench, History, CircleDollarSign } from 'lucide-react';
+import { Fuel, Wrench, History, CircleDollarSign, Coins } from 'lucide-react';
 
 interface DashboardViewProps {
   stats: Stats;
@@ -69,7 +69,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs }: Dashbo
       <div className="grid grid-cols-2 gap-4 mb-8">
         <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-primary" />
         <StatCard delay={200} label="Service" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
-        <StatCard delay={300} label="History" value={stats.logsCount.toLocaleString()} icon={History} color="bg-slate-700" />
+        <StatCard delay={300} label="Cost / KM" value={`रू ${stats.costPerKm}`} icon={Coins} color="bg-green-600" />
         <StatCard delay={400} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
       </div>
 

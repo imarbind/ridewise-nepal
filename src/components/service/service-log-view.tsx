@@ -1,13 +1,15 @@
 "use client";
 
-import { Calendar } from 'lucide-react';
+import { Calendar, Trash2 } from 'lucide-react';
 import type { ServiceRecord } from '@/lib/types';
+import { Button } from '@/components/ui/button';
 
 interface ServiceLogViewProps {
     services: ServiceRecord[];
+    onDelete: (id: number) => void;
 }
 
-export function ServiceLogView({ services }: ServiceLogViewProps) {
+export function ServiceLogView({ services, onDelete }: ServiceLogViewProps) {
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">Service History</h2>
@@ -23,8 +25,11 @@ export function ServiceLogView({ services }: ServiceLogViewProps) {
                                 <Calendar size={10} /> {new Date(s.date).toLocaleDateString('en-CA')} • {s.odo.toLocaleString()} KM
                             </p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex items-center gap-2">
                             <p className="text-blue-600 font-black text-lg">रू {s.totalCost.toLocaleString()}</p>
+                             <Button onClick={() => onDelete(s.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Trash2 size={16} />
+                            </Button>
                         </div>
                     </div>
                     <div className="space-y-2 relative z-10 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">

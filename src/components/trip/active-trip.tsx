@@ -24,8 +24,10 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
   today.setHours(0,0,0,0);
   const start = new Date(trip.start);
   start.setHours(0,0,0,0);
-  const daysDiff = Math.ceil((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  const daysDiff = Math.ceil((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
   const tripTotal = trip.expenses.reduce((s, e) => s + parseFloat(String(e.cost)), 0);
+
+  const canAddExpense = daysDiff >= 0;
 
   const handleAddOrUpdateExpense = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,8 +66,8 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
             <p className="text-sm opacity-70 mt-1 flex items-center gap-2"><MapPin size={14}/> {trip.distance} km trip</p>
           </div>
           <div className="text-right bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
-            <p className="text-2xl font-black">{daysDiff >= 0 ? daysDiff : Math.abs(daysDiff)}</p>
-            <p className="text-[9px] uppercase font-bold opacity-70">{daysDiff >= 0 ? 'Days To Go' : 'Days In'}</p>
+            <p className="text-2xl font-black">{daysDiff < 0 ? Math.abs(daysDiff) : daysDiff}</p>
+            <p className="text-[9px] uppercase font-bold opacity-70">{daysDiff < 0 ? 'Days To Go' : 'Days In'}</p>
           </div>
         </div>
         <div className="mt-6 flex gap-2">
@@ -83,34 +85,40 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
           <Wallet size={18} className="text-green-600"/> Trip Wallet
         </h3>
         
-        <form onSubmit={handleAddOrUpdateExpense} className="bg-card p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
-          <div className="flex gap-2 mb-2">
-            <Input 
-              value={expenseItem} 
-              onChange={e => setExpenseItem(e.target.value)}
-              placeholder="Expense (e.g. Lunch)" 
-              className="flex-1 bg-slate-50 p-3 h-auto rounded-xl border-slate-200 font-bold text-sm outline-none focus:border-blue-500"
-            />
-            <Input 
-              type="number"
-              value={expenseCost} 
-              onChange={e => setExpenseCost(e.target.value)}
-              placeholder="Cost" 
-              className="w-24 bg-slate-50 p-3 h-auto rounded-xl border-slate-200 font-bold text-sm outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="flex gap-2">
-            {editingExpense && (
-              <Button type="button" onClick={handleCancelEdit} variant="ghost" className="w-full bg-slate-200 text-slate-700 p-3 h-auto rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors">
-                Cancel
+        {canAddExpense ? (
+          <form onSubmit={handleAddOrUpdateExpense} className="bg-card p-4 rounded-2xl border border-slate-200 shadow-sm mb-4">
+            <div className="flex gap-2 mb-2">
+              <Input 
+                value={expenseItem} 
+                onChange={e => setExpenseItem(e.target.value)}
+                placeholder="Expense (e.g. Lunch)" 
+                className="flex-1 bg-slate-50 p-3 h-auto rounded-xl border-slate-200 font-bold text-sm outline-none focus:border-blue-500"
+              />
+              <Input 
+                type="number"
+                value={expenseCost} 
+                onChange={e => setExpenseCost(e.target.value)}
+                placeholder="Cost" 
+                className="w-24 bg-slate-50 p-3 h-auto rounded-xl border-slate-200 font-bold text-sm outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="flex gap-2">
+              {editingExpense && (
+                <Button type="button" onClick={handleCancelEdit} variant="ghost" className="w-full bg-slate-200 text-slate-700 p-3 h-auto rounded-xl font-bold text-sm hover:bg-slate-300 transition-colors">
+                  Cancel
+                </Button>
+              )}
+              <Button type="submit" className="w-full bg-slate-800 text-white p-3 h-auto rounded-xl font-bold text-sm hover:bg-slate-700 transition-colors">
+                {editingExpense ? 'Update Expense' : '+ Add Expense'}
               </Button>
-            )}
-            <Button type="submit" className="w-full bg-slate-800 text-white p-3 h-auto rounded-xl font-bold text-sm hover:bg-slate-700 transition-colors">
-              {editingExpense ? 'Update Expense' : '+ Add Expense'}
-            </Button>
-          </div>
-          <p className="text-[10px] text-slate-400 mt-2 italic text-center">Note: Fuel & Service logs added now will auto-sync here.</p>
-        </form>
+            </div>
+            <p className="text-[10px] text-slate-400 mt-2 italic text-center">Note: Fuel & Service logs added now will auto-sync here.</p>
+          </form>
+        ) : (
+            <div className="bg-blue-50 text-blue-800 p-4 rounded-2xl border border-blue-200 text-center text-xs font-bold mb-4">
+                Your trip hasn't started yet. You can add expenses once the trip begins.
+            </div>
+        )}
 
         <div className="space-y-3">
           <div className="flex justify-between items-center px-2">

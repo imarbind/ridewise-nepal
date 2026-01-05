@@ -8,13 +8,27 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
 
   const totalFuelCost = logs.reduce((sum, item) => sum + (parseFloat(String(item.amount)) || 0), 0);
   const totalServiceCost = services.reduce((sum, item) => sum + (parseFloat(String(item.totalCost)) || 0), 0);
+  const totalOwnership = totalFuelCost + totalServiceCost;
 
   let avgMileage = 0;
+  let costPerKm = 0;
+
+  const allRecordsByOdo = [...logs.map(l => ({ odo: l.odo })), ...services.map(s => ({ odo: s.odo }))]
+    .filter(r => r.odo)
+    .sort((a, b) => a.odo - b.odo);
+    
+  const firstOdo = allRecordsByOdo.length > 0 ? allRecordsByOdo[0].odo : 0;
+  const totalDistance = lastOdo - firstOdo;
+
   if (logs.length > 1) {
     const sortedByOdo = [...logs].sort((a, b) => a.odo - b.odo);
-    const totalDist = sortedByOdo[sortedByOdo.length - 1].odo - sortedByOdo[0].odo;
+    const totalDistForFuel = sortedByOdo[sortedByOdo.length - 1].odo - sortedByOdo[0].odo;
     const fuelConsumed = logs.slice(0, -1).reduce((sum, item) => sum + (parseFloat(String(item.liters)) || 0), 0);
-    avgMileage = fuelConsumed > 0 ? (totalDist / fuelConsumed) : 0;
+    avgMileage = fuelConsumed > 0 ? (totalDistForFuel / fuelConsumed) : 0;
+  }
+
+  if (totalDistance > 0) {
+    costPerKm = totalOwnership / totalDistance;
   }
 
   let dailyAvg = 0;
@@ -41,6 +55,7 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
     totalServiceCost,
     totalOwnership: totalFuelCost + totalServiceCost,
     avgMileage: avgMileage.toFixed(1),
+    costPerKm: costPerKm.toFixed(2),
     efficiencyStatus,
     logsCount: logs.length,
     serviceCount: services.length,
