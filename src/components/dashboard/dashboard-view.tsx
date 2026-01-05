@@ -36,9 +36,8 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
     <div className="pb-32 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="mb-4 flex justify-between items-start z-10 relative">
         <h1 className="text-3xl font-black text-slate-800 tracking-tighter italic drop-shadow-sm flex items-center gap-2">
-          <span className="text-primary">RIDE</span>
-          <span className="text-foreground">LOG</span>
-          <span className="text-blue-600 text-sm border border-blue-600 px-2 py-0.5 rounded-md ml-1">NEPAL</span>
+          <span className="text-primary">RYD</span>
+          <span className="text-foreground">IO</span>
         </h1>
         <Button onClick={onNavigateDocs} variant="outline" size="icon" className="bg-card border-slate-200 w-12 h-12 rounded-2xl text-slate-500 hover:text-primary hover:border-primary/50 hover:shadow-primary/10 transition-all shadow-lg active:scale-95">
           <FileText size={20} />

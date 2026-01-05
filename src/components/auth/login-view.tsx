@@ -51,7 +51,7 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
     <div className="flex items-center justify-center min-h-screen bg-slate-50">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
         <h1 className="text-3xl font-black text-slate-800 tracking-tighter text-center">
-          Welcome to <span className="text-primary">RideLog Nepal</span>
+          Welcome to <span className="text-primary">Rydio</span>
         </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

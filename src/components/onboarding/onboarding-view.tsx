@@ -55,7 +55,7 @@ export function OnboardingView({ onSubmit }: OnboardingViewProps) {
       <div className="w-full max-w-lg p-8 space-y-6 bg-white rounded-3xl shadow-2xl">
         <div className="text-center">
           <h1 className="text-3xl font-black text-slate-800 tracking-tighter">
-            Welcome to <span className="text-primary">RideLog</span>!
+            Welcome to <span className="text-primary">Rydio</span>!
           </h1>
           <p className="text-slate-600 mt-2">Let's set up your vehicle profile to get started.</p>
         </div>
