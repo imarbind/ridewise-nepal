@@ -72,9 +72,13 @@ export function ExpenseChart({ data }: ExpenseChartProps) {
                         tickFormatter={(value) => `रू${Number(value) / 1000}k`}
                         className="text-muted-foreground"
                     />
-                     <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
+                     <Tooltip
+                        cursor={{fill: 'hsl(var(--muted))'}}
+                        contentStyle={{
+                            backgroundColor: 'hsl(var(--background))',
+                            borderRadius: 'var(--radius)',
+                            border: '1px solid hsl(var(--border))',
+                        }}
                     />
                     <Legend content={({ payload }) => (
                          <div className="flex gap-4 justify-center mt-4">
