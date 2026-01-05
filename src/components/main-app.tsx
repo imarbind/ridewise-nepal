@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { calculateStats, getActiveReminders } from '@/lib/calculations';
-import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType } from '@/lib/types';
+import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense } from '@/lib/types';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
 import { MainNavigation } from '@/components/layout/main-navigation';
@@ -36,6 +36,12 @@ export function MainApp() {
   const addExpenseToActiveTrip = (title: string, cost: number) => {
     const activeTrip = trips.find(t => t.status === 'active');
     if (activeTrip) {
+      const start = new Date(activeTrip.start);
+      start.setHours(0,0,0,0);
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      if(today.getTime() < start.getTime()) return;
+
       setTrips(prev => prev.map(t => {
         if (t.id === activeTrip.id) {
           return {
@@ -74,6 +80,66 @@ export function MainApp() {
     }
   };
 
+  const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses'>) => {
+    const newTripObj: Trip = {
+      id: Date.now(),
+      ...newTripData,
+      status: 'active',
+      expenses: []
+    };
+    setTrips(prev => [newTripObj, ...prev]);
+  };
+
+  const endTrip = (id: number) => {
+    if(window.confirm("End this trip? This will move it to history.")) {
+      setTrips(trips.map(t => t.id === id ? { ...t, status: 'completed' } : t));
+    }
+  };
+
+  const deleteTrip = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this trip? This action cannot be undone.")) {
+      setTrips(prev => prev.filter(t => t.id !== id));
+    }
+  };
+
+  const addTripExpense = (tripId: number, item: string, cost: string) => {
+    if (!item || !cost) return;
+    const updatedTrips = trips.map((t) => {
+      if (t.id === tripId) { 
+        return { ...t, expenses: [{ id: Date.now(), item, cost: parseFloat(cost) }, ...t.expenses] };
+      }
+      return t;
+    });
+    setTrips(updatedTrips);
+  };
+
+  const updateTripExpense = (tripId: number, updatedExpense: TripExpense) => {
+    setTrips(prevTrips => prevTrips.map(trip => {
+      if (trip.id === tripId) {
+        return {
+          ...trip,
+          expenses: trip.expenses.map(expense => 
+            expense.id === updatedExpense.id ? updatedExpense : expense
+          )
+        };
+      }
+      return trip;
+    }));
+  };
+  
+  const deleteTripExpense = (tripId: number, expenseId: number) => {
+     if (!window.confirm("Delete this expense?")) return;
+    setTrips(prevTrips => prevTrips.map(trip => {
+      if (trip.id === tripId) {
+        return {
+          ...trip,
+          expenses: trip.expenses.filter(expense => expense.id !== expenseId)
+        };
+      }
+      return trip;
+    }));
+  };
+
   const openModal = (type: NonNullable<ModalType>) => {
     setModalType(type);
     setShowModal(true);
@@ -84,7 +150,18 @@ export function MainApp() {
         case 'dashboard':
             return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} />;
         case 'trip':
-            return <TripView trips={trips} setTrips={setTrips} stats={stats} services={services} />;
+            return <TripView 
+              trips={trips} 
+              setTrips={setTrips} 
+              stats={stats} 
+              services={services}
+              onCreateTrip={createTrip}
+              onEndTrip={endTrip}
+              onDeleteTrip={deleteTrip}
+              onAddExpense={addTripExpense}
+              onUpdateExpense={updateTripExpense}
+              onDeleteExpense={deleteTripExpense}
+            />;
         case 'logs':
             return <FuelLogView logs={logs} onDelete={handleDeleteFuel} />;
         case 'service':
@@ -106,9 +183,7 @@ export function MainApp() {
 
       <MainNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {(activeTab !== 'docs' && activeTab !== 'trip') && (
-        <FloatingActionButtons onOpenModal={openModal} />
-      )}
+      <FloatingActionButtons onOpenModal={openModal} />
       
       <FuelModal
         isOpen={showModal && modalType === 'fuel'}
