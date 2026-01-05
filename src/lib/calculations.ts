@@ -191,40 +191,46 @@ export function getActiveReminders(services: ServiceRecord[], lastOdo: number): 
 export function getExpenseChartData(logs: FuelLog[], services: ServiceRecord[]): ExpenseChartData[] {
   const expenses: { [key: string]: { fuel: number; service: number } } = {};
   const today = new Date();
-  const last12Months: string[] = [];
+  const last12MonthsKeys: string[] = [];
 
   for (let i = 11; i >= 0; i--) {
     const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
     const month = d.toLocaleString('default', { month: 'short' });
     const year = d.getFullYear();
     const key = `${month} '${String(year).slice(-2)}`;
-    last12Months.push(key);
+    last12MonthsKeys.push(key);
     expenses[key] = { fuel: 0, service: 0 };
   }
+  
+  const twelveMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
 
   logs.forEach(log => {
     const date = new Date(log.date);
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.getFullYear();
-    const key = `${month} '${String(year).slice(-2)}`;
-    if (expenses[key]) {
-      expenses[key].fuel += parseFloat(String(log.amount)) || 0;
+    if (date >= twelveMonthsAgo) {
+      const month = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear();
+      const key = `${month} '${String(year).slice(-2)}`;
+      if (expenses[key]) {
+        expenses[key].fuel += parseFloat(String(log.amount)) || 0;
+      }
     }
   });
 
   services.forEach(service => {
     const date = new Date(service.date);
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.getFullYear();
-    const key = `${month} '${String(year).slice(-2)}`;
-    if (expenses[key]) {
-      expenses[key].service += parseFloat(String(service.totalCost)) || 0;
+     if (date >= twelveMonthsAgo) {
+      const month = date.toLocaleString('default', { month: 'short' });
+      const year = date.getFullYear();
+      const key = `${month} '${String(year).slice(-2)}`;
+      if (expenses[key]) {
+        expenses[key].service += parseFloat(String(service.totalCost)) || 0;
+      }
     }
   });
 
-  return last12Months.map(month => ({
-    month,
-    fuel: expenses[month].fuel,
-    service: expenses[month].service,
+  return last12MonthsKeys.map(key => ({
+    month: key,
+    fuel: expenses[key].fuel,
+    service: expenses[key].service,
   }));
 }
