@@ -15,8 +15,9 @@ import type { ServiceRecord } from '@/lib/types';
 interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Omit<ServiceRecord, 'id'>) => void;
+    onSubmit: (data: Omit<ServiceRecord, 'id'>, id?: number) => void;
     lastOdo: number;
+    editingService: ServiceRecord | null;
 }
 
 const partSchema = z.object({
@@ -41,17 +42,14 @@ const serviceSchema = z.object({
   work: z.string().min(3, 'Service title is required'),
   labor: z.coerce.number().min(0).default(0),
   parts: z.array(partSchema).min(1, 'At least one part or item is required'),
+  totalCost: z.coerce.number().optional(), // totalCost is calculated in submit
 });
 
-export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModalProps) {
-  const form = useForm<z.infer<typeof serviceSchema>>({
+type ServiceFormData = z.infer<typeof serviceSchema>;
+
+export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo, editingService }: ServiceModalProps) {
+  const form = useForm<ServiceFormData>({
     resolver: zodResolver(serviceSchema),
-    defaultValues: {
-      date: new Date().toISOString().split('T')[0],
-      work: '',
-      labor: 0,
-      parts: [{ id: '1', name: '', cost: 0, reminderType: 'none', reminderValue: '' }],
-    },
   });
 
   const { control, reset } = form;
@@ -62,22 +60,26 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModa
   
   useEffect(() => {
     if (isOpen) {
-      reset({
-        date: new Date().toISOString().split('T')[0],
-        work: '',
-        labor: 0,
-        odo: lastOdo > 0 ? lastOdo : undefined,
-        parts: [{ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' }],
-      });
+      if (editingService) {
+        reset(editingService);
+      } else {
+        reset({
+          date: new Date().toISOString().split('T')[0],
+          work: '',
+          labor: 0,
+          odo: lastOdo > 0 ? lastOdo : undefined,
+          parts: [{ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' }],
+        });
+      }
     }
-  }, [isOpen, lastOdo, reset]);
+  }, [isOpen, editingService, lastOdo, reset]);
 
-  const onFormSubmit = (data: z.infer<typeof serviceSchema>) => {
+  const onFormSubmit = (data: ServiceFormData) => {
     const partsTotal = data.parts.reduce((sum, p) => sum + p.cost, 0);
     const totalCost = (data.labor || 0) + partsTotal;
     const finalData = { ...data, totalCost };
-    onSubmit(finalData);
-    form.reset();
+    onSubmit(finalData, editingService?.id);
+    onClose();
   }
 
   return (
@@ -87,7 +89,7 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModa
         <DialogHeader className="mt-2">
           <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
             <Wrench className="text-blue-500"/>
-            New Service
+            {editingService ? 'Edit Service' : 'New Service'}
           </DialogTitle>
         </DialogHeader>
 
@@ -147,7 +149,9 @@ export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModa
               )} />
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide mt-4">Save Service Record</Button>
+            <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide mt-4">
+              {editingService ? 'Update Service Record' : 'Save Service Record'}
+            </Button>
           </form>
         </Form>
       </DialogContent>

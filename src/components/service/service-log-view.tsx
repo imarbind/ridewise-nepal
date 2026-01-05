@@ -1,15 +1,16 @@
 "use client";
 
-import { Calendar, Trash2 } from 'lucide-react';
+import { Calendar, Trash2, Edit } from 'lucide-react';
 import type { ServiceRecord } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
 interface ServiceLogViewProps {
     services: ServiceRecord[];
     onDelete: (id: number) => void;
+    onEdit: (service: ServiceRecord) => void;
 }
 
-export function ServiceLogView({ services, onDelete }: ServiceLogViewProps) {
+export function ServiceLogView({ services, onDelete, onEdit }: ServiceLogViewProps) {
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">Service History</h2>
@@ -25,8 +26,11 @@ export function ServiceLogView({ services, onDelete }: ServiceLogViewProps) {
                                 <Calendar size={10} /> {new Date(s.date).toLocaleDateString('en-CA')} • {s.odo.toLocaleString()} KM
                             </p>
                         </div>
-                        <div className="text-right flex items-center gap-2">
+                        <div className="text-right flex items-center gap-1">
                             <p className="text-blue-600 font-black text-lg">रू {s.totalCost.toLocaleString()}</p>
+                             <Button onClick={() => onEdit(s)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-blue-50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Edit size={16} />
+                            </Button>
                              <Button onClick={() => onDelete(s.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Trash2 size={16} />
                             </Button>
@@ -36,7 +40,7 @@ export function ServiceLogView({ services, onDelete }: ServiceLogViewProps) {
                         {s.parts.map((p, idx) => (
                         <div key={idx} className="flex justify-between text-xs py-1 border-b border-slate-200 dark:border-slate-700 last:border-0">
                             <span className="text-slate-500 dark:text-slate-400 font-medium">{p.name}</span>
-                            <span className="text-slate-800 dark:text-slate-200 font-bold">रू {parseFloat(p.cost).toLocaleString()}</span>
+                            <span className="text-slate-800 dark:text-slate-200 font-bold">रू {parseFloat(String(p.cost)).toLocaleString()}</span>
                         </div>
                         ))}
                         <div className="flex justify-between text-xs pt-1 text-slate-400 dark:text-slate-500 italic">

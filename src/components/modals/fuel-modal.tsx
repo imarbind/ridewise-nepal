@@ -4,19 +4,20 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Fuel, X } from 'lucide-react';
+import { Fuel } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import type { FuelLog } from '@/lib/types';
 
 interface FuelModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (data: Omit<FuelLog, 'id'>) => void;
+    onSubmit: (data: Omit<FuelLog, 'id'>, id?: number) => void;
     lastOdo: number;
     lastPrice?: number;
+    editingFuel: FuelLog | null;
 }
 
 const fuelSchema = z.object({
@@ -27,16 +28,11 @@ const fuelSchema = z.object({
   amount: z.coerce.number().positive('Total amount must be positive'),
 });
 
-export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: FuelModalProps) {
-  const form = useForm<z.infer<typeof fuelSchema>>({
+type FuelFormData = z.infer<typeof fuelSchema>;
+
+export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editingFuel }: FuelModalProps) {
+  const form = useForm<FuelFormData>({
     resolver: zodResolver(fuelSchema),
-    defaultValues: {
-      date: new Date().toISOString().split('T')[0],
-      odo: undefined,
-      price: lastPrice,
-      liters: undefined,
-      amount: undefined,
-    },
   });
   
   const { watch, setValue, reset } = form;
@@ -44,15 +40,19 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: Fue
 
   useEffect(() => {
     if (isOpen) {
-      reset({
-        date: new Date().toISOString().split('T')[0],
-        odo: lastOdo > 0 ? lastOdo : undefined,
-        price: lastPrice,
-        liters: undefined,
-        amount: undefined,
-      });
+      if (editingFuel) {
+        reset(editingFuel);
+      } else {
+        reset({
+          date: new Date().toISOString().split('T')[0],
+          odo: lastOdo > 0 ? lastOdo : undefined,
+          price: lastPrice,
+          liters: undefined,
+          amount: undefined,
+        });
+      }
     }
-  }, [isOpen, lastPrice, lastOdo, reset]);
+  }, [isOpen, editingFuel, lastOdo, lastPrice, reset]);
 
   const handleValueChange = (changedField: 'price' | 'liters' | 'amount', value: number) => {
     if (isNaN(value) || value <= 0) return;
@@ -67,9 +67,9 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: Fue
     }
   };
 
-  const onFormSubmit = (data: z.infer<typeof fuelSchema>) => {
-    onSubmit(data);
-    form.reset();
+  const onFormSubmit = (data: FuelFormData) => {
+    onSubmit(data, editingFuel?.id);
+    onClose();
   }
 
   return (
@@ -79,7 +79,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: Fue
         <DialogHeader className="mt-2">
           <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
             <Fuel className="text-primary"/>
-            New Fuel Log
+            {editingFuel ? 'Edit Fuel Log' : 'New Fuel Log'}
           </DialogTitle>
         </DialogHeader>
 
@@ -132,7 +132,9 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: Fue
               </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-red-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide">Add Fuel Log</Button>
+            <Button type="submit" className="w-full bg-gradient-to-r from-primary to-red-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide">
+              {editingFuel ? 'Update Fuel Log' : 'Add Fuel Log'}
+            </Button>
           </form>
         </Form>
       </DialogContent>

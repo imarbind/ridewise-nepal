@@ -21,8 +21,10 @@ const APP_ID = 'ridelog-nepal-v3';
 
 export function MainApp() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
-  const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
+  
+  const [editingFuel, setEditingFuel] = useState<FuelLog | null>(null);
+  const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
 
   const [logs, setLogs] = useLocalStorage<FuelLog[]>(`${APP_ID}_logs`, []);
   const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, []);
@@ -54,18 +56,28 @@ export function MainApp() {
     }
   };
 
-  const handleAddFuel = (fuelEntry: Omit<FuelLog, 'id'>) => {
-    const newLog = { id: Date.now(), ...fuelEntry };
-    setLogs(prev => [newLog, ...prev].sort((a, b) => b.odo - a.odo));
-    addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
-    setShowModal(false);
+  const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: number) => {
+    if (id) { // Editing existing
+      setLogs(prev => prev.map(log => log.id === id ? { ...log, ...fuelEntry } : log).sort((a,b) => b.odo - a.odo));
+    } else { // Adding new
+      const newLog = { id: Date.now(), ...fuelEntry };
+      setLogs(prev => [newLog, ...prev].sort((a, b) => b.odo - a.odo));
+      addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
+    }
+    setEditingFuel(null);
+    setModalType(null);
   };
   
-  const handleAddService = (serviceEntry: Omit<ServiceRecord, 'id'>) => {
-    const newRecord = { id: Date.now(), ...serviceEntry };
-    setServices(prev => [newRecord, ...prev].sort((a, b) => b.odo - a.odo));
-    addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
-    setShowModal(false);
+  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id'>, id?: number) => {
+    if (id) {
+       setServices(prev => prev.map(service => service.id === id ? { ...service, ...serviceEntry } : service).sort((a,b) => b.odo - a.odo));
+    } else {
+      const newRecord = { id: Date.now(), ...serviceEntry };
+      setServices(prev => [newRecord, ...prev].sort((a, b) => b.odo - a.odo));
+      addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
+    }
+    setEditingService(null);
+    setModalType(null);
   };
 
   const handleDeleteFuel = (id: number) => {
@@ -79,6 +91,22 @@ export function MainApp() {
       setServices(prev => prev.filter(service => service.id !== id));
     }
   };
+
+  const handleEditFuel = (log: FuelLog) => {
+    setEditingFuel(log);
+    setModalType('fuel');
+  }
+
+  const handleEditService = (service: ServiceRecord) => {
+    setEditingService(service);
+    setModalType('service');
+  }
+
+  const handleCloseModal = () => {
+    setModalType(null);
+    setEditingFuel(null);
+    setEditingService(null);
+  }
 
   const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses'>) => {
     const newTripObj: Trip = {
@@ -142,7 +170,6 @@ export function MainApp() {
 
   const openModal = (type: NonNullable<ModalType>) => {
     setModalType(type);
-    setShowModal(true);
   }
 
   const renderActiveTab = () => {
@@ -162,9 +189,9 @@ export function MainApp() {
               onDeleteExpense={deleteTripExpense}
             />;
         case 'logs':
-            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} />;
+            return <FuelLogView logs={logs} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
         case 'service':
-            return <ServiceLogView services={services} onDelete={handleDeleteService} />;
+            return <ServiceLogView services={services} onDelete={handleDeleteService} onEdit={handleEditService} />;
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
@@ -181,21 +208,23 @@ export function MainApp() {
       </div>
 
       <MainNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <FloatingActionButtons onOpenModal={openModal} />
+      
+      {activeTab !== 'trip' && <FloatingActionButtons onOpenModal={openModal} />}
       
       <FuelModal
-        isOpen={showModal && modalType === 'fuel'}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleAddFuel}
+        isOpen={modalType === 'fuel'}
+        onClose={handleCloseModal}
+        onSubmit={handleAddOrUpdateFuel}
         lastOdo={stats.lastOdo}
         lastPrice={logs.length > 0 && logs[0].price ? logs[0].price : undefined}
+        editingFuel={editingFuel}
       />
       <ServiceModal
-        isOpen={showModal && modalType === 'service'}
-        onClose={() => setShowModal(false)}
-        onSubmit={handleAddService}
+        isOpen={modalType === 'service'}
+        onClose={handleCloseModal}
+        onSubmit={handleAddOrUpdateService}
         lastOdo={stats.lastOdo}
+        editingService={editingService}
       />
     </>
   );

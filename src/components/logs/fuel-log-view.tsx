@@ -1,15 +1,16 @@
 "use client";
 
-import { Droplets, Trash2 } from 'lucide-react';
+import { Droplets, Trash2, Edit } from 'lucide-react';
 import type { FuelLog } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
 interface FuelLogViewProps {
     logs: FuelLog[];
     onDelete: (id: number) => void;
+    onEdit: (log: FuelLog) => void;
 }
 
-export function FuelLogView({ logs, onDelete }: FuelLogViewProps) {
+export function FuelLogView({ logs, onDelete, onEdit }: FuelLogViewProps) {
     return (
         <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
             <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-600">Fuel History</h2>
@@ -33,8 +34,11 @@ export function FuelLogView({ logs, onDelete }: FuelLogViewProps) {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
                             <p className="text-slate-800 font-black bg-slate-100 px-3 py-1 rounded-lg border border-slate-200">रू {l.amount.toLocaleString()}</p>
+                            <Button onClick={() => onEdit(l)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-blue-50 hover:text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Edit size={16} />
+                            </Button>
                             <Button onClick={() => onDelete(l.id)} variant="ghost" size="icon" className="w-8 h-8 rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <Trash2 size={16} />
                             </Button>
