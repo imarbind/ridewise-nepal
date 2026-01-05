@@ -26,10 +26,12 @@ export function PlannedTrip({ trip, onStart, onDelete }: PlannedTripProps) {
             <span className="flex items-center gap-1.5"><Calendar size={12}/> {format(startDate, "MMM d, yyyy, h:mm a")}</span>
           </div>
         </div>
-        <div className="text-right">
-            <p className="text-2xl font-black text-blue-600">{daysToGo}</p>
-            <p className="text-[9px] uppercase font-bold text-slate-500 -mt-1">{daysToGo === 1 ? 'Day' : 'Days'} To Go</p>
-        </div>
+        {daysToGo >= 0 && (
+          <div className="text-right">
+              <p className="text-2xl font-black text-blue-600">{daysToGo}</p>
+              <p className="text-[9px] uppercase font-bold text-slate-500 -mt-1">{daysToGo === 1 ? 'Day' : 'Days'} To Go</p>
+          </div>
+        )}
       </div>
       <div className="mt-4 flex gap-2">
         <Button onClick={() => onStart(trip.id)} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold h-10 rounded-xl text-xs flex items-center gap-2">

@@ -65,7 +65,7 @@ export function ActiveTrip({ trip, onEndTrip, onDeleteTrip, onAddExpense, onUpda
           </div>
           <div className="text-right bg-white/10 backdrop-blur-md p-3 rounded-2xl border border-white/10">
             <p className="text-2xl font-black">{daysDiff < 0 ? Math.abs(daysDiff) : daysDiff}</p>
-            <p className="text-[9px] uppercase font-bold opacity-70">{daysDiff < 0 ? 'Days To Go' : 'Days In'}</p>
+            <p className="text-[9px] uppercase font-bold opacity-70">{daysDiff < 0 ? 'Days To Go' : (daysDiff === 1 ? 'Day In' : 'Days In')}</p>
           </div>
         </div>
         <div className="mt-6 flex gap-2">

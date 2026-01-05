@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { calculateStats, getActiveReminders, getExpenseChartData } from '@/lib/calculations';
 import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc, BikeDetails } from '@/lib/types';
+import { differenceInDays } from 'date-fns';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
 import { MainNavigation } from '@/components/layout/main-navigation';
@@ -51,15 +52,18 @@ export function MainApp() {
   const expenseChartData = useMemo(() => getExpenseChartData(logs, services), [logs, services]);
   
   const upcomingTrip = useMemo(() => {
-    const planned = trips.find(t => t.status === 'planned');
-    if (!planned) return null;
+    const plannedTrips = trips.filter(t => t.status === 'planned');
+    if (plannedTrips.length === 0) return null;
 
-    const now = new Date();
-    const startDate = new Date(planned.start);
+    const sortedUpcoming = plannedTrips.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
     
-    if (startDate > now) {
-      return planned;
+    for (const trip of sortedUpcoming) {
+        const startDate = new Date(trip.start);
+        if (startDate > new Date()) {
+            return trip;
+        }
     }
+
     return null;
   }, [trips]);
 
@@ -147,8 +151,12 @@ export function MainApp() {
   
   const startTrip = (id: number) => {
      setTrips(trips.map(t => {
+        // Deactivate any currently active trip
+        if (t.status === 'active') return { ...t, status: 'completed', end: new Date().toISOString() }; 
+        return t;
+     }).map(t => {
+        // Activate the selected trip
         if (t.id === id) return { ...t, status: 'active', start: new Date().toISOString() };
-        if (t.status === 'active') return { ...t, status: 'planned' }; // Ensure only one active trip
         return t;
      }));
   }
