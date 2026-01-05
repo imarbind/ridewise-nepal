@@ -47,67 +47,6 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         </Button>
       </div>
 
-       <div className="mb-8 p-4 bg-card/50 rounded-2xl border border-slate-100 backdrop-blur-sm">
-        {isEditingBike ? (
-          <div className="space-y-3">
-             <div className="grid grid-cols-2 gap-3">
-              <Input 
-                placeholder="Make (e.g. Bajaj)"
-                value={editableBikeDetails.make} 
-                onChange={(e) => setEditableBikeDetails(prev => ({...prev, make: e.target.value}))} 
-                className="bg-slate-50 font-medium"
-              />
-              <Input 
-                placeholder="Model (e.g. Pulsar 220F)"
-                value={editableBikeDetails.model} 
-                onChange={(e) => setEditableBikeDetails(prev => ({...prev, model: e.target.value}))} 
-                className="bg-slate-50 font-medium"
-              />
-             </div>
-             <Input 
-              placeholder="Bike Nickname"
-              value={editableBikeDetails.name} 
-              onChange={(e) => setEditableBikeDetails(prev => ({...prev, name: e.target.value}))} 
-              className="bg-slate-50 font-bold"
-            />
-            <Input 
-              placeholder="Bike Number (e.g. BA 01-001 PA)"
-              value={editableBikeDetails.number} 
-              onChange={(e) => setEditableBikeDetails(prev => ({...prev, number: e.target.value}))} 
-              className="bg-slate-50 font-medium"
-            />
-            <div className="grid grid-cols-2 gap-3">
-               <Input 
-                placeholder="Year"
-                type="number"
-                value={editableBikeDetails.year} 
-                onChange={(e) => setEditableBikeDetails(prev => ({...prev, year: e.target.value}))} 
-                className="bg-slate-50 font-medium"
-              />
-              <Select value={editableBikeDetails.engineCc} onValueChange={(value: EngineCc) => setEditableBikeDetails(prev => ({...prev, engineCc: value}))}>
-                <SelectTrigger className="w-full bg-slate-50 h-auto text-sm font-bold border-slate-200 rounded-lg">
-                  <SelectValue placeholder="Engine CC" />
-                </SelectTrigger>
-                <SelectContent>
-                  {ccOptions.map(cc => <SelectItem key={cc} value={cc} className="text-sm">{cc} cc</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={handleBikeDetailsSave} size="sm" className="w-full">Save Details</Button>
-          </div>
-        ) : (
-          <div className="flex items-start justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-700">{bikeDetails.name}</h2>
-              <p className="text-xs font-mono text-slate-400 bg-slate-100 inline-block px-2 py-0.5 rounded mt-1">{bikeDetails.number}</p>
-            </div>
-            <Button onClick={() => { setIsEditingBike(true); setEditableBikeDetails(bikeDetails); }} variant="ghost" size="icon" className="w-8 h-8 text-slate-400">
-              <Edit size={16} />
-            </Button>
-          </div>
-        )}
-      </div>
-
       <div className="group relative mb-8 [perspective:1000px]">
         <div className="absolute inset-0 bg-primary rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
         <div className="relative bg-gradient-to-br from-red-700 via-red-800 to-blue-900 rounded-[2.5rem] p-8 shadow-2xl border-t border-white/20 transition-transform duration-500 transform group-hover:[transform:rotateX(2deg)] overflow-hidden">
@@ -115,7 +54,66 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
           <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-blue-500/30 rounded-full blur-2xl"></div>
 
           <div className="relative z-10">
-             <div className="flex justify-between items-start">
+            {isEditingBike ? (
+              <div className="space-y-3 mb-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <Input 
+                    placeholder="Make (e.g. Bajaj)"
+                    value={editableBikeDetails.make} 
+                    onChange={(e) => setEditableBikeDetails(prev => ({...prev, make: e.target.value}))} 
+                    className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                  />
+                  <Input 
+                    placeholder="Model (e.g. Pulsar 220F)"
+                    value={editableBikeDetails.model} 
+                    onChange={(e) => setEditableBikeDetails(prev => ({...prev, model: e.target.value}))} 
+                    className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                  />
+                </div>
+                <Input 
+                  placeholder="Bike Nickname"
+                  value={editableBikeDetails.name} 
+                  onChange={(e) => setEditableBikeDetails(prev => ({...prev, name: e.target.value}))} 
+                  className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-bold"
+                />
+                <Input 
+                  placeholder="Bike Number (e.g. BA 01-001 PA)"
+                  value={editableBikeDetails.number} 
+                  onChange={(e) => setEditableBikeDetails(prev => ({...prev, number: e.target.value}))} 
+                  className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input 
+                    placeholder="Year"
+                    type="number"
+                    value={editableBikeDetails.year} 
+                    onChange={(e) => setEditableBikeDetails(prev => ({...prev, year: e.target.value}))} 
+                    className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                  />
+                  <Select value={editableBikeDetails.engineCc} onValueChange={(value: EngineCc) => setEditableBikeDetails(prev => ({...prev, engineCc: value}))}>
+                    <SelectTrigger className="w-full bg-white/10 text-white h-auto text-sm font-bold border-white/20 rounded-lg">
+                      <SelectValue placeholder="Engine CC" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ccOptions.map(cc => <SelectItem key={cc} value={cc} className="text-sm">{cc} cc</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button onClick={handleBikeDetailsSave} size="sm" className="w-full bg-white/90 text-slate-800 hover:bg-white">Save Details</Button>
+              </div>
+            ) : (
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold text-white">{bikeDetails.name}</h2>
+                  <p className="text-xs font-mono text-white/70 bg-black/20 inline-block px-2 py-0.5 rounded mt-1">{bikeDetails.number}</p>
+                </div>
+                <Button onClick={() => { setIsEditingBike(true); setEditableBikeDetails(bikeDetails); }} variant="ghost" size="icon" className="w-8 h-8 text-white/70 hover:bg-white/10">
+                  <Edit size={16} />
+                </Button>
+              </div>
+            )}
+
+            <div className="flex justify-between items-start">
               <div className="bg-black/20 backdrop-blur-md p-2 rounded-xl border border-white/10 inline-block mb-2">
                 <Mountain size={20} className="text-white/90" />
               </div>
@@ -124,7 +122,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
                   <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
                   <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
                 </div>
-                <div>
+                 <div>
                   <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Daily Average</p>
                   <p className="text-xl font-black text-white">{stats.dailyAvg} <span className="text-xs font-normal opacity-70">km/day</span></p>
                 </div>
