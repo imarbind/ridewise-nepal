@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Fuel } from 'lucide-react';
+import { Fuel, Droplets } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
@@ -123,21 +123,16 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                 </FormItem>
               )} />
             
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 relative overflow-hidden">
+              <div className="absolute -bottom-8 -right-8 text-primary/10">
+                <Droplets size={100} strokeWidth={1} />
+              </div>
               <div className="flex items-center gap-2">
                   <div className="w-1 h-4 bg-primary rounded-full"></div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations (fill any 2)</p>
               </div>
-              <div className="space-y-3">
+              <div className="space-y-3 relative z-10">
                 <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="amount" render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
-                          <FormControl>
-                            <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
-                          </FormControl><FormMessage />
-                        </FormItem>
-                      )} />
                     <FormField control={form.control} name="liters" render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Liters</FormLabel>
@@ -146,15 +141,23 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
+                    <FormField control={form.control} name="price" render={({ field }) => (
+                        <FormItem>
+                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price/Liter</FormLabel>
+                        <FormControl>
+                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
+                        </FormControl><FormMessage />
+                        </FormItem>
+                    )} />
                 </div>
-                <FormField control={form.control} name="price" render={({ field }) => (
+                <FormField control={form.control} name="amount" render={({ field }) => (
                     <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Price/Liter</FormLabel>
-                      <FormControl>
-                        <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all" />
-                      </FormControl><FormMessage />
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
+                        <FormControl>
+                        <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-primary transition-all" />
+                        </FormControl><FormMessage />
                     </FormItem>
-                  )} />
+                    )} />
               </div>
             </div>
 
