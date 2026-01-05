@@ -1,13 +1,15 @@
 "use client";
 
-import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets } from "lucide-react";
-import type { Stats, Reminder } from "@/lib/types";
+import { FileText, Mountain, TrendingUp, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, Info } from "lucide-react";
+import type { Stats, Reminder, EngineCc } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import { Input } from "../ui/input";
 import { ExpenseChart, ExpenseChartData } from "./expense-chart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { ConditionRatingCard } from "./condition-rating-card";
 
 interface DashboardViewProps {
   stats: Stats;
@@ -16,9 +18,11 @@ interface DashboardViewProps {
   bikeName: string;
   setBikeName: (name: string) => void;
   expenseChartData: ExpenseChartData[];
+  engineCc: EngineCc;
+  setEngineCc: (cc: EngineCc) => void;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName, expenseChartData }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName, expenseChartData, engineCc, setEngineCc }: DashboardViewProps) {
   const [isEditingBikeName, setIsEditingBikeName] = useState(false);
   const [editableBikeName, setEditableBikeName] = useState(bikeName);
 
@@ -26,6 +30,8 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
     setBikeName(editableBikeName);
     setIsEditingBikeName(false);
   };
+  
+  const ccOptions: EngineCc[] = ['50-125', '126-250', '251-500', '501-1000', '>1000'];
 
   return (
     <div className="pb-32 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -43,7 +49,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
         </Button>
       </div>
 
-       <div className="mb-8 flex items-center gap-2">
+       <div className="mb-8 flex flex-wrap items-center gap-2">
         {isEditingBikeName ? (
           <div className="flex gap-2 w-full">
             <Input 
@@ -54,13 +60,30 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
             <Button onClick={handleBikeNameSave} size="sm">Save</Button>
           </div>
         ) : (
-          <>
+          <div className="flex items-center">
             <h2 className="text-xl font-bold text-slate-700">{bikeName}</h2>
             <Button onClick={() => setIsEditingBikeName(true)} variant="ghost" size="icon" className="w-8 h-8 text-slate-400">
               <Edit size={16} />
             </Button>
-          </>
+          </div>
         )}
+        <div className="flex items-center gap-2">
+           <Select value={engineCc} onValueChange={(value: EngineCc) => setEngineCc(value)}>
+            <SelectTrigger className="w-[150px] bg-card h-8 text-xs font-bold border-slate-200 rounded-lg">
+              <SelectValue placeholder="Engine CC" />
+            </SelectTrigger>
+            <SelectContent>
+              {ccOptions.map(cc => <SelectItem key={cc} value={cc} className="text-xs">{cc} cc</SelectItem>)}
+            </SelectContent>
+          </Select>
+           <div className="group relative flex items-center">
+             <Info size={14} className="text-slate-400"/>
+             <div className="absolute bottom-full mb-2 w-48 bg-slate-800 text-white text-xs rounded-lg p-2 text-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                Select your engine size for accurate condition rating.
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-800"></div>
+             </div>
+           </div>
+        </div>
       </div>
 
       <div className="group relative mb-8 [perspective:1000px]">
@@ -104,10 +127,12 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName
           </div>
         </div>
       </div>
+      
+      <ConditionRatingCard cpkData={stats.cpk} />
 
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-primary" />
-        <StatCard delay={200} label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
+        <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-green-600" />
+        <StatCard delay={200} label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-primary" />
         <StatCard delay={300} label="Oil Changes" value={`${stats.totalOilChanges}`} icon={Droplets} color="bg-orange-500" />
         <StatCard delay={400} label="Parts Changed" value={`${stats.totalPartsChanged}`} icon={ListChecks} color="bg-green-600" />
         <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" colSpan="col-span-2" />

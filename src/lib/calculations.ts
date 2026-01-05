@@ -1,7 +1,63 @@
-import type { FuelLog, ServiceRecord, Stats, Reminder } from './types';
+import type { FuelLog, ServiceRecord, Stats, Reminder, EngineCc, CpkData } from './types';
 import { ExpenseChartData } from '@/components/dashboard/expense-chart';
 
-export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stats {
+const cpkRanges: Record<EngineCc, { mint: number; solid: number; fair: number; worn: number; basket: number }> = {
+    '50-125':   { mint: 3.60, solid: 5.77, fair: 8.65,  worn: 14.41, basket: 14.41 },
+    '126-250':  { mint: 4.32, solid: 6.49, fair: 10.09, worn: 17.30, basket: 17.30 },
+    '251-500':  { mint: 5.77, solid: 7.93, fair: 12.25, worn: 20.18, basket: 20.18 },
+    '501-1000': { mint: 7.21, solid: 10.09, fair: 14.41, worn: 23.06, basket: 23.06 },
+    '>1000':    { mint: 8.65, solid: 12.25, fair: 17.30, worn: 28.83, basket: 28.83 },
+};
+
+function calculateCpk(logs: FuelLog[], services: ServiceRecord[], engineCc: EngineCc): CpkData {
+  const allRecords = [
+    ...logs.map(l => ({ odo: l.odo })),
+    ...services.map(s => ({ odo: s.odo }))
+  ].filter(r => r.odo > 0).sort((a, b) => a.odo - b.odo);
+
+  if (allRecords.length < 2) {
+    return { condition: 'Not Enough Data', totalCpk: null };
+  }
+
+  const minOdo = allRecords[0].odo;
+  const maxOdo = allRecords[allRecords.length - 1].odo;
+  const totalDistance = maxOdo - minOdo;
+
+  if (totalDistance < 500) {
+    return { condition: 'Not Enough Data', totalCpk: null };
+  }
+
+  const fuelSum = logs.reduce((sum, log) => sum + log.amount, 0);
+  const serviceSum = services.reduce((sum, service) => sum + service.totalCost, 0);
+  const totalExpenses = fuelSum + serviceSum;
+
+  if (totalDistance <= 0 || totalExpenses <= 0) {
+      return { condition: 'Not Enough Data', totalCpk: null };
+  }
+
+  const totalCpk = totalExpenses / totalDistance;
+  const ranges = cpkRanges[engineCc];
+
+  let condition: CpkData['condition'];
+  if (totalCpk < ranges.mint) condition = 'Mint Condition';
+  else if (totalCpk <= ranges.solid) condition = 'Solid Rider';
+  else if (totalCpk <= ranges.fair) condition = 'Fair Runner';
+  else if (totalCpk <= ranges.worn) condition = 'Worn Beater';
+  else condition = 'Basket Case';
+
+  return {
+    totalCpk: parseFloat(totalCpk.toFixed(2)),
+    fuelCpk: parseFloat((fuelSum / totalDistance).toFixed(2)),
+    serviceCpk: parseFloat((serviceSum / totalDistance).toFixed(2)),
+    fuelCpkPercent: Math.round((fuelSum / totalExpenses) * 100),
+    serviceCpkPercent: Math.round((serviceSum / totalExpenses) * 100),
+    condition,
+    totalDistance,
+  };
+}
+
+
+export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engineCc: EngineCc): Stats {
   const sortedLogs = [...logs].sort((a, b) => b.odo - a.odo);
   const lastFuelOdo = sortedLogs.length > 0 ? sortedLogs[0].odo : 0;
   const lastServiceOdo = services.length > 0 ? Math.max(...services.map(s => s.odo)) : 0;
@@ -62,6 +118,8 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
     });
   });
 
+  const cpk = calculateCpk(logs, services, engineCc);
+
   return {
     lastOdo,
     totalFuelCost,
@@ -73,6 +131,7 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[]): Stat
     dailyAvg: dailyAvg.toFixed(1),
     totalPartsChanged,
     totalOilChanges,
+    cpk,
   };
 }
 

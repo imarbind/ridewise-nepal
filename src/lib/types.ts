@@ -50,6 +50,23 @@ export interface Doc {
     // Add other doc properties like image URL, expiry date etc.
 }
 
+export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
+
+export type ConditionRating = 'Mint Condition' | 'Solid Rider' | 'Fair Runner' | 'Worn Beater' | 'Basket Case' | 'Not Enough Data';
+
+export type CpkData = {
+  totalCpk: number;
+  fuelCpk: number;
+  serviceCpk: number;
+  fuelCpkPercent: number;
+  serviceCpkPercent: number;
+  condition: ConditionRating;
+  totalDistance: number;
+} | {
+  totalCpk: null;
+  condition: 'Not Enough Data';
+}
+
 export type Stats = {
     lastOdo: number;
     totalFuelCost: number;
@@ -61,6 +78,7 @@ export type Stats = {
     dailyAvg: string;
     totalPartsChanged: number;
     totalOilChanges: number;
+    cpk: CpkData;
 }
 
 export type Reminder = {
@@ -76,5 +94,3 @@ export type Reminder = {
         currentUsed: number;
     }
 }
-
-    
