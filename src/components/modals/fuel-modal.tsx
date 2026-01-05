@@ -35,8 +35,8 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     resolver: zodResolver(fuelSchema),
   });
   
-  const { watch, setValue, reset } = form;
-  const [price, liters, amount] = watch(['price', 'liters', 'amount']);
+  const { watch, setValue, reset, trigger } = form;
+  const [amount, liters, price] = watch(['amount', 'liters', 'price']);
 
   useEffect(() => {
     if (isOpen) {
@@ -54,18 +54,26 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     }
   }, [isOpen, editingFuel, lastOdo, lastPrice, reset]);
 
-  const handleValueChange = (changedField: 'price' | 'liters' | 'amount', value: number) => {
-    if (isNaN(value) || value <= 0) return;
-  
-    if (changedField === 'liters') {
-      if (price > 0) setValue('amount', parseFloat((value * price).toFixed(2)), { shouldValidate: true });
-    } else if (changedField === 'amount') {
-      if (price > 0) setValue('liters', parseFloat((value / price).toFixed(2)), { shouldValidate: true });
-    } else if (changedField === 'price') {
-      if (liters > 0) setValue('amount', parseFloat((liters * value).toFixed(2)), { shouldValidate: true });
-      else if (amount > 0) setValue('liters', parseFloat((amount / value).toFixed(2)), { shouldValidate: true });
-    }
+  const handleValueChange = (changedField: 'amount' | 'liters' | 'price') => {
+      const numericAmount = parseFloat(String(amount));
+      const numericLiters = parseFloat(String(liters));
+      const numericPrice = parseFloat(String(price));
+
+      if (changedField === 'amount' || changedField === 'liters') {
+        if (!isNaN(numericAmount) && numericAmount > 0 && !isNaN(numericLiters) && numericLiters > 0) {
+          setValue('price', parseFloat((numericAmount / numericLiters).toFixed(2)), { shouldValidate: true });
+        }
+      } else if (changedField === 'price') {
+        if (!isNaN(numericPrice) && numericPrice > 0) {
+            if (!isNaN(numericLiters) && numericLiters > 0) {
+                setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
+            } else if (!isNaN(numericAmount) && numericAmount > 0) {
+                setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
+            }
+        }
+      }
   };
+
 
   const onFormSubmit = (data: FuelFormData) => {
     onSubmit(data, editingFuel?.id);
@@ -106,29 +114,29 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="amount" render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input type="number" placeholder="Total Cost (रू)" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                      </FormControl><FormMessage />
+                    </FormItem>
+                  )} />
+                <FormField control={form.control} name="liters" render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input type="number" step="0.01" placeholder="Liters" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                      </FormControl><FormMessage />
+                    </FormItem>
+                  )} />
                 <div className="col-span-2">
                     <FormField control={form.control} name="price" render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input type="number" step="0.01" placeholder="Price Per Liter (रू)" {...field} onChange={e => { field.onChange(e); handleValueChange('price', parseFloat(e.target.value)); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
+                            <Input type="number" step="0.01" placeholder="Price Per Liter (रू)" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange('price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
                           </FormControl><FormMessage />
                         </FormItem>
                       )} />
                 </div>
-                <FormField control={form.control} name="liters" render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input type="number" step="0.01" placeholder="Liters" {...field} onChange={e => { field.onChange(e); handleValueChange('liters', parseFloat(e.target.value)); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
-                      </FormControl><FormMessage />
-                    </FormItem>
-                  )} />
-                <FormField control={form.control} name="amount" render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input type="number" placeholder="Total (रू)" {...field} onChange={e => { field.onChange(e); handleValueChange('amount', parseFloat(e.target.value)); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary transition-all placeholder:text-slate-400" />
-                      </FormControl><FormMessage />
-                    </FormItem>
-                  )} />
               </div>
             </div>
 
