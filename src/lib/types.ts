@@ -11,9 +11,9 @@ export interface FuelLog {
 }
 
 export interface ServicePart {
-  id: number;
+  id: string;
   name: string;
-  cost: string;
+  cost: number;
   reminderType: 'none' | 'km' | 'days';
   reminderValue: string;
 }

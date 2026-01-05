@@ -1,7 +1,7 @@
 "use client";
 
 import { MapPin } from "lucide-react";
-import type { Trip, Stats, ServiceRecord } from "@/lib/types";
+import type { Trip, Stats, ServiceRecord, TripExpense } from "@/lib/types";
 import { ActiveTrip } from "./active-trip";
 import { TripPlanner } from "./trip-planner";
 import { PastTrips } from "./past-trips";
@@ -49,14 +49,44 @@ export function TripView({ trips, setTrips, stats, services }: TripViewProps) {
     });
     setTrips(updatedTrips);
   };
+
+  const updateTripExpense = (tripId: number, updatedExpense: TripExpense) => {
+    setTrips(prevTrips => prevTrips.map(trip => {
+      if (trip.id === tripId) {
+        return {
+          ...trip,
+          expenses: trip.expenses.map(expense => 
+            expense.id === updatedExpense.id ? updatedExpense : expense
+          )
+        };
+      }
+      return trip;
+    }));
+  };
+  
+  const deleteTripExpense = (tripId: number, expenseId: number) => {
+     if (!confirm("Delete this expense?")) return;
+    setTrips(prevTrips => prevTrips.map(trip => {
+      if (trip.id === tripId) {
+        return {
+          ...trip,
+          expenses: trip.expenses.filter(expense => expense.id !== expenseId)
+        };
+      }
+      return trip;
+    }));
+  };
   
   return (
     <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
       {activeTrip ? (
         <ActiveTrip 
           trip={activeTrip} 
-          onEndTrip={endTrip} 
+          onEndTrip={endTrip}
+          onDeleteTrip={deleteTrip}
           onAddExpense={addTripExpense}
+          onUpdateExpense={updateTripExpense}
+          onDeleteExpense={deleteTripExpense}
         />
       ) : (
         <>
