@@ -8,7 +8,6 @@ import { PastTrips } from "./past-trips";
 
 interface TripViewProps {
   trips: Trip[];
-  setTrips: React.Dispatch<React.SetStateAction<Trip[]>>;
   stats: Stats;
   services: ServiceRecord[];
   onCreateTrip: (newTripData: Omit<Trip, 'id' | 'status' | 'expenses'>) => void;
@@ -21,7 +20,6 @@ interface TripViewProps {
 
 export function TripView({ 
   trips, 
-  setTrips, 
   stats, 
   services,
   onCreateTrip,

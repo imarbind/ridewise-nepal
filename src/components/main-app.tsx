@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
@@ -152,7 +152,6 @@ export function MainApp() {
         case 'trip':
             return <TripView 
               trips={trips} 
-              setTrips={setTrips} 
               stats={stats} 
               services={services}
               onCreateTrip={createTrip}
