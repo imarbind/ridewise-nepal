@@ -40,7 +40,10 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
   useEffect(() => {
     if (isOpen) {
       if (editingFuel) {
-        reset(editingFuel);
+        reset({
+          ...editingFuel,
+          odo: editingFuel.odo,
+        });
       } else {
         reset({
           date: new Date().toISOString().split('T')[0],
@@ -61,19 +64,16 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
       const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
 
       if (changedField === 'price') {
-        // When price changes, if liters or amount is present, recalculate amount
         if (!isNaN(numericPrice) && numericPrice > 0) {
             if (!isNaN(numericLiters) && numericLiters > 0) {
                 setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
             }
         }
       } else if (changedField === 'liters') {
-          // When liters change, if price is present, recalculate amount
           if (!isNaN(numericLiters) && numericLiters > 0 && !isNaN(numericPrice) && numericPrice > 0) {
             setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
           }
       } else if (changedField === 'amount') {
-        // When amount changes, if price is present, recalculate liters
         if (!isNaN(numericAmount) && numericAmount > 0 && !isNaN(numericPrice) && numericPrice > 0) {
           setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
         }
