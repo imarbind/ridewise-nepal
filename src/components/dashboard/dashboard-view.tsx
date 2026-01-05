@@ -53,9 +53,8 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         </Button>
       </div>
 
-      <div className="relative mb-8">
+      <div className="space-y-4 mb-8">
         <div className="group [perspective:1000px]">
-          <div className="absolute inset-0 bg-primary rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-30 transition-opacity duration-500"></div>
           <div className="relative bg-gradient-to-br from-red-700 via-red-800 to-blue-900 rounded-[2.5rem] p-8 shadow-2xl border-t border-white/20 transition-transform duration-500 transform group-hover:[transform:rotateX(2deg)] overflow-hidden">
             <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-blue-500/30 rounded-full blur-2xl"></div>
@@ -142,7 +141,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
             </div>
           </div>
         </div>
-        <div className="relative z-20 -mt-10 px-4">
+        <div className="px-4">
           <ConditionRatingCard cpkData={stats.cpk} />
         </div>
       </div>
