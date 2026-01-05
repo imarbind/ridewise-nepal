@@ -51,12 +51,12 @@ const prompt = ai.definePrompt({
   name: 'tripMaintenanceAdvisoryPrompt',
   input: { schema: TripMaintenanceAdvisoryInputSchema },
   output: { schema: TripMaintenanceAdvisoryOutputSchema },
-  prompt: `You are an expert vehicle maintenance advisor. You will analyze the trip details and maintenance tasks to provide a maintenance advisory.
+  prompt: `You are an expert vehicle maintenance advisor. Your task is to analyze trip details and the vehicle's maintenance history to provide a clear and actionable maintenance advisory.
 
 Trip Details:
 - Destination: {{destination}}
 - Start Date: {{startDate}}
-- Distance: {{distance}} km
+- Trip Distance: {{distance}} km
 - Current Odometer: {{currentOdometer}} km
 
 Maintenance Tasks:
@@ -72,11 +72,17 @@ Maintenance Tasks:
   {{/if}}
 {{/each}}
 
-Analyze the trip details and maintenance tasks. Determine the status of each maintenance task relative to the trip (due before, due during, due after, or not due).  For any tasks that are overdue, include how many kilometers or days the task is overdue.
+Follow these rules for your analysis:
+1.  For each maintenance task, calculate its status based on the trip. The possible statuses are: 'due_before', 'due_during', 'due_after', 'not_due'.
+2.  A task is 'due_before' if it is already past its maintenance interval at the 'Current Odometer' or before the 'Start Date'. If it is, specify by how many kilometers or days it is overdue.
+3.  A task is 'due_during' if the maintenance interval will be exceeded within the 'Trip Distance' or during the trip's duration. For example, if an oil change is due every 3000 km, the last one was at 5000 km, and the current odometer is 7500 km, a 1000 km trip would make it due during the trip.
+4.  For any task that is 'due_during', the message should strongly recommend getting the service done BEFORE the trip.
+5.  **CRITICAL**: If a task is not 'due_during' but its usage will exceed 80% of its interval by the end of the trip, you MUST still flag it. Set its status to 'due_during' and provide a message like "This service will be over 80% of its service life during the trip. It's highly recommended to perform this maintenance beforehand to avoid issues."
+6.  A task is 'due_after' if it is not due before or during the trip but will be due sometime after.
+7.  A task is 'not_due' if it is well within its service life and will not be a concern for this trip. Provide a reassuring message.
+8.  Provide a concise and informative 'message' for each task that explains the status and gives a clear recommendation.
 
-Provide a concise and informative maintenance advisory for each task. The advisory should include the task name, status, and a message providing more details.
-
-Ensure that the output is valid JSON.
+Ensure your output is a valid JSON object matching the specified schema.
 `,
 });
 
