@@ -28,6 +28,7 @@ export function MainApp() {
   const [services, setServices] = useLocalStorage<ServiceRecord[]>(`${APP_ID}_services`, []);
   const [docs, setDocs] = useLocalStorage<Doc[]>(`${APP_ID}_docs`, []);
   const [trips, setTrips] = useLocalStorage<Trip[]>(`${APP_ID}_trips`, []);
+  const [bikeName, setBikeName] = useLocalStorage<string>(`${APP_ID}_bikeName`, "My Bike");
 
   const stats = useMemo(() => calculateStats(logs, services), [logs, services]);
   const activeReminders = useMemo(() => getActiveReminders(services, stats.lastOdo), [services, stats.lastOdo]);
@@ -62,13 +63,13 @@ export function MainApp() {
   };
 
   const handleDeleteFuel = (id: number) => {
-    if (confirm('Are you sure you want to delete this fuel log?')) {
+    if (window.confirm('Are you sure you want to delete this fuel log?')) {
       setLogs(prev => prev.filter(log => log.id !== id));
     }
   };
 
   const handleDeleteService = (id: number) => {
-    if (confirm('Are you sure you want to delete this service record?')) {
+    if (window.confirm('Are you sure you want to delete this service record?')) {
       setServices(prev => prev.filter(service => service.id !== id));
     }
   };
@@ -81,7 +82,7 @@ export function MainApp() {
   const renderActiveTab = () => {
     switch(activeTab) {
         case 'dashboard':
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} />;
         case 'trip':
             return <TripView trips={trips} setTrips={setTrips} stats={stats} services={services} />;
         case 'logs':
@@ -91,7 +92,7 @@ export function MainApp() {
         case 'docs':
             return <DocsView onNavigateBack={() => setActiveTab('dashboard')} />;
         default:
-            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} />;
+            return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeName={bikeName} setBikeName={setBikeName} />;
     }
   }
 
@@ -105,7 +106,7 @@ export function MainApp() {
 
       <MainNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {activeTab !== 'docs' && (
+      {(activeTab !== 'docs' && activeTab !== 'trip') && (
         <FloatingActionButtons onOpenModal={openModal} />
       )}
       
@@ -113,12 +114,14 @@ export function MainApp() {
         isOpen={showModal && modalType === 'fuel'}
         onClose={() => setShowModal(false)}
         onSubmit={handleAddFuel}
+        lastOdo={stats.lastOdo}
         lastPrice={logs.length > 0 && logs[0].price ? logs[0].price : undefined}
       />
       <ServiceModal
         isOpen={showModal && modalType === 'service'}
         onClose={() => setShowModal(false)}
         onSubmit={handleAddService}
+        lastOdo={stats.lastOdo}
       />
     </>
   );

@@ -16,6 +16,7 @@ interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: Omit<ServiceRecord, 'id'>) => void;
+    lastOdo: number;
 }
 
 const partSchema = z.object({
@@ -42,7 +43,7 @@ const serviceSchema = z.object({
   parts: z.array(partSchema).min(1, 'At least one part or item is required'),
 });
 
-export function ServiceModal({ isOpen, onClose, onSubmit }: ServiceModalProps) {
+export function ServiceModal({ isOpen, onClose, onSubmit, lastOdo }: ServiceModalProps) {
   const form = useForm<z.infer<typeof serviceSchema>>({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
@@ -64,10 +65,11 @@ export function ServiceModal({ isOpen, onClose, onSubmit }: ServiceModalProps) {
         date: new Date().toISOString().split('T')[0],
         work: '',
         labor: 0,
+        odo: lastOdo > 0 ? lastOdo : undefined,
         parts: [{ id: String(Date.now()), name: '', cost: 0, reminderType: 'none', reminderValue: '' }],
       });
     }
-  }, [isOpen, form]);
+  }, [isOpen, form, lastOdo]);
 
   const onFormSubmit = (data: z.infer<typeof serviceSchema>) => {
     const partsTotal = data.parts.reduce((sum, p) => sum + p.cost, 0);

@@ -28,13 +28,13 @@ export function TripView({ trips, setTrips, stats, services }: TripViewProps) {
   };
 
   const endTrip = (id: number) => {
-    if(confirm("End this trip? This will move it to history.")) {
+    if(window.confirm("End this trip? This will move it to history.")) {
       setTrips(trips.map(t => t.id === id ? { ...t, status: 'completed' } : t));
     }
   };
 
   const deleteTrip = (id: number) => {
-    if (confirm("Are you sure you want to delete this trip? This action cannot be undone.")) {
+    if (window.confirm("Are you sure you want to delete this trip? This action cannot be undone.")) {
       setTrips(prev => prev.filter(t => t.id !== id));
     }
   };
@@ -65,7 +65,7 @@ export function TripView({ trips, setTrips, stats, services }: TripViewProps) {
   };
   
   const deleteTripExpense = (tripId: number, expenseId: number) => {
-     if (!confirm("Delete this expense?")) return;
+     if (!window.confirm("Delete this expense?")) return;
     setTrips(prevTrips => prevTrips.map(trip => {
       if (trip.id === tripId) {
         return {

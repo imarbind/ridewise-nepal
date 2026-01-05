@@ -15,6 +15,7 @@ interface FuelModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (data: Omit<FuelLog, 'id'>) => void;
+    lastOdo: number;
     lastPrice?: number;
 }
 
@@ -26,7 +27,7 @@ const fuelSchema = z.object({
   amount: z.coerce.number().positive('Total amount must be positive'),
 });
 
-export function FuelModal({ isOpen, onClose, onSubmit, lastPrice }: FuelModalProps) {
+export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice }: FuelModalProps) {
   const form = useForm<z.infer<typeof fuelSchema>>({
     resolver: zodResolver(fuelSchema),
     defaultValues: {
@@ -44,12 +45,12 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastPrice }: FuelModalPro
   useEffect(() => {
     form.reset({
       date: new Date().toISOString().split('T')[0],
-      odo: undefined,
+      odo: lastOdo > 0 ? lastOdo : undefined,
       price: lastPrice,
       liters: undefined,
       amount: undefined,
     });
-  }, [isOpen, lastPrice, form]);
+  }, [isOpen, lastPrice, lastOdo, form]);
 
   const handleValueChange = (changedField: 'price' | 'liters' | 'amount', value: number) => {
     if (isNaN(value) || value <= 0) return;

@@ -10,7 +10,7 @@ interface FloatingActionButtonsProps {
 
 export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProps) {
     return (
-        <div className="fixed bottom-32 right-6 flex flex-col gap-4 z-50">
+        <div className="fixed bottom-24 right-6 flex flex-col gap-4 z-50">
             <Button 
                 aria-label="Add Service Record"
                 onClick={() => onOpenModal('service')} 

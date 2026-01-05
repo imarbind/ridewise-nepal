@@ -1,22 +1,34 @@
 "use client";
 
-import { FileText, Mountain, TrendingUp } from "lucide-react";
+import { FileText, Mountain, TrendingUp, Edit } from "lucide-react";
 import type { Stats, Reminder } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
 import { Fuel, Wrench, History, CircleDollarSign, Coins } from 'lucide-react';
+import { useState } from "react";
+import { Input } from "../ui/input";
 
 interface DashboardViewProps {
   stats: Stats;
   activeReminders: Reminder[];
   onNavigateDocs: () => void;
+  bikeName: string;
+  setBikeName: (name: string) => void;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeName, setBikeName }: DashboardViewProps) {
+  const [isEditingBikeName, setIsEditingBikeName] = useState(false);
+  const [editableBikeName, setEditableBikeName] = useState(bikeName);
+
+  const handleBikeNameSave = () => {
+    setBikeName(editableBikeName);
+    setIsEditingBikeName(false);
+  };
+
   return (
     <div className="pb-32 animate-in fade-in slide-in-from-bottom-8 duration-700">
-      <div className="mb-8 flex justify-between items-start z-10 relative">
+      <div className="mb-4 flex justify-between items-start z-10 relative">
         <div>
           <h1 className="text-3xl font-black text-slate-800 tracking-tighter italic drop-shadow-sm flex items-center gap-2">
             <span className="text-primary">RIDE</span>
@@ -28,6 +40,26 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs }: Dashbo
         <Button onClick={onNavigateDocs} variant="outline" size="icon" className="bg-card border-slate-200 w-12 h-12 rounded-2xl text-slate-500 hover:text-primary hover:border-primary/50 hover:shadow-primary/10 transition-all shadow-lg active:scale-95">
           <FileText size={20} />
         </Button>
+      </div>
+
+       <div className="mb-8 flex items-center gap-2">
+        {isEditingBikeName ? (
+          <div className="flex gap-2 w-full">
+            <Input 
+              value={editableBikeName} 
+              onChange={(e) => setEditableBikeName(e.target.value)} 
+              className="bg-card font-bold text-lg"
+            />
+            <Button onClick={handleBikeNameSave} size="sm">Save</Button>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-xl font-bold text-slate-700">{bikeName}</h2>
+            <Button onClick={() => setIsEditingBikeName(true)} variant="ghost" size="icon" className="w-8 h-8 text-slate-400">
+              <Edit size={16} />
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="group relative mb-8 [perspective:1000px]">
@@ -53,13 +85,16 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs }: Dashbo
                 <span className="text-lg font-bold ml-2 opacity-50">KM</span>
               </h2>
             </div>
-            <div className="mt-6 flex gap-3">
-              <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <div className="bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${stats.efficiencyStatus === 'Excellent' ? 'bg-green-400' : 'bg-yellow-400'} animate-pulse`}></div>
                 <span className="text-xs font-bold text-white/90">{stats.efficiencyStatus} Condition</span>
               </div>
-               <div className="flex-1 bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
+               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
                 <span className="text-xs font-bold text-white/90">{stats.dailyAvg} km/day</span>
+              </div>
+               <div className="bg-black/20 backdrop-blur-sm rounded-xl p-2 border border-white/10 flex items-center gap-2">
+                <span className="text-xs font-bold text-white/90">रू {stats.costPerKm}/km</span>
               </div>
             </div>
           </div>
@@ -69,8 +104,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs }: Dashbo
       <div className="grid grid-cols-2 gap-4 mb-8">
         <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-primary" />
         <StatCard delay={200} label="Service" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-blue-600" />
-        <StatCard delay={300} label="Cost / KM" value={`रू ${stats.costPerKm}`} icon={Coins} color="bg-green-600" />
-        <StatCard delay={400} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
+        <StatCard delay={300} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
       </div>
 
       <MaintenanceStatus activeReminders={activeReminders} />
