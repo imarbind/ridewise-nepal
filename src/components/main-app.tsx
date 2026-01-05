@@ -23,6 +23,7 @@ import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocki
 import { useCollection, useDoc } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
 import { OnboardingView } from './onboarding/onboarding-view';
+import { TripSummaryDialog } from './trip/trip-summary-dialog';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -42,6 +43,7 @@ export function MainApp() {
   
   const [editingFuel, setEditingFuel] = useState<FuelLog | null>(null);
   const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
+  const [lastCompletedTrip, setLastCompletedTrip] = useState<Trip | null>(null);
 
   const { firestore, user } = useFirebase();
 
@@ -94,6 +96,21 @@ export function MainApp() {
     }
   };
 
+  const syncOdometer = (newOdo: number) => {
+    if (newOdo > stats.lastOdo) {
+      const dummyLog: Omit<FuelLog, 'id'> = {
+        date: new Date().toISOString(),
+        odo: newOdo,
+        liters: 0,
+        amount: 0,
+        price: 0,
+      };
+      if(logsCollectionRef) {
+        addDocumentNonBlocking(logsCollectionRef, dummyLog);
+      }
+    }
+  };
+
   const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: string) => {
     if (id && logsCollectionRef) { // Editing existing
       const logRef = doc(logsCollectionRef, id);
@@ -102,6 +119,7 @@ export function MainApp() {
       addDocumentNonBlocking(logsCollectionRef, fuelEntry);
       addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
     }
+    syncOdometer(fuelEntry.odo);
     setEditingFuel(null);
     setModalType(null);
   };
@@ -114,6 +132,7 @@ export function MainApp() {
       addDocumentNonBlocking(servicesCollectionRef, serviceEntry);
       addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
     }
+    syncOdometer(serviceEntry.odo);
     setEditingService(null);
     setModalType(null);
   };
@@ -144,6 +163,7 @@ export function MainApp() {
     setModalType(null);
     setEditingFuel(null);
     setEditingService(null);
+    setLastCompletedTrip(null);
   }
 
   const createTrip = (newTripData: Omit<Trip, 'id' | 'status' | 'expenses' | 'end'>) => {
@@ -169,6 +189,7 @@ export function MainApp() {
     // Activate the selected trip
     const tripRef = doc(tripsCollectionRef, id);
     updateDocumentNonBlocking(tripRef, { status: 'active', start: new Date().toISOString(), startOdo });
+    syncOdometer(startOdo);
   }
 
   const endTrip = (id: string, endOdo: number) => {
@@ -182,7 +203,9 @@ export function MainApp() {
             return;
         }
 
-        updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString(), endOdo });
+        const completedTrip = { ...trip, status: 'completed' as 'completed', end: new Date().toISOString(), endOdo };
+        updateDocumentNonBlocking(tripRef, { status: 'completed', end: completedTrip.end, endOdo });
+        syncOdometer(endOdo);
         
         // Update rider board
         const riderBoardRef = doc(firestore, 'rider_board', user.uid);
@@ -191,9 +214,12 @@ export function MainApp() {
           const newTotal = currentData.totalKilometers + distanceTraveled;
           setDocumentNonBlocking(riderBoardRef, { userId: user.uid, totalKilometers: newTotal, userName: user.displayName }, { merge: true });
         });
+
+        setLastCompletedTrip(completedTrip);
       } else {
         // Fallback for trips without startOdo (legacy data)
          updateDocumentNonBlocking(tripRef, { status: 'completed', end: new Date().toISOString(), endOdo });
+         syncOdometer(endOdo);
       }
     }
   };
@@ -335,6 +361,13 @@ export function MainApp() {
         lastOdo={stats.lastOdo}
         editingService={editingService}
       />
+      <TripSummaryDialog 
+        isOpen={!!lastCompletedTrip}
+        onClose={() => setLastCompletedTrip(null)}
+        trip={lastCompletedTrip}
+      />
     </>
   );
 };
+
+    
