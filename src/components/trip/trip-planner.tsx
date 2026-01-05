@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { getTripMaintenanceAdviceAction } from '@/app/actions';
 import { TripMaintenanceAdvisoryOutput } from '@/ai/flows/trip-maintenance-advisor';
+import { differenceInDays } from 'date-fns';
 
 interface TripPlannerProps {
   onCreateTrip: (tripData: Omit<Trip, 'id'|'status'|'expenses'|'end'>) => void;
@@ -27,6 +28,17 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
       setAnalysis(null);
       return;
     }
+
+    const tripStartDate = new Date(startDate);
+    const today = new Date();
+    // Use today if trip start date is in the past for duration calculation
+    const durationStartDate = tripStartDate < today ? today : tripStartDate;
+    
+    // Approximate duration, assuming a return trip might not be immediate. 
+    // This is a placeholder; a more accurate end date would be better.
+    // For now, let's assume a trip lasts at least 1 day.
+    const estimatedTripDays = Math.max(1, Math.ceil(parseFloat(distance) / Math.max(parseFloat(stats.dailyAvg), 50)));
+
     
     startTransition(async () => {
       const result = await getTripMaintenanceAdviceAction(
@@ -34,7 +46,9 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
         startDate.split('T')[0],
         parseFloat(distance),
         stats.lastOdo,
-        services
+        services,
+        parseFloat(stats.dailyAvg),
+        estimatedTripDays
       );
       if ("advisory" in result) {
         setAnalysis(result);
@@ -43,7 +57,7 @@ export function TripPlanner({ onCreateTrip, stats, services }: TripPlannerProps)
         setAnalysis(null);
       }
     });
-  }, [newTrip.destination, stats.lastOdo, services]);
+  }, [newTrip.destination, stats.lastOdo, stats.dailyAvg, services]);
 
   const debouncedAnalysis = useCallback(debounce(getAiAnalysis, 500), [getAiAnalysis]);
 

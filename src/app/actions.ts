@@ -42,7 +42,9 @@ export async function getTripMaintenanceAdviceAction(
     startDate: string,
     distance: number,
     currentOdometer: number,
-    services: ServiceRecord[]
+    services: ServiceRecord[],
+    dailyAvgKm: number,
+    durationDays: number,
 ): Promise<TripMaintenanceAdvisoryOutput | { error: string }> {
 
     if (!destination || !startDate || !distance || !currentOdometer) {
@@ -57,7 +59,9 @@ export async function getTripMaintenanceAdviceAction(
             startDate,
             distance,
             currentOdometer,
-            maintenanceTasks
+            maintenanceTasks,
+            dailyAvgKm,
+            durationDays,
         };
         
         const result = await getTripMaintenanceAdvisory(input);
