@@ -47,11 +47,10 @@ const partSchema = z.object({
     path: ["reminderValue"],
 });
 
-const serviceSchema = z.object({
+const serviceObjectSchema = z.object({
   mode: z.literal("service"),
   date: z.string().min(1, 'Date is required'),
   odo: z.coerce.number().min(1, 'Odometer reading is required'),
-  work: z.string().min(3, 'Service title is required'),
   labor: z.coerce.number().min(0).default(0),
   parts: z.array(partSchema).min(1, 'At least one part or item is required'),
   totalCost: z.coerce.number().optional(),
@@ -60,7 +59,8 @@ const serviceSchema = z.object({
   invoiceUrl: z.string().optional(),
 });
 
-const reminderSchema = z.object({
+
+const reminderObjectSchema = z.object({
   mode: z.literal("reminder"),
   date: z.string().optional(),
   odo: z.coerce.number().optional(),
@@ -68,8 +68,8 @@ const reminderSchema = z.object({
 });
 
 const combinedSchema = z.discriminatedUnion("mode", [
-  serviceSchema,
-  reminderSchema,
+  serviceObjectSchema,
+  reminderObjectSchema,
 ]).refine((data) => {
     if (data.mode === 'reminder') {
         return data.date || data.odo;
@@ -145,7 +145,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     resolver: zodResolver(combinedSchema),
     defaultValues: {
       mode: 'service',
-      // @ts-ignore
       labor: 0,
       serviceType: 'regular',
       notes: '',
@@ -174,7 +173,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
             reset({
                 mode: 'service',
                 date: new Date().toISOString().split('T')[0],
-                work: '',
                 labor: 0,
                 odo: lastOdo > 0 ? lastOdo : undefined,
                 parts: [{ id: String(Date.now()), name: '', cost: 0, quantity: 1, reminderType: 'none', reminderValue: '' }],
@@ -200,7 +198,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
              reset({
                 mode: 'service',
                 date: new Date().toISOString().split('T')[0],
-                work: '',
                 labor: 0,
                 odo: lastOdo > 0 ? lastOdo : undefined,
                 parts: [{ id: String(Date.now()), name: '', cost: 0, quantity: 1, reminderType: 'none', reminderValue: '' }],
@@ -218,7 +215,8 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     if (data.mode === 'service') {
         const partsTotal = data.parts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
         const totalCost = (data.labor || 0) + partsTotal;
-        const finalData = { ...data, totalCost };
+        const serviceTitle = data.parts.length > 0 ? data.parts[0].name : "Service";
+        const finalData = { ...data, totalCost, work: serviceTitle };
         onSubmitService(finalData, editingService?.id);
     } else if (data.mode === 'reminder') {
         onSubmitReminder({
@@ -283,21 +281,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                         </FormItem>
                     )} />
                 </div>
-                 <FormField control={form.control} name="work" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Service Title</FormLabel>
-                        <FormControl>
-                            {/* @ts-ignore */}
-                            <MasterSelect
-                                items={bikeServices}
-                                placeholder="Select a service or type custom..."
-                                value={field.value || ''}
-                                onValueChange={field.onChange}
-                            />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
                 
                 <FormField control={form.control} name="serviceType" render={({ field }) => (
                     <FormItem>
