@@ -24,6 +24,7 @@ import { useMemoFirebase } from '@/firebase/provider';
 import { OnboardingView } from './onboarding/onboarding-view';
 import { TripSummaryDialog } from './trip/trip-summary-dialog';
 import { ReportsView } from './reports/reports-view';
+import { demoFuelLogs, demoServiceRecords, demoTrips } from '@/lib/demo-data';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -44,6 +45,7 @@ export function MainApp() {
   const [editingFuel, setEditingFuel] = useState<FuelLog | null>(null);
   const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
   const [lastCompletedTrip, setLastCompletedTrip] = useState<Trip | null>(null);
+  const [hasCheckedDemoData, setHasCheckedDemoData] = useState(false);
 
   const { firestore, user } = useFirebase();
 
@@ -69,6 +71,33 @@ export function MainApp() {
 
   const manualRemindersCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'manual_reminders') : null, [firestore, user]);
   const { data: manualReminders, isLoading: manualRemindersLoading } = useCollection<ManualReminder>(manualRemindersCollectionRef);
+
+  useEffect(() => {
+    if (user && !logsLoading && !servicesLoading && !tripsLoading && !hasCheckedDemoData) {
+      const isNewUser = (logs === null || logs.length === 0) &&
+                        (services === null || services.length === 0) &&
+                        (trips === null || trips.length === 0);
+
+      if (isNewUser) {
+        // This is a new user, let's add demo data.
+        demoFuelLogs.forEach(log => {
+          if (logsCollectionRef) addDocumentNonBlocking(logsCollectionRef, log);
+        });
+        demoServiceRecords.forEach(service => {
+          if (servicesCollectionRef) addDocumentNonBlocking(servicesCollectionRef, service);
+        });
+        demoTrips.forEach(trip => {
+          const newTripObj: Omit<Trip, 'id'> = {
+            ...trip,
+            status: 'planned',
+            expenses: []
+          };
+          if (tripsCollectionRef) addDocumentNonBlocking(tripsCollectionRef, newTripObj);
+        });
+      }
+      setHasCheckedDemoData(true); // Mark as checked to prevent re-running
+    }
+  }, [user, logs, services, trips, logsLoading, servicesLoading, tripsLoading, hasCheckedDemoData, firestore]);
 
   const stats = useMemo(() => calculateStats(logs || [], services || [], bikeDetails?.engineCc || '126-250'), [logs, services, bikeDetails]);
   const activeReminders = useMemo(() => getActiveReminders(services || [], manualReminders || [], stats.lastOdo, parseFloat(stats.dailyAvg)), [services, manualReminders, stats.lastOdo, stats.dailyAvg]);
@@ -134,13 +163,18 @@ export function MainApp() {
     setModalType(null);
   };
   
-  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id'>, id?: string) => {
+  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id' | 'work'> & { work?: string }, id?: string) => {
+    const finalServiceEntry = {
+        ...serviceEntry,
+        work: serviceEntry.parts[0]?.name || 'General Service',
+    };
+
     if (id && servicesCollectionRef) {
        const serviceRef = doc(servicesCollectionRef, id);
-       updateDocumentNonBlocking(serviceRef, serviceEntry);
+       updateDocumentNonBlocking(serviceRef, finalServiceEntry);
     } else if (servicesCollectionRef) {
-      addDocumentNonBlocking(servicesCollectionRef, serviceEntry);
-      addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
+      addDocumentNonBlocking(servicesCollectionRef, finalServiceEntry);
+      addExpenseToActiveTrip(`Service: ${finalServiceEntry.work}`, finalServiceEntry.totalCost);
     }
     syncOdometer(serviceEntry.odo);
     // Mark manual reminders as complete if service is done

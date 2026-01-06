@@ -18,7 +18,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 type ModalMode = 'service' | 'reminder';
 
-// Part schema
+// Schema for a single part in a service
 const partSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Part name can't be empty"),
@@ -36,7 +36,7 @@ const partSchema = z.object({
     path: ["reminderValue"],
 });
 
-// Explicitly define the two object schemas for the union.
+// Explicitly define the schemas for the discriminated union
 const serviceObjectSchema = z.object({
   mode: z.literal("service"),
   date: z.string().min(1, 'Date is required'),
@@ -50,12 +50,13 @@ const serviceObjectSchema = z.object({
 });
 
 const reminderObjectSchema = z.object({
-  mode: z.literal("reminder"),
-  date: z.string().optional(),
-  odo: z.coerce.number().optional(),
-  notes: z.string().min(1, 'Reminder notes are required.'),
+    mode: z.literal('reminder'),
+    date: z.string().optional(),
+    odo: z.coerce.number().optional(),
+    notes: z.string().min(1, 'Reminder notes are required.'),
 });
 
+// Create the combined schema with the refinement logic at the top level
 const combinedSchema = z.discriminatedUnion("mode", [
   serviceObjectSchema,
   reminderObjectSchema,
@@ -66,7 +67,7 @@ const combinedSchema = z.discriminatedUnion("mode", [
     return true;
 }, {
     message: 'Either a date or an odometer reading is required for a reminder.',
-    path: ['date'],
+    path: ['notes'], // Apply error to a field that is always visible in reminder mode
 });
 
 
@@ -75,7 +76,7 @@ type ServiceFormData = z.infer<typeof combinedSchema>;
 interface ServiceModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmitService: (data: Omit<ServiceRecord, 'id'>, id?: string) => void;
+    onSubmitService: (data: Omit<ServiceRecord, 'id' | 'work'>, id?: string) => void;
     onSubmitReminder: (data: Omit<ManualReminder, 'id' | 'isCompleted'>) => void;
     lastOdo: number;
     editingService: ServiceRecord | null;
@@ -115,7 +116,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
             const serviceData = { ...editingService, mode: 'service' as const };
             reset(serviceData);
         } else {
-            // Reset to default for service mode when opened
             reset({
                 mode: 'service',
                 date: new Date().toISOString().split('T')[0],
@@ -131,7 +131,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   }, [isOpen, editingService, lastOdo, reset]);
 
   useEffect(() => {
-    // When mode changes, reset the form with appropriate defaults
     if (isOpen && !editingService) {
         if (mode === 'reminder') {
             reset({
@@ -161,8 +160,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     if (data.mode === 'service') {
         const partsTotal = data.parts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
         const totalCost = (data.labor || 0) + partsTotal;
-        const serviceTitle = data.parts.length > 0 ? data.parts[0].name : "Service";
-        const finalData = { ...data, totalCost, work: serviceTitle };
+        const finalData = { ...data, totalCost };
         onSubmitService(finalData, editingService?.id);
     } else if (data.mode === 'reminder') {
         onSubmitReminder({
@@ -383,5 +381,3 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     </Dialog>
   );
 }
-
-    
