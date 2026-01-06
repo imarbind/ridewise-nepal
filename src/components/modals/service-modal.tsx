@@ -70,6 +70,7 @@ const reminderSchema = reminderBaseSchema.refine(data => data.date || data.odo, 
   path: ['date'], 
 });
 
+
 const combinedSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("service") }).merge(serviceSchema),
   z.object({ mode: z.literal("reminder") }).merge(reminderBaseSchema.extend({
@@ -373,7 +374,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     </FormItem>
                 )} />
                 <div className="text-right">
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</p>
                     <p className="font-black text-3xl text-primary mt-1">{calculatedTotal.toLocaleString()}</p>
                 </div>
                 </div>
