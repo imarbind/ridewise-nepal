@@ -59,26 +59,26 @@ const serviceSchema = z.object({
   invoiceUrl: z.string().optional(),
 });
 
-const reminderBaseSchema = z.object({
-  date: z.string().optional(),
-  odo: z.coerce.number().optional(),
-  notes: z.string().min(1, 'Reminder notes are required.'),
-});
-
-const reminderSchema = reminderBaseSchema.refine(data => data.date || data.odo, {
-  message: 'Either a date or an odometer reading is required for a reminder.',
-  path: ['date'], 
+const reminderSchema = z.object({
+    date: z.string().optional(),
+    odo: z.coerce.number().optional(),
+    notes: z.string().min(1, 'Reminder notes are required.'),
 });
 
 
 const combinedSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("service") }).merge(serviceSchema),
-  z.object({ mode: z.literal("reminder") }).merge(reminderBaseSchema.extend({
-      reminderDate: reminderBaseSchema.shape.date,
-      reminderOdo: reminderBaseSchema.shape.odo,
-      reminderNotes: reminderBaseSchema.shape.notes,
-  }).omit({ date: true, odo: true, notes: true })),
-]);
+  z.object({ mode: z.literal("reminder") }).merge(reminderSchema),
+]).refine((data) => {
+    if (data.mode === 'reminder') {
+        return data.date || data.odo;
+    }
+    return true;
+}, {
+    message: 'Either a date or an odometer reading is required for a reminder.',
+    path: ['date'], 
+});
+
 
 type ServiceFormData = z.infer<typeof combinedSchema>;
 
@@ -189,9 +189,9 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
         if (mode === 'reminder') {
             reset({
                 mode: 'reminder',
-                reminderDate: '',
-                reminderOdo: undefined,
-                reminderNotes: '',
+                date: '',
+                odo: undefined,
+                notes: '',
             });
         } else {
              reset({
@@ -219,15 +219,16 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
         onSubmitService(finalData, editingService?.id);
     } else if (data.mode === 'reminder') {
         onSubmitReminder({
-            date: data.reminderDate,
-            odo: data.reminderOdo,
-            notes: data.reminderNotes
+            date: data.date,
+            odo: data.odo,
+            notes: data.notes
         });
     }
     onClose();
   }
   
   const calculatedTotal = useMemo(() => {
+      if (!parts) return labor || 0;
       const partsTotal = (parts || []).reduce((sum, p) => sum + ((p.cost || 0) * (p.quantity || 1)), 0);
       return (labor || 0) + partsTotal;
   }, [parts, labor]);
@@ -238,13 +239,13 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary to-red-400"></div>
         <DialogHeader className="mt-2">
            <RadioGroup defaultValue="service" value={mode} onValueChange={(value: ModalMode) => setMode(value)} className="grid grid-cols-2 gap-2 mb-4 bg-slate-100 p-1 rounded-full">
-                <FormLabel htmlFor="mode-service" className={cn("text-center rounded-full p-2 text-sm font-bold cursor-pointer transition-colors", mode === 'service' ? 'bg-white text-primary shadow' : 'text-slate-500')}>
+                <label htmlFor="mode-service" className={cn("text-center rounded-full p-2 text-sm font-bold cursor-pointer transition-colors", mode === 'service' ? 'bg-white text-primary shadow' : 'text-slate-500')}>
                   Add Service
-                </FormLabel>
+                </label>
                 <RadioGroupItem value="service" id="mode-service" className="sr-only" />
-                <FormLabel htmlFor="mode-reminder" className={cn("text-center rounded-full p-2 text-sm font-bold cursor-pointer transition-colors", mode === 'reminder' ? 'bg-white text-primary shadow' : 'text-slate-500')}>
+                <label htmlFor="mode-reminder" className={cn("text-center rounded-full p-2 text-sm font-bold cursor-pointer transition-colors", mode === 'reminder' ? 'bg-white text-primary shadow' : 'text-slate-500')}>
                   Set Reminder
-                </FormLabel>
+                </label>
                 <RadioGroupItem value="reminder" id="mode-reminder" className="sr-only" />
             </RadioGroup>
           <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
@@ -374,7 +375,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     </FormItem>
                 )} />
                 <div className="text-right">
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</p>
+                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</p>
                     <p className="font-black text-3xl text-primary mt-1">{calculatedTotal.toLocaleString()}</p>
                 </div>
                 </div>
@@ -405,7 +406,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <p className="text-sm text-slate-600">
                     Set a reminder for your next service. The app will notify you based on date or kilometers, whichever comes first.
                 </p>
-                 <FormField control={form.control} name="reminderDate" render={({ field }) => (
+                 <FormField control={form.control} name="date" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Next Service Date</FormLabel>
                         <FormControl><Input type="date" {...field} /></FormControl>
@@ -419,7 +420,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     <div className="flex-grow border-t border-slate-200"></div>
                 </div>
 
-                <FormField control={form.control} name="reminderOdo" render={({ field }) => (
+                <FormField control={form.control} name="odo" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Next Service at Odometer (KM)</FormLabel>
                         <FormControl><Input type="number" placeholder={`e.g., ${lastOdo + 5000}`} {...field} /></FormControl>
@@ -427,7 +428,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     </FormItem>
                 )} />
 
-                <FormField control={form.control} name="reminderNotes" render={({ field }) => (
+                <FormField control={form.control} name="notes" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Notes (Required)</FormLabel>
                         <FormControl><Textarea placeholder="e.g., General check-up, change oil..." {...field} /></FormControl>
@@ -446,3 +447,5 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     </Dialog>
   );
 }
+
+    
