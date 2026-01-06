@@ -87,13 +87,27 @@ const MasterSelect = ({ value, onValueChange, placeholder, items }: { value: str
     const [open, setOpen] = useState(false);
     const [customValue, setCustomValue] = useState('');
 
+    const handleSelect = (selectedValue: string) => {
+        onValueChange(selectedValue);
+        setCustomValue("");
+        setOpen(false);
+    }
+    
+    const handleCustomValue = () => {
+        if(customValue && !items.includes(customValue)) {
+            onValueChange(customValue);
+        }
+        setOpen(false);
+    }
+
     return (
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={handleCustomValue}>
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}
+                    onClick={() => setOpen(prev => !prev)}
                     className="w-full justify-between font-bold text-sm text-slate-800 bg-white p-3 h-auto rounded-xl border-slate-200"
                 >
                     {value ? items.find((item) => item === value) || value : placeholder}
@@ -109,10 +123,7 @@ const MasterSelect = ({ value, onValueChange, placeholder, items }: { value: str
                     />
                     <CommandEmpty>
                          <CommandItem
-                            onSelect={() => {
-                                onValueChange(customValue);
-                                setOpen(false);
-                            }}
+                            onSelect={() => handleSelect(customValue)}
                             >
                             Add: "{customValue}"
                         </CommandItem>
@@ -121,10 +132,7 @@ const MasterSelect = ({ value, onValueChange, placeholder, items }: { value: str
                         {items.map((item) => (
                             <CommandItem
                                 key={item}
-                                onSelect={() => {
-                                    onValueChange(item);
-                                    setOpen(false);
-                                }}
+                                onSelect={() => handleSelect(item)}
                             >
                                 <Check className={cn("mr-2 h-4 w-4", value === item ? "opacity-100" : "opacity-0")} />
                                 {item}
@@ -397,6 +405,13 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <p className="text-sm text-slate-600">
                     Set a reminder for your next service. The app will notify you based on date or kilometers, whichever comes first.
                 </p>
+                 <FormField control={form.control} name="notes" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Notes (Required)</FormLabel>
+                        <FormControl><Textarea placeholder="e.g., General check-up, change oil..." {...field} /></FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )} />
                  <FormField control={form.control} name="date" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Next Service Date</FormLabel>
@@ -415,14 +430,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     <FormItem>
                         <FormLabel>Next Service at Odometer (KM)</FormLabel>
                         <FormControl><Input type="number" placeholder={`e.g., ${lastOdo + 5000}`} {...field} /></FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
-
-                <FormField control={form.control} name="notes" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Notes (Required)</FormLabel>
-                        <FormControl><Textarea placeholder="e.g., General check-up, change oil..." {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
                 )} />
