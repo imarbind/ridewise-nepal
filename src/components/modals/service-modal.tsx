@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Wrench, X, Plus, BellRing, ChevronsUpDown, Check } from 'lucide-react';
+import { Wrench, X, Plus, BellRing } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
@@ -18,15 +18,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 type ModalMode = 'service' | 'reminder';
 
-interface ServiceModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmitService: (data: Omit<ServiceRecord, 'id'>, id?: string) => void;
-    onSubmitReminder: (data: Omit<ManualReminder, 'id' | 'isCompleted'>) => void;
-    lastOdo: number;
-    editingService: ServiceRecord | null;
-}
-
+// Part schema
 const partSchema = z.object({
   id: z.string(),
   name: z.string().min(1, "Part name can't be empty"),
@@ -44,6 +36,7 @@ const partSchema = z.object({
     path: ["reminderValue"],
 });
 
+// Explicitly define the two object schemas for the union.
 const serviceObjectSchema = z.object({
   mode: z.literal("service"),
   date: z.string().min(1, 'Date is required'),
@@ -57,22 +50,36 @@ const serviceObjectSchema = z.object({
 });
 
 const reminderObjectSchema = z.object({
-    mode: z.literal("reminder"),
-    date: z.string().optional(),
-    odo: z.coerce.number().optional(),
-    notes: z.string().min(1, 'Reminder notes are required.'),
-  }).refine((data) => data.date || data.odo, {
-    message: 'Either a date or an odometer reading is required for a reminder.',
-    path: ['date'], 
-  });
+  mode: z.literal("reminder"),
+  date: z.string().optional(),
+  odo: z.coerce.number().optional(),
+  notes: z.string().min(1, 'Reminder notes are required.'),
+});
 
 const combinedSchema = z.discriminatedUnion("mode", [
   serviceObjectSchema,
   reminderObjectSchema,
-]);
+]).refine((data) => {
+    if (data.mode === 'reminder') {
+        return data.date || data.odo;
+    }
+    return true;
+}, {
+    message: 'Either a date or an odometer reading is required for a reminder.',
+    path: ['date'],
+});
+
 
 type ServiceFormData = z.infer<typeof combinedSchema>;
 
+interface ServiceModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmitService: (data: Omit<ServiceRecord, 'id'>, id?: string) => void;
+    onSubmitReminder: (data: Omit<ManualReminder, 'id' | 'isCompleted'>) => void;
+    lastOdo: number;
+    editingService: ServiceRecord | null;
+}
 
 export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminder, lastOdo, editingService }: ServiceModalProps) {
   const [mode, setMode] = useState<ModalMode>('service');
@@ -81,7 +88,10 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     resolver: zodResolver(combinedSchema),
     defaultValues: {
       mode: 'service',
+      date: new Date().toISOString().split('T')[0],
+      odo: lastOdo > 0 ? lastOdo : undefined,
       labor: 0,
+      parts: [{ id: String(Date.now()), name: '', cost: 0, quantity: 1, reminderType: 'none', reminderValue: '' }],
       serviceType: 'regular',
       notes: '',
       invoiceUrl: '',
@@ -373,3 +383,5 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     </Dialog>
   );
 }
+
+    
