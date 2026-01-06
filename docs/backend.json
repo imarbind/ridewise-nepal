@@ -127,6 +127,19 @@
         "totalKilometers": { "type": "number" }
       },
       "required": ["userId", "totalKilometers"]
+    },
+    "ManualReminder": {
+      "title": "Manual Reminder",
+      "description": "A manually set service reminder.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "odo": { "type": "number" },
+        "notes": { "type": "string" },
+        "isCompleted": { "type": "boolean" }
+      },
+      "required": ["id", "isCompleted"]
     }
   },
   "auth": {
@@ -148,6 +161,10 @@
     "/users/{userId}/trips/{tripId}": {
       "schema": { "$ref": "#/backend/entities/Trip" },
       "description": "Stores trip details for a user."
+    },
+    "/users/{userId}/manual_reminders/{reminderId}": {
+      "schema": { "$ref": "#/backend/entities/ManualReminder" },
+      "description": "Stores manual service reminders for a user."
     },
     "/rider_board/{userId}": {
       "schema": { "$ref": "#/backend/entities/RiderBoard" },

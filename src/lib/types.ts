@@ -1,5 +1,6 @@
+
 export type ActiveTab = 'dashboard' | 'trip' | 'history' | 'docs' | 'rider-board' | 'reports';
-export type ModalType = 'fuel' | 'service' | null;
+export type ModalType = 'fuel' | 'service' | 'reminder' | null;
 
 export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
 
@@ -51,6 +52,14 @@ export interface ServiceRecord {
   serviceType?: 'regular' | 'repair' | 'emergency';
   notes?: string;
   invoiceUrl?: string;
+}
+
+export interface ManualReminder {
+  id: string;
+  date?: string;
+  odo?: number;
+  notes?: string;
+  isCompleted: boolean;
 }
 
 export interface TripExpense {
@@ -134,4 +143,11 @@ export type NextServiceInfo = {
     daysToNextService: number | null;
     tasks: string[];
     progress: number;
+}
+
+export interface RiderBoardEntry {
+  id: string;
+  userId: string;
+  userName: string;
+  totalKilometers: number;
 }

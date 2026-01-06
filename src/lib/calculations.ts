@@ -1,4 +1,5 @@
-import type { FuelLog, ServiceRecord, Stats, Reminder, EngineCc, CpkData, NextServiceInfo } from './types';
+
+import type { FuelLog, ServiceRecord, Stats, Reminder, EngineCc, CpkData, NextServiceInfo, ManualReminder } from './types';
 import { differenceInDays, addDays } from 'date-fns';
 
 const cpkRanges: Record<EngineCc, { mint: number; solid: number; fair: number; worn: number; basket: number }> = {
@@ -187,11 +188,12 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engin
   };
 }
 
-export function getActiveReminders(services: ServiceRecord[], lastOdo: number, dailyAvgKm: number): Reminder[] {
+export function getActiveReminders(services: ServiceRecord[], manualReminders: ManualReminder[], lastOdo: number, dailyAvgKm: number): Reminder[] {
     const reminders: Reminder[] = [];
     const partMap: { [key: string]: Reminder['rawData'] } = {};
     const now = new Date();
 
+    // Process reminders from service parts
     [...services].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).forEach(s => {
       s.parts.forEach(p => {
         if (p.reminderType && p.reminderType !== 'none' && p.reminderValue) {
@@ -251,6 +253,65 @@ export function getActiveReminders(services: ServiceRecord[], lastOdo: number, d
         rawData: { ...data, currentUsed }
       });
     });
+
+    // Process manual reminders
+    manualReminders.forEach(reminder => {
+      if (reminder.isCompleted) return;
+
+      let byDate: Reminder | null = null;
+      if (reminder.date) {
+        const dueDate = new Date(reminder.date);
+        const lastServiceDate = services.length > 0 ? new Date(services[services.length - 1].date) : new Date(0);
+        const totalDuration = differenceInDays(dueDate, lastServiceDate);
+        const usedDays = differenceInDays(now, lastServiceDate);
+        const progress = totalDuration > 0 ? (usedDays / totalDuration) * 100 : 0;
+        const remainingDays = differenceInDays(dueDate, now);
+        byDate = {
+          name: reminder.notes || 'General Service',
+          progress: Math.min(100, progress),
+          label: `${usedDays} / ${totalDuration} Days`,
+          isDue: now >= dueDate,
+          remainingDays: Math.max(0, remainingDays),
+          estimatedDueDate: dueDate,
+          rawData: { lastOdo: lastOdo, lastDate: now.toISOString(), reminderType: 'days', reminderValue: totalDuration, currentUsed: usedDays }
+        };
+      }
+
+      let byOdo: Reminder | null = null;
+      if (reminder.odo > 0) {
+        const dueOdo = reminder.odo;
+        const lastServiceOdo = services.length > 0 ? services[services.length-1].odo : 0;
+        const totalKm = dueOdo - lastServiceOdo;
+        const usedKm = lastOdo - lastServiceOdo;
+        const progress = totalKm > 0 ? (usedKm / totalKm) * 100 : 0;
+        const remainingKm = dueOdo - lastOdo;
+        const remainingDays = (dailyAvgKm > 0) ? Math.ceil(remainingKm / dailyAvgKm) : Infinity;
+        byOdo = {
+          name: reminder.notes || 'General Service',
+          progress: Math.min(100, progress),
+          label: `${usedKm.toLocaleString()} / ${totalKm.toLocaleString()} KM`,
+          isDue: lastOdo >= dueOdo,
+          remainingDays: Math.max(0, remainingDays),
+          estimatedDueDate: addDays(now, Math.max(0, remainingDays)),
+          rawData: { lastOdo: lastServiceOdo, lastDate: now.toISOString(), reminderType: 'km', reminderValue: totalKm, currentUsed: usedKm }
+        };
+      }
+      
+      // Add the one that is due sooner
+      if (byDate && byOdo) {
+        if (byDate.remainingDays <= byOdo.remainingDays) {
+          reminders.push(byDate);
+        } else {
+          reminders.push(byOdo);
+        }
+      } else if (byDate) {
+        reminders.push(byDate);
+      } else if (byOdo) {
+        reminders.push(byOdo);
+      }
+    });
+
+
     return reminders;
 }
 

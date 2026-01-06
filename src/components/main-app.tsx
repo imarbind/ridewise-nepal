@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { calculateStats, getActiveReminders, getNextService } from '@/lib/calculations';
-import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc, BikeDetails, Reminder, NextServiceInfo } from '@/lib/types';
+import type { ActiveTab, FuelLog, ServiceRecord, Trip, Doc, ModalType, TripExpense, EngineCc, BikeDetails, Reminder, NextServiceInfo, ManualReminder } from '@/lib/types';
 
 import { NepalBackground } from '@/components/layout/nepal-background';
 import { MainNavigation } from '@/components/layout/main-navigation';
@@ -16,13 +17,14 @@ import { ServiceModal } from '@/components/modals/service-modal';
 import { RiderBoardView } from './rider-board/rider-board-view';
 import { TimelineView } from './timeline/timeline-view';
 import { useFirebase } from '@/firebase';
-import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, getDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, getDoc, updateDoc } from 'firebase/firestore';
 import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useCollection, useDoc } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
 import { OnboardingView } from './onboarding/onboarding-view';
 import { TripSummaryDialog } from './trip/trip-summary-dialog';
 import { ReportsView } from './reports/reports-view';
+import { ReminderModal } from './modals/reminder-modal';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -66,8 +68,11 @@ export function MainApp() {
   const tripsCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'trips') : null, [firestore, user]);
   const { data: trips, isLoading: tripsLoading } = useCollection<Trip>(tripsCollectionRef);
 
+  const manualRemindersCollectionRef = useMemoFirebase(() => user ? collection(firestore, 'users', user.uid, 'manual_reminders') : null, [firestore, user]);
+  const { data: manualReminders, isLoading: manualRemindersLoading } = useCollection<ManualReminder>(manualRemindersCollectionRef);
+
   const stats = useMemo(() => calculateStats(logs || [], services || [], bikeDetails?.engineCc || '126-250'), [logs, services, bikeDetails]);
-  const activeReminders = useMemo(() => getActiveReminders(services || [], stats.lastOdo, parseFloat(stats.dailyAvg)), [services, stats.lastOdo, stats.dailyAvg]);
+  const activeReminders = useMemo(() => getActiveReminders(services || [], manualReminders || [], stats.lastOdo, parseFloat(stats.dailyAvg)), [services, manualReminders, stats.lastOdo, stats.dailyAvg]);
   const nextServiceInfo: NextServiceInfo = useMemo(() => getNextService(activeReminders, stats.lastServiceDate), [activeReminders, stats.lastServiceDate]);
   
   const upcomingTrip = useMemo(() => {
@@ -139,6 +144,15 @@ export function MainApp() {
       addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
     }
     syncOdometer(serviceEntry.odo);
+    // Mark manual reminders as complete if service is done
+    if (manualRemindersCollectionRef && manualReminders) {
+      manualReminders.forEach(reminder => {
+        if (!reminder.isCompleted && serviceEntry.odo >= reminder.odo) {
+          const reminderRef = doc(manualRemindersCollectionRef, reminder.id);
+          updateDocumentNonBlocking(reminderRef, { isCompleted: true });
+        }
+      });
+    }
     setEditingService(null);
     setModalType(null);
   };
@@ -153,6 +167,13 @@ export function MainApp() {
     if (window.confirm('Are you sure you want to delete this service record?') && servicesCollectionRef) {
       deleteDocumentNonBlocking(doc(servicesCollectionRef, id));
     }
+  };
+
+  const handleAddReminder = (reminderData: Omit<ManualReminder, 'id' | 'isCompleted'>) => {
+    if (manualRemindersCollectionRef) {
+      addDocumentNonBlocking(manualRemindersCollectionRef, { ...reminderData, isCompleted: false });
+    }
+    setModalType(null);
   };
 
   const handleEditFuel = (log: FuelLog) => {
@@ -326,7 +347,7 @@ export function MainApp() {
               onDeleteTrip={deleteTrip}
               onAddExpense={addTripExpense}
               onUpdateExpense={updateTripExpense}
-              onDeleteExpense={deleteTripExpense}
+              onDeleteExpense={onDeleteExpense}
             />;
         case 'reports':
             return <ReportsView fuelLogs={logs || []} serviceLogs={services || []} />;
@@ -365,6 +386,12 @@ export function MainApp() {
         onSubmit={handleAddOrUpdateService}
         lastOdo={stats.lastOdo}
         editingService={editingService}
+      />
+       <ReminderModal
+        isOpen={modalType === 'reminder'}
+        onClose={handleCloseModal}
+        onSubmit={handleAddReminder}
+        lastOdo={stats.lastOdo}
       />
       <TripSummaryDialog 
         isOpen={!!lastCompletedTrip}

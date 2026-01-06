@@ -26,6 +26,9 @@ service cloud.firestore {
       match /trips/{tripId} {
         allow read, write, delete: if isOwner(userId);
       }
+      match /manual_reminders/{reminderId} {
+        allow read, write, delete: if isOwner(userId);
+      }
     }
     
     // Rider board is public readable, but only writable by the owner of the record
