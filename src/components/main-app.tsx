@@ -10,13 +10,11 @@ import { MainNavigation } from '@/components/layout/main-navigation';
 import { FloatingActionButtons } from '@/components/layout/floating-action-buttons';
 import { DashboardView } from '@/components/dashboard/dashboard-view';
 import { TripView } from '@/components/trip/trip-view';
-import { ServiceLogView } from '@/components/service/service-log-view';
 import { DocsView } from '@/components/docs/docs-view';
 import { FuelModal } from '@/components/modals/fuel-modal';
 import { ServiceModal } from '@/components/modals/service-modal';
-import { HistoryView } from './history/history-view';
-import { FuelLogView } from './logs/fuel-log-view';
 import { RiderBoardView } from './rider-board/rider-board-view';
+import { TimelineView } from './timeline/timeline-view';
 import { useFirebase } from '@/firebase';
 import { collection, doc, onSnapshot, setDoc, addDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { setDocumentNonBlocking, addDocumentNonBlocking, deleteDocumentNonBlocking, updateDocumentNonBlocking } from '@/firebase/non-blocking-updates';
@@ -104,6 +102,7 @@ export function MainApp() {
         liters: 0,
         amount: 0,
         price: 0,
+        tankStatus: 'partial',
       };
       if(logsCollectionRef) {
         addDocumentNonBlocking(logsCollectionRef, dummyLog);
@@ -278,6 +277,7 @@ export function MainApp() {
         liters: 0,
         amount: 0,
         price: 0,
+        tankStatus: 'partial',
       };
       addDocumentNonBlocking(logsCollectionRef, initialLog);
     }
@@ -299,12 +299,8 @@ export function MainApp() {
     switch(activeTab) {
         case 'dashboard':
             return <DashboardView stats={stats} activeReminders={activeReminders} onNavigateDocs={() => setActiveTab('docs')} bikeDetails={bikeDetails} setBikeDetails={setBikeDetails} upcomingTrip={upcomingTrip} />;
-        case 'fuel':
-            return <FuelLogView logs={logs || []} onDelete={handleDeleteFuel} onEdit={handleEditFuel} />;
-        case 'service':
-            return <ServiceLogView logs={services || []} onDelete={handleDeleteService} onEdit={handleEditService} />;
         case 'history':
-            return <HistoryView 
+            return <TimelineView
                         fuelLogs={logs || []} 
                         serviceLogs={services || []} 
                         onEditFuel={handleEditFuel}
@@ -369,5 +365,3 @@ export function MainApp() {
     </>
   );
 };
-
-    

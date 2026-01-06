@@ -1,13 +1,11 @@
 "use client";
 
-import { BarChart3, History, Navigation2, Wrench, Fuel, Trophy } from 'lucide-react';
+import { BarChart3, History, Navigation2, Trophy } from 'lucide-react';
 import type { ActiveTab } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 const navItems: { id: ActiveTab; icon: React.ElementType, color: string, label: string }[] = [
     { id: 'dashboard', icon: BarChart3, color: 'primary', label: 'Dashboard' },
-    { id: 'fuel', icon: Fuel, color: 'green-600', label: 'Fuel' },
-    { id: 'service', icon: Wrench, color: 'primary', label: 'Service' },
     { id: 'history', icon: History, color: 'blue-600', label: 'History' },
     { id: 'trip', icon: Navigation2, color: 'purple-600', label: 'Trip' },
     { id: 'rider-board', icon: Trophy, color: 'yellow-500', label: 'Rider Board' },

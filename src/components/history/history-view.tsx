@@ -36,7 +36,7 @@ export function HistoryView({
   }, [fuelLogs, serviceLogs]);
 
   return (
-    <div className="pb-32 animate-in slide-in-from-right-8 fade-in duration-500">
+    <div className="pb-32">
       <h2 className="text-2xl font-black mb-6 uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-primary">
         Vehicle Timeline
       </h2>
