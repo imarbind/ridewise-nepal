@@ -59,21 +59,23 @@ const serviceSchema = z.object({
   invoiceUrl: z.string().optional(),
 });
 
-const reminderSchema = z.object({
+const reminderBaseSchema = z.object({
   date: z.string().optional(),
   odo: z.coerce.number().optional(),
   notes: z.string().min(1, 'Reminder notes are required.'),
-}).refine(data => data.date || data.odo, {
+});
+
+const reminderSchema = reminderBaseSchema.refine(data => data.date || data.odo, {
   message: 'Either a date or an odometer reading is required for a reminder.',
   path: ['date'], 
 });
 
 const combinedSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("service") }).merge(serviceSchema),
-  z.object({ mode: z.literal("reminder") }).merge(reminderSchema.extend({
-      reminderDate: reminderSchema.shape.date,
-      reminderOdo: reminderSchema.shape.odo,
-      reminderNotes: reminderSchema.shape.notes,
+  z.object({ mode: z.literal("reminder") }).merge(reminderBaseSchema.extend({
+      reminderDate: reminderBaseSchema.shape.date,
+      reminderOdo: reminderBaseSchema.shape.odo,
+      reminderNotes: reminderBaseSchema.shape.notes,
   }).omit({ date: true, odo: true, notes: true })),
 ]);
 
@@ -443,5 +445,3 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     </Dialog>
   );
 }
-
-    
