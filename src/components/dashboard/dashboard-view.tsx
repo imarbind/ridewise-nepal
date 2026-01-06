@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, TrendingUp, History, Award, Thermometer, TrendingDown } from "lucide-react";
@@ -170,9 +171,9 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         <div className="flex gap-4">
           {/* Left Column */}
           <div className="w-[45%] flex flex-col gap-4">
-            <StatCard isCompact label="Last km/l" value={stats.lastMileage} sub="km/l" icon={TrendingUp} />
-            <StatCard isCompact label="Best km/l" value={stats.bestMileage} sub="km/l" icon={Award} />
-            <StatCard isCompact label="Avg km/l" value={stats.avgMileage} sub="km/l" icon={TrendingDown} />
+            <StatCard isCompact label="Last km/l" value={stats.lastMileage} sub="km/l" icon={TrendingUp} iconColorClass="bg-blue-500" />
+            <StatCard isCompact label="Best km/l" value={stats.bestMileage} sub="km/l" icon={Award} iconColorClass="bg-yellow-500"/>
+            <StatCard isCompact label="Avg km/l" value={stats.avgMileage} sub="km/l" icon={TrendingDown} iconColorClass="bg-orange-500"/>
           </div>
           {/* Right Column */}
           <div className="w-[55%]">
@@ -188,16 +189,16 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
 
         {/* MIDDLE SECTION */}
         <div className="grid grid-cols-3 gap-4">
-          <StatCard label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} />
-          <StatCard label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} />
-          <StatCard label="Total Fuel" value={`${stats.totalFuelLiters.toFixed(1)}`} sub="Liters" icon={Thermometer} />
+          <StatCard label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} iconColorClass="bg-green-600"/>
+          <StatCard label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} iconColorClass="bg-red-500"/>
+          <StatCard label="Total Fuel" value={`${stats.totalFuelLiters.toFixed(1)}`} sub="Liters" icon={Thermometer} iconColorClass="bg-purple-500"/>
         </div>
         
         {/* BOTTOM SECTION */}
         <div className="grid grid-cols-3 gap-4">
-            <StatCard isCompact label="Fuel Logs" value={`${stats.totalFuelLogs}`} icon={History} />
-            <StatCard isCompact label="Services" value={`${stats.totalServices}`} icon={Wrench} />
-            <StatCard isCompact label="Parts/Oil" value={`${stats.totalPartsChanged}/${stats.totalOilChanges}`} icon={ListChecks} />
+            <StatCard isCompact label="Fuel Logs" value={`${stats.totalFuelLogs}`} icon={History} iconColorClass="bg-sky-500" />
+            <StatCard isCompact label="Services" value={`${stats.totalServices}`} icon={Wrench} iconColorClass="bg-pink-500"/>
+            <StatCard isCompact label="Parts/Oil" value={`${stats.totalPartsChanged}/${stats.totalOilChanges}`} icon={ListChecks} iconColorClass="bg-indigo-500"/>
         </div>
       </div>
 

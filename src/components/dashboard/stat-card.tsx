@@ -9,12 +9,13 @@ interface StatCardProps {
   value: string;
   sub?: string;
   icon: LucideIcon;
+  iconColorClass?: string;
   delay?: number;
   colSpan?: string;
   isCompact?: boolean;
 }
 
-export const StatCard = ({ label, value, sub, icon: Icon, delay = 0, colSpan = 'col-span-1', isCompact = false }: StatCardProps) => (
+export const StatCard = ({ label, value, sub, icon: Icon, iconColorClass = 'bg-primary', delay = 0, colSpan = 'col-span-1', isCompact = false }: StatCardProps) => (
   <div 
     className={cn(
         "relative group [perspective:1000px] animate-in fade-in slide-in-from-bottom-4 fill-mode-backwards",
@@ -39,14 +40,14 @@ export const StatCard = ({ label, value, sub, icon: Icon, delay = 0, colSpan = '
                   {sub && <span className="text-xs font-bold text-slate-400 ml-1">{sub}</span>}
               </h3>
             </div>
-            <div className={cn("p-2 rounded-xl inline-block shadow-lg text-white bg-primary")}>
+            <div className={cn("p-2 rounded-xl inline-block shadow-lg text-white", iconColorClass)}>
               <Icon size={16} />
             </div>
         </div>
       ) : (
         <>
           <div>
-            <div className={cn("p-2 rounded-xl inline-block mb-2 shadow-lg text-white bg-primary")}>
+            <div className={cn("p-2 rounded-xl inline-block mb-2 shadow-lg text-white", iconColorClass)}>
               <Icon size={16} />
             </div>
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight z-10 relative">{label}</p>
