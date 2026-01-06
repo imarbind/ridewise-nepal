@@ -86,7 +86,6 @@ type ServiceFormData = z.infer<typeof combinedSchema>;
 const MasterSelect = ({ value, onValueChange, placeholder, items }: { value: string; onValueChange: (val: string) => void; placeholder: string; items: readonly string[] }) => {
     const [open, setOpen] = useState(false);
     const [customValue, setCustomValue] = useState('');
-    const isCustom = value && !items.includes(value);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -104,7 +103,8 @@ const MasterSelect = ({ value, onValueChange, placeholder, items }: { value: str
             <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                 <Command>
                     <CommandInput 
-                        placeholder="Search or type custom..." 
+                        placeholder="Search or type custom..."
+                        value={customValue}
                         onValueChange={setCustomValue}
                     />
                     <CommandEmpty>
