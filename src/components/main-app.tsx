@@ -347,7 +347,7 @@ export function MainApp() {
               onDeleteTrip={deleteTrip}
               onAddExpense={addTripExpense}
               onUpdateExpense={updateTripExpense}
-              onDeleteExpense={onDeleteExpense}
+              onDeleteExpense={deleteTripExpense}
             />;
         case 'reports':
             return <ReportsView fuelLogs={logs || []} serviceLogs={services || []} />;
