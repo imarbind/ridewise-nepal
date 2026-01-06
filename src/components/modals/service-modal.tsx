@@ -60,17 +60,21 @@ const serviceSchema = z.object({
 });
 
 const reminderSchema = z.object({
-  reminderDate: z.string().optional(),
-  reminderOdo: z.coerce.number().optional(),
-  reminderNotes: z.string().min(1, 'Reminder notes are required.'),
-}).refine(data => data.reminderDate || data.reminderOdo, {
+  date: z.string().optional(),
+  odo: z.coerce.number().optional(),
+  notes: z.string().min(1, 'Reminder notes are required.'),
+}).refine(data => data.date || data.odo, {
   message: 'Either a date or an odometer reading is required for a reminder.',
-  path: ['reminderDate'], 
+  path: ['date'], 
 });
 
 const combinedSchema = z.discriminatedUnion("mode", [
   z.object({ mode: z.literal("service") }).merge(serviceSchema),
-  z.object({ mode: z.literal("reminder") }).merge(reminderSchema),
+  z.object({ mode: z.literal("reminder") }).merge(reminderSchema.extend({
+      reminderDate: reminderSchema.shape.date,
+      reminderOdo: reminderSchema.shape.odo,
+      reminderNotes: reminderSchema.shape.notes,
+  }).omit({ date: true, odo: true, notes: true })),
 ]);
 
 type ServiceFormData = z.infer<typeof combinedSchema>;
@@ -210,7 +214,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
         const totalCost = (data.labor || 0) + partsTotal;
         const finalData = { ...data, totalCost };
         onSubmitService(finalData, editingService?.id);
-    } else {
+    } else if (data.mode === 'reminder') {
         onSubmitReminder({
             date: data.reminderDate,
             odo: data.reminderOdo,
@@ -439,3 +443,5 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     </Dialog>
   );
 }
+
+    
