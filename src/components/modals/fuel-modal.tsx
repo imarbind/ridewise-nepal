@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -66,25 +67,17 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
   }, [isOpen, editingFuel, lastOdo, lastPrice, reset]);
 
   const handleValueChange = (changedValue: string, changedField: 'amount' | 'liters' | 'price') => {
-      const [amount, liters, price] = getValues(['amount', 'liters', 'price']);
+      const { amount, liters, price } = getValues();
       
       const numericAmount = parseFloat(String(changedField === 'amount' ? changedValue : amount));
       const numericLiters = parseFloat(String(changedField === 'liters' ? changedValue : liters));
       const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
 
-      if (changedField === 'price') {
-        if (!isNaN(numericPrice) && numericPrice > 0) {
-            if (!isNaN(numericLiters) && numericLiters > 0) {
-                setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
-            }
-        }
-      } else if (changedField === 'liters') {
-          if (!isNaN(numericLiters) && numericLiters > 0 && !isNaN(numericPrice) && numericPrice > 0) {
+      if (!isNaN(numericPrice) && numericPrice > 0) {
+        if (changedField === 'liters' && !isNaN(numericLiters) && numericLiters > 0) {
             setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
-          }
-      } else if (changedField === 'amount') {
-        if (!isNaN(numericAmount) && numericAmount > 0 && !isNaN(numericPrice) && numericPrice > 0) {
-          setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
+        } else if (changedField === 'amount' && !isNaN(numericAmount) && numericAmount > 0) {
+            setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
         }
       }
   };
@@ -170,7 +163,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                         <FormControl>
                             <Input type="number" placeholder="e.g. 35" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
                         </FormControl>
-                        <p className="text-[11px] text-slate-500 mt-1 px-1">Provide an estimate if you know it. It helps in calculations.</p>
+                        <p className="text-[11px] text-slate-500 mt-1 px-1">Provide an estimate if you know it. It helps in calculations when two consecutive full-tank logs aren't available.</p>
                         <FormMessage />
                     </FormItem>
                 )} />
@@ -223,3 +216,5 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     </Dialog>
   );
 }
+
+    
