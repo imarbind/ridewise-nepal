@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import type { FuelLog } from '@/lib/types';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 interface FuelModalProps {
     isOpen: boolean;
@@ -26,6 +27,8 @@ const fuelSchema = z.object({
   price: z.coerce.number().positive('Price must be positive'),
   liters: z.coerce.number().positive('Liters must be positive'),
   amount: z.coerce.number().positive('Total amount must be positive'),
+  tankStatus: z.enum(['full', 'partial']),
+  estimatedMileage: z.coerce.number().optional(),
 });
 
 type FuelFormData = z.infer<typeof fuelSchema>;
@@ -33,9 +36,13 @@ type FuelFormData = z.infer<typeof fuelSchema>;
 export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editingFuel }: FuelModalProps) {
   const form = useForm<FuelFormData>({
     resolver: zodResolver(fuelSchema),
+    defaultValues: {
+      tankStatus: 'full',
+    }
   });
   
   const { watch, setValue, reset, getValues } = form;
+  const tankStatus = watch('tankStatus');
 
   useEffect(() => {
     if (isOpen) {
@@ -51,6 +58,8 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
           price: lastPrice,
           liters: undefined,
           amount: undefined,
+          tankStatus: 'full',
+          estimatedMileage: undefined
         });
       }
     }
@@ -119,6 +128,54 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                 )} />
              </div>
             
+            <FormField
+              control={form.control}
+              name="tankStatus"
+              render={({ field }) => (
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Tank Status</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="grid grid-cols-2 gap-4"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="full" id="full" className="peer sr-only" />
+                        </FormControl>
+                        <FormLabel htmlFor="full" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary w-full cursor-pointer">
+                          Full Tank
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="partial" id="partial" className="peer sr-only"/>
+                        </FormControl>
+                        <FormLabel htmlFor="partial" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary w-full cursor-pointer">
+                          Partial Fill
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {tankStatus === 'partial' && (
+                <FormField control={form.control} name="estimatedMileage" render={({ field }) => (
+                    <FormItem className="animate-in fade-in">
+                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Estimated Average (KM/L)</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="e.g. 35" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
+                        </FormControl>
+                        <p className="text-[11px] text-slate-500 mt-1 px-1">Provide an estimate if you know it. It helps in calculations.</p>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+            )}
+
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 relative overflow-hidden">
               <div className="absolute -bottom-8 -right-8 text-green-600/10">
                 <Droplets size={100} strokeWidth={1} />

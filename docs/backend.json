@@ -39,9 +39,11 @@
         "odo": { "type": "number" },
         "liters": { "type": "number" },
         "amount": { "type": "number" },
-        "price": { "type": "number" }
+        "price": { "type": "number" },
+        "tankStatus": { "type": "string", "enum": ["full", "partial"] },
+        "estimatedMileage": { "type": "number" }
       },
-      "required": ["date", "odo", "liters", "amount", "price"]
+      "required": ["date", "odo", "liters", "amount", "price", "tankStatus"]
     },
     "ServiceRecord": {
       "title": "Service Record",

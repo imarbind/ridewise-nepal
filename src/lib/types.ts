@@ -19,6 +19,8 @@ export interface FuelLog {
   liters: number;
   amount: number;
   price: number;
+  tankStatus: 'full' | 'partial';
+  estimatedMileage?: number;
 }
 
 export interface ServicePart {

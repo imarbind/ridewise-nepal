@@ -1,5 +1,4 @@
 import type { FuelLog, ServiceRecord, Stats, Reminder, EngineCc, CpkData } from './types';
-import { ExpenseChartData } from '@/components/dashboard/expense-chart';
 
 const cpkRanges: Record<EngineCc, { mint: number; solid: number; fair: number; worn: number; basket: number }> = {
     '50-125':   { mint: 3.60, solid: 5.77, fair: 8.65,  worn: 14.41, basket: 14.41 },
@@ -56,6 +55,51 @@ function calculateCpk(logs: FuelLog[], services: ServiceRecord[], engineCc: Engi
   };
 }
 
+function calculateAverageMileage(logs: FuelLog[]): number {
+  if (logs.length < 2) return 0;
+
+  const sortedLogs = [...logs].sort((a, b) => a.odo - b.odo);
+  
+  // Find two most recent consecutive full tank logs
+  let firstFullIndex = -1;
+  let secondFullIndex = -1;
+
+  for (let i = sortedLogs.length - 1; i > 0; i--) {
+    if (sortedLogs[i].tankStatus === 'full') {
+      secondFullIndex = i;
+      for (let j = i - 1; j >= 0; j--) {
+        if (sortedLogs[j].tankStatus === 'full') {
+          firstFullIndex = j;
+          break;
+        }
+      }
+      break;
+    }
+  }
+
+  if (firstFullIndex !== -1 && secondFullIndex !== -1) {
+    const distance = sortedLogs[secondFullIndex].odo - sortedLogs[firstFullIndex].odo;
+    let fuelConsumed = 0;
+    // Sum fuel from the log after the first full tank up to and including the second full tank
+    for (let i = firstFullIndex + 1; i <= secondFullIndex; i++) {
+      fuelConsumed += sortedLogs[i].liters;
+    }
+    
+    if (distance > 0 && fuelConsumed > 0) {
+      return distance / fuelConsumed;
+    }
+  }
+
+  // Fallback: use the most recent estimated mileage if available
+  for (let i = sortedLogs.length - 1; i >= 0; i--) {
+      if (sortedLogs[i].estimatedMileage && sortedLogs[i].estimatedMileage! > 0) {
+          return sortedLogs[i].estimatedMileage!;
+      }
+  }
+  
+  return 0; // No valid data to calculate
+}
+
 
 export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engineCc: EngineCc): Stats {
   const sortedLogs = [...logs].sort((a, b) => b.odo - a.odo);
@@ -67,8 +111,7 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engin
   const totalServiceCost = services.reduce((sum, item) => sum + (parseFloat(String(item.totalCost)) || 0), 0);
   const totalOwnership = totalFuelCost + totalServiceCost;
 
-  let avgMileage = 0;
-  let costPerKm = 0;
+  const avgMileage = calculateAverageMileage(logs);
 
   const allRecordsByOdo = [...logs.map(l => ({ odo: l.odo })), ...services.map(s => ({ odo: s.odo }))]
     .filter(r => r.odo)
@@ -76,17 +119,8 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engin
     
   const firstOdo = allRecordsByOdo.length > 0 ? allRecordsByOdo[0].odo : 0;
   const totalDistance = lastOdo - firstOdo;
-
-  if (logs.length > 1) {
-    const sortedByOdo = [...logs].sort((a, b) => a.odo - b.odo);
-    const totalDistForFuel = sortedByOdo[sortedByOdo.length - 1].odo - sortedByOdo[0].odo;
-    const fuelConsumed = logs.slice(0, -1).reduce((sum, item) => sum + (parseFloat(String(item.liters)) || 0), 0);
-    avgMileage = fuelConsumed > 0 ? (totalDistForFuel / fuelConsumed) : 0;
-  }
-
-  if (totalDistance > 0) {
-    costPerKm = totalOwnership / totalDistance;
-  }
+  
+  const costPerKm = totalDistance > 0 ? totalOwnership / totalDistance : 0;
 
   let dailyAvg = 0;
   const allRecords = [...logs, ...services]
@@ -185,52 +219,4 @@ export function getActiveReminders(services: ServiceRecord[], lastOdo: number): 
       });
     });
     return reminders;
-}
-
-
-export function getExpenseChartData(logs: FuelLog[], services: ServiceRecord[]): ExpenseChartData[] {
-  const expenses: { [key: string]: { fuel: number; service: number } } = {};
-  const today = new Date();
-  const last12MonthsKeys: string[] = [];
-
-  for (let i = 11; i >= 0; i--) {
-    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-    const month = d.toLocaleString('default', { month: 'short' });
-    const year = d.getFullYear();
-    const key = `${month} '${String(year).slice(-2)}`;
-    last12MonthsKeys.push(key);
-    expenses[key] = { fuel: 0, service: 0 };
-  }
-  
-  const twelveMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
-
-  logs.forEach(log => {
-    const date = new Date(log.date);
-    if (date >= twelveMonthsAgo) {
-      const month = date.toLocaleString('default', { month: 'short' });
-      const year = date.getFullYear();
-      const key = `${month} '${String(year).slice(-2)}`;
-      if (expenses[key]) {
-        expenses[key].fuel += parseFloat(String(log.amount)) || 0;
-      }
-    }
-  });
-
-  services.forEach(service => {
-    const date = new Date(service.date);
-     if (date >= twelveMonthsAgo) {
-      const month = date.toLocaleString('default', { month: 'short' });
-      const year = date.getFullYear();
-      const key = `${month} '${String(year).slice(-2)}`;
-      if (expenses[key]) {
-        expenses[key].service += parseFloat(String(service.totalCost)) || 0;
-      }
-    }
-  });
-
-  return last12MonthsKeys.map(key => ({
-    month: key,
-    fuel: expenses[key].fuel,
-    service: expenses[key].service,
-  }));
 }
