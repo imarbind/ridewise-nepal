@@ -2,7 +2,7 @@
 "use client";
 
 import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, TrendingUp, History, Award, Thermometer } from "lucide-react";
-import type { Stats, Reminder, EngineCc, BikeDetails, Trip } from "@/lib/types";
+import type { Stats, Reminder, EngineCc, BikeDetails, Trip, NextServiceInfo } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
 import { Button } from "../ui/button";
@@ -20,10 +20,10 @@ interface DashboardViewProps {
   bikeDetails: BikeDetails;
   setBikeDetails: (details: BikeDetails) => void;
   upcomingTrip: Trip | null;
-  nextServiceReminder: Reminder | null;
+  nextServiceInfo: NextServiceInfo;
 }
 
-export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, upcomingTrip, nextServiceReminder }: DashboardViewProps) {
+export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDetails, setBikeDetails, upcomingTrip, nextServiceInfo }: DashboardViewProps) {
   const [isEditingBike, setIsEditingBike] = useState(false);
   const [editableBikeDetails, setEditableBikeDetails] = useState(bikeDetails);
 
@@ -160,7 +160,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         </div>
         <div className="px-4 space-y-4">
           <ConditionRatingCard cpkData={stats.cpk} />
-          <NextServiceBar reminder={nextServiceReminder} />
+          <NextServiceBar serviceInfo={nextServiceInfo} />
         </div>
       </div>
       

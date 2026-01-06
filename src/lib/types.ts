@@ -60,7 +60,7 @@ export interface TripExpense {
 }
 
 export interface Trip {
-    id: string;
+    id:string;
     destination: string;
     start: string; // ISO 8601 format
     end?: string; // ISO 8601 format, optional
@@ -109,6 +109,7 @@ export type Stats = {
     lastMileage: string;
     bestMileage: string;
     totalFuelLogs: number;
+    lastServiceDate: string | null;
 }
 
 export type Reminder = {
@@ -116,6 +117,8 @@ export type Reminder = {
     progress: number;
     label: string;
     isDue: boolean;
+    remainingDays: number;
+    estimatedDueDate: Date;
     rawData: {
         lastOdo: number;
         lastDate: string;
@@ -125,9 +128,10 @@ export type Reminder = {
     }
 }
 
-export interface RiderBoardEntry {
-  id: string;
-  userId: string;
-  userName?: string;
-  totalKilometers: number;
+export type NextServiceInfo = {
+    lastServiceDate: string | null;
+    nextServiceDate: Date | null;
+    daysToNextService: number | null;
+    tasks: string[];
+    progress: number;
 }
