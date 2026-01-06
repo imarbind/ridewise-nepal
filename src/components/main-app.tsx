@@ -24,7 +24,6 @@ import { useMemoFirebase } from '@/firebase/provider';
 import { OnboardingView } from './onboarding/onboarding-view';
 import { TripSummaryDialog } from './trip/trip-summary-dialog';
 import { ReportsView } from './reports/reports-view';
-import { ReminderModal } from './modals/reminder-modal';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -118,7 +117,7 @@ export function MainApp() {
   };
 
   const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: string) => {
-    const cleanedEntry = { ...fuelEntry };
+    const cleanedEntry: Partial<Omit<FuelLog, 'id'>> = { ...fuelEntry };
     if (typeof cleanedEntry.estimatedMileage !== 'number' || isNaN(cleanedEntry.estimatedMileage)) {
         delete cleanedEntry.estimatedMileage;
     }
@@ -127,10 +126,10 @@ export function MainApp() {
       const logRef = doc(logsCollectionRef, id);
       updateDocumentNonBlocking(logRef, cleanedEntry);
     } else if (logsCollectionRef) { // Adding new
-      addDocumentNonBlocking(logsCollectionRef, cleanedEntry);
-      addExpenseToActiveTrip(`Fuel (${cleanedEntry.liters}L)`, cleanedEntry.amount);
+      addDocumentNonBlocking(logsCollectionRef, cleanedEntry as Omit<FuelLog, 'id'>);
+      addExpenseToActiveTrip(`Fuel (${cleanedEntry.liters}L)`, cleanedEntry.amount!);
     }
-    syncOdometer(cleanedEntry.odo);
+    syncOdometer(cleanedEntry.odo!);
     setEditingFuel(null);
     setModalType(null);
   };
@@ -147,7 +146,7 @@ export function MainApp() {
     // Mark manual reminders as complete if service is done
     if (manualRemindersCollectionRef && manualReminders) {
       manualReminders.forEach(reminder => {
-        if (!reminder.isCompleted && serviceEntry.odo >= reminder.odo) {
+        if (!reminder.isCompleted && serviceEntry.odo >= (reminder.odo ?? Infinity)) {
           const reminderRef = doc(manualRemindersCollectionRef, reminder.id);
           updateDocumentNonBlocking(reminderRef, { isCompleted: true });
         }
@@ -383,15 +382,10 @@ export function MainApp() {
       <ServiceModal
         isOpen={modalType === 'service'}
         onClose={handleCloseModal}
-        onSubmit={handleAddOrUpdateService}
+        onSubmitService={handleAddOrUpdateService}
+        onSubmitReminder={handleAddReminder}
         lastOdo={stats.lastOdo}
         editingService={editingService}
-      />
-       <ReminderModal
-        isOpen={modalType === 'reminder'}
-        onClose={handleCloseModal}
-        onSubmit={handleAddReminder}
-        lastOdo={stats.lastOdo}
       />
       <TripSummaryDialog 
         isOpen={!!lastCompletedTrip}

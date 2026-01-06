@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Fuel, Wrench, BellRing } from 'lucide-react';
+import { Fuel, Wrench } from 'lucide-react';
 import type { ModalType } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 
@@ -12,14 +12,6 @@ interface FloatingActionButtonsProps {
 export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProps) {
     return (
         <div className="fixed bottom-24 right-6 flex flex-col gap-4 z-50">
-             <Button 
-                aria-label="Set Reminder"
-                onClick={() => onOpenModal('reminder')} 
-                className="group relative bg-blue-600 hover:bg-blue-700 text-white w-14 h-14 rounded-full shadow-lg shadow-blue-600/30 active:scale-90 transition-all hover:-translate-y-1"
-            >
-                <div className="absolute inset-0 bg-white rounded-full opacity-0 group-hover:opacity-20 transition-opacity animate-ping-slow-once"></div>
-                <BellRing size={24}/>
-            </Button>
             <Button 
                 aria-label="Add Service Record"
                 onClick={() => onOpenModal('service')} 
