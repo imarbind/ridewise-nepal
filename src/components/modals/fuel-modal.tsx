@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import type { FuelLog } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { cn } from '@/lib/utils';
+import { Textarea } from '../ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface FuelModalProps {
     isOpen: boolean;
@@ -31,6 +33,11 @@ const fuelSchema = z.object({
   amount: z.coerce.number().positive('Total amount must be positive'),
   tankStatus: z.enum(['full', 'partial']),
   estimatedMileage: z.coerce.number().optional(),
+  fuelStation: z.string().optional(),
+  fuelType: z.enum(['normal', 'premium']).optional(),
+  paymentMode: z.string().optional(),
+  location: z.string().optional(),
+  notes: z.string().optional(),
 });
 
 type FuelFormData = z.infer<typeof fuelSchema>;
@@ -62,7 +69,12 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
           liters: undefined,
           amount: undefined,
           tankStatus: 'full',
-          estimatedMileage: undefined
+          estimatedMileage: undefined,
+          fuelStation: '',
+          fuelType: 'normal',
+          paymentMode: '',
+          location: '',
+          notes: ''
         });
       }
     }
@@ -89,7 +101,11 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
 
 
   const onFormSubmit = (data: FuelFormData) => {
-    onSubmit(data, editingFuel?.id);
+    const cleanedEntry = { ...data };
+    if (typeof cleanedEntry.estimatedMileage !== 'number' || isNaN(cleanedEntry.estimatedMileage)) {
+        delete cleanedEntry.estimatedMileage;
+    }
+    onSubmit(cleanedEntry, editingFuel?.id);
     onClose();
   }
 
@@ -120,7 +136,7 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-3xl p-6 sm:p-8 border-slate-200 shadow-2xl bg-white">
+      <DialogContent className="rounded-3xl p-6 sm:p-8 border-slate-200 shadow-2xl bg-white max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-black text-slate-800 tracking-tighter flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center border border-green-200">
@@ -182,6 +198,37 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                     <FloatingLabelInput name="amount" label="Total Cost (रू)" type="number" onChange={(e) => handleValueChange(e.target.value, 'amount')} />
                 </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <FloatingLabelInput name="fuelStation" label="Fuel Station" />
+                <FloatingLabelInput name="location" label="Location" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+                <FormField control={form.control} name="fuelType" render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>Fuel Type</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl><SelectTrigger><SelectValue placeholder="Select fuel type..." /></SelectTrigger></FormControl>
+                            <SelectContent>
+                                <SelectItem value="normal">Normal</SelectItem>
+                                <SelectItem value="premium">Premium</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+                <FloatingLabelInput name="paymentMode" label="Payment Mode" />
+            </div>
+
+            <FormField control={form.control} name="notes" render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl><Textarea placeholder="Any notes..." {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+            )} />
+
 
             <Button type="submit" className="w-full h-12 text-base font-bold text-white bg-slate-800 rounded-xl shadow-none border-b-4 border-slate-900 active:border-b-0 active:translate-y-1 transition-all duration-150 hover:bg-slate-700">
               {editingFuel ? 'Update Fuel Log' : 'Add Fuel Log'}

@@ -26,7 +26,10 @@
         "make": { "type": "string" },
         "model": { "type": "string" },
         "year": { "type": "string" },
-        "engineCc": { "type": "string" }
+        "engineCc": { "type": "string" },
+        "purchasePrice": { "type": "number" },
+        "purchaseDate": { "type": "string", "format": "date-time" },
+        "fuelTankCapacity": { "type": "number" }
       },
       "required": ["name", "number", "engineCc"]
     },
@@ -41,7 +44,12 @@
         "amount": { "type": "number" },
         "price": { "type": "number" },
         "tankStatus": { "type": "string", "enum": ["full", "partial"] },
-        "estimatedMileage": { "type": "number" }
+        "estimatedMileage": { "type": "number" },
+        "fuelStation": { "type": "string" },
+        "fuelType": { "type": "string", "enum": ["normal", "premium"] },
+        "paymentMode": { "type": "string" },
+        "location": { "type": "string" },
+        "notes": { "type": "string" }
       },
       "required": ["date", "odo", "liters", "amount", "price", "tankStatus"]
     },
@@ -58,7 +66,10 @@
         "parts": {
           "type": "array",
           "items": { "$ref": "#/backend/entities/ServicePart" }
-        }
+        },
+        "serviceType": { "type": "string", "enum": ["regular", "repair", "emergency"]},
+        "notes": { "type": "string" },
+        "invoiceUrl": { "type": "string" }
       },
       "required": ["date", "odo", "work", "totalCost", "parts"]
     },
@@ -70,10 +81,11 @@
         "id": { "type": "string" },
         "name": { "type": "string" },
         "cost": { "type": "number" },
+        "quantity": { "type": "number" },
         "reminderType": { "type": "string", "enum": ["none", "km", "days"] },
         "reminderValue": { "type": "string" }
       },
-      "required": ["id", "name", "cost", "reminderType"]
+      "required": ["id", "name", "cost", "reminderType", "quantity"]
     },
     "Trip": {
       "title": "Trip",

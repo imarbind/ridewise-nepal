@@ -97,6 +97,29 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
                       </SelectContent>
                     </Select>
                   </div>
+                   <div className="grid grid-cols-2 gap-3">
+                     <Input 
+                      placeholder="Purchase Price"
+                      type="number"
+                      value={editableBikeDetails.purchasePrice} 
+                      onChange={(e) => setEditableBikeDetails(prev => ({...prev, purchasePrice: Number(e.target.value)}))} 
+                      className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                    />
+                    <Input 
+                      placeholder="Purchase Date"
+                      type="date"
+                      value={editableBikeDetails.purchaseDate} 
+                      onChange={(e) => setEditableBikeDetails(prev => ({...prev, purchaseDate: e.target.value}))} 
+                      className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                    />
+                  </div>
+                   <Input 
+                      placeholder="Fuel Tank Capacity (Liters)"
+                      type="number"
+                      value={editableBikeDetails.fuelTankCapacity} 
+                      onChange={(e) => setEditableBikeDetails(prev => ({...prev, fuelTankCapacity: Number(e.target.value)}))} 
+                      className="bg-white/10 text-white placeholder:text-white/50 border-white/20 font-medium"
+                    />
                   <Button onClick={handleBikeDetailsSave} size="sm" className="w-full bg-white/90 text-slate-800 hover:bg-white">Save Details</Button>
                 </div>
               ) : (

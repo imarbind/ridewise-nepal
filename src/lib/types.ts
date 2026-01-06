@@ -10,6 +10,9 @@ export interface BikeDetails {
   model: string;
   year: string;
   engineCc: EngineCc;
+  purchasePrice?: number;
+  purchaseDate?: string;
+  fuelTankCapacity?: number;
 }
 
 export interface FuelLog {
@@ -21,12 +24,18 @@ export interface FuelLog {
   price: number;
   tankStatus: 'full' | 'partial';
   estimatedMileage?: number;
+  fuelStation?: string;
+  fuelType?: 'normal' | 'premium';
+  paymentMode?: string;
+  location?: string;
+  notes?: string;
 }
 
 export interface ServicePart {
   id: string;
   name: string;
   cost: number;
+  quantity: number;
   reminderType: 'none' | 'km' | 'days';
   reminderValue: string;
 }
@@ -39,6 +48,9 @@ export interface ServiceRecord {
   labor: number;
   totalCost: number;
   parts: ServicePart[];
+  serviceType?: 'regular' | 'repair' | 'emergency';
+  notes?: string;
+  invoiceUrl?: string;
 }
 
 export interface TripExpense {
