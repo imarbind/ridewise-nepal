@@ -22,6 +22,7 @@ import { useCollection, useDoc } from '@/firebase';
 import { useMemoFirebase } from '@/firebase/provider';
 import { OnboardingView } from './onboarding/onboarding-view';
 import { TripSummaryDialog } from './trip/trip-summary-dialog';
+import { ReportsView } from './reports/reports-view';
 
 
 const APP_ID = 'ridelog-nepal-v3';
@@ -326,6 +327,8 @@ export function MainApp() {
               onUpdateExpense={updateTripExpense}
               onDeleteExpense={deleteTripExpense}
             />;
+        case 'reports':
+            return <ReportsView fuelLogs={logs || []} serviceLogs={services || []} />;
         case 'rider-board':
             return <RiderBoardView />;
         case 'docs':

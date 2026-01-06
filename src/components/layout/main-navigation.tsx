@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, History, Navigation2, Trophy } from 'lucide-react';
+import { BarChart3, History, Navigation2, Trophy, PieChart } from 'lucide-react';
 import type { ActiveTab } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
@@ -8,6 +8,7 @@ const navItems: { id: ActiveTab; icon: React.ElementType, color: string, label: 
     { id: 'dashboard', icon: BarChart3, color: 'primary', label: 'Dashboard' },
     { id: 'history', icon: History, color: 'blue-600', label: 'History' },
     { id: 'trip', icon: Navigation2, color: 'purple-600', label: 'Trip' },
+    { id: 'reports', icon: PieChart, color: 'green-600', label: 'Reports' },
     { id: 'rider-board', icon: Trophy, color: 'yellow-500', label: 'Rider Board' },
 ];
 

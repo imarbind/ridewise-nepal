@@ -1,4 +1,4 @@
-export type ActiveTab = 'dashboard' | 'trip' | 'history' | 'docs' | 'rider-board';
+export type ActiveTab = 'dashboard' | 'trip' | 'history' | 'docs' | 'rider-board' | 'reports';
 export type ModalType = 'fuel' | 'service' | null;
 
 export type EngineCc = '50-125' | '126-250' | '251-500' | '501-1000' | '>1000';
