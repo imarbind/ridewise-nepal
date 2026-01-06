@@ -232,3 +232,16 @@ export function getActiveReminders(services: ServiceRecord[], lastOdo: number): 
     });
     return reminders;
 }
+
+
+export function getNextService(reminders: Reminder[]): Reminder | null {
+    if (reminders.length === 0) {
+        return null;
+    }
+    // Find the reminder with the highest progress percentage
+    const nextService = reminders.reduce((prev, current) => {
+        return (prev.progress > current.progress) ? prev : current;
+    });
+
+    return nextService;
+}
