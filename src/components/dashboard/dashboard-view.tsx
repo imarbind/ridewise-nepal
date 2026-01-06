@@ -47,7 +47,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
       <div className="space-y-4 mb-8">
         {upcomingTrip && <UpcomingTripCard trip={upcomingTrip} />}
         <div className="group [perspective:1000px]">
-          <div className="relative bg-gradient-to-br from-red-700 via-red-800 to-blue-900 rounded-[2.5rem] p-8 shadow-2xl border-t border-white/20 transition-transform duration-500 transform group-hover:[transform:rotateX(2deg)] overflow-hidden">
+          <div className="relative bg-gradient-to-br from-primary via-red-800 to-accent rounded-[2.5rem] p-8 shadow-2xl border-t border-white/20 transition-transform duration-500 transform group-hover:[transform:rotateX(2deg)] overflow-hidden">
             <div className="absolute -right-12 -top-12 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
             <div className="absolute -left-12 -bottom-12 w-40 h-40 bg-blue-500/30 rounded-full blur-2xl"></div>
 

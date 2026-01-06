@@ -49,15 +49,15 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-blue-500">
-      <div className="w-full max-w-sm p-8 space-y-6 bg-white rounded-2xl shadow-2xl transform transition-all hover:scale-[1.01]">
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="w-full max-w-sm p-8 space-y-6 bg-card rounded-3xl shadow-2xl transform transition-all hover:scale-[1.01]">
         <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-800">
+            <h1 className="text-3xl font-black text-foreground">
             Sign in
             </h1>
-            <p className="text-sm text-slate-500 mt-2">
+            <p className="text-sm text-muted-foreground mt-2">
                 Not registered?{' '}
-                <Button variant="link" onClick={onSwitchToSignup} className="p-0 text-blue-600">
+                <Button variant="link" onClick={onSwitchToSignup} className="p-0 text-primary">
                     Click here to register
                 </Button>
             </p>
@@ -71,8 +71,8 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
                 <FormItem>
                   <FormControl>
                     <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                        <Input placeholder="Email" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input placeholder="Email" {...field} className="pl-10 h-12 rounded-full bg-secondary border-transparent focus:bg-background focus:border-primary" />
                     </div>
                   </FormControl>
                   <FormMessage className="pl-4"/>
@@ -86,8 +86,8 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
                 <FormItem>
                   <FormControl>
                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-                        <Input type="password" placeholder="Password" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input type="password" placeholder="Password" {...field} className="pl-10 h-12 rounded-full bg-secondary border-transparent focus:bg-background focus:border-primary" />
                     </div>
                   </FormControl>
                   <FormMessage className="pl-4"/>
@@ -97,11 +97,11 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
             <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                     <Checkbox id="remember" />
-                    <label htmlFor="remember" className="text-slate-600 cursor-pointer">Remember me</label>
+                    <label htmlFor="remember" className="text-foreground cursor-pointer">Remember me</label>
                 </div>
-                <Button variant="link" className="p-0 text-blue-600">Forgot Password?</Button>
+                <Button variant="link" className="p-0 text-primary">Forgot Password?</Button>
             </div>
-            <Button type="submit" className="w-full h-12 rounded-full text-base font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20" disabled={isLoading}>
+            <Button type="submit" className="w-full h-12 rounded-full text-base font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" disabled={isLoading}>
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>

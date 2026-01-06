@@ -30,7 +30,3 @@ export function FloatingActionButtons({ onOpenModal }: FloatingActionButtonsProp
       </div>
     );
 }
-
-// Add animation to tailwind.config if needed
-// keyframes: { 'ping-slow-once': { '75%, 100%': { transform: 'scale(1.5)', opacity: '0' } } }
-// animation: { 'ping-slow-once': 'ping-slow-once 1s cubic-bezier(0, 0, 0.2, 1)' }

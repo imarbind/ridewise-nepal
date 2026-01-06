@@ -51,18 +51,18 @@ export function OnboardingView({ onSubmit }: OnboardingViewProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
-      <div className="w-full max-w-lg p-8 space-y-6 bg-white rounded-3xl shadow-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-background p-4">
+      <div className="w-full max-w-lg p-8 space-y-6 bg-card rounded-3xl shadow-2xl">
         <div className="text-center">
-          <h1 className="text-3xl font-black text-slate-800 tracking-tighter">
+          <h1 className="text-3xl font-black text-foreground tracking-tighter">
             Welcome to <span className="text-primary">Rydio</span>!
           </h1>
-          <p className="text-slate-600 mt-2">Let's set up your vehicle profile to get started.</p>
+          <p className="text-muted-foreground mt-2">Let's set up your vehicle profile to get started.</p>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-            <h3 className="font-bold text-slate-600 border-b pb-2">Your Bike's Details</h3>
+            <h3 className="font-bold text-foreground border-b pb-2">Your Bike's Details</h3>
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="make" render={({ field }) => (
                 <FormItem><FormLabel>Make</FormLabel><FormControl><Input placeholder="e.g., Bajaj" {...field} /></FormControl><FormMessage /></FormItem>
@@ -93,7 +93,7 @@ export function OnboardingView({ onSubmit }: OnboardingViewProps) {
               )} />
             </div>
 
-            <h3 className="font-bold text-slate-600 border-b pb-2 pt-4">Current Reading</h3>
+            <h3 className="font-bold text-foreground border-b pb-2 pt-4">Current Reading</h3>
             <FormField control={form.control} name="initialOdo" render={({ field }) => (
               <FormItem><FormLabel>Odometer Reading (KM)</FormLabel><FormControl><Input type="number" placeholder="e.g., 15000" {...field} /></FormControl><FormMessage /></FormItem>
             )} />
