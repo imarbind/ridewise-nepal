@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from '
 import { Input } from '@/components/ui/input';
 import type { FuelLog } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { cn } from '@/lib/utils';
 
 interface FuelModalProps {
     isOpen: boolean;
@@ -42,7 +43,8 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     }
   });
   
-  const { watch, setValue, reset, getValues } = form;
+  const { watch, setValue, reset, getValues, formState } = form;
+  const { isDirty, touchedFields } = formState;
   const tankStatus = watch('tankStatus');
 
   useEffect(() => {
@@ -67,19 +69,20 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
   }, [isOpen, editingFuel, lastOdo, lastPrice, reset]);
 
   const handleValueChange = (changedValue: string, changedField: 'amount' | 'liters' | 'price') => {
-      const { amount, liters, price } = getValues();
-      
-      const numericAmount = parseFloat(String(changedField === 'amount' ? changedValue : amount));
-      const numericLiters = parseFloat(String(changedField === 'liters' ? changedValue : liters));
-      const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
+      const { price } = getValues();
+      const value = parseFloat(changedValue);
 
-      if (changedField === 'price') return; // Rate should not be auto-calculated
+      if (isNaN(value) || value < 0) return;
 
-      if (!isNaN(numericPrice) && numericPrice > 0) {
-        if (changedField === 'liters' && !isNaN(numericLiters) && numericLiters > 0) {
-            setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
-        } else if (changedField === 'amount' && !isNaN(numericAmount) && numericAmount > 0) {
-            setValue('liters', parseFloat((numericAmount / numericPrice).toFixed(3)), { shouldValidate: true });
+      if (changedField === 'liters') {
+        const currentPrice = parseFloat(String(price || 0));
+        if (currentPrice > 0) {
+          setValue('amount', parseFloat((value * currentPrice).toFixed(2)), { shouldValidate: true });
+        }
+      } else if (changedField === 'amount') {
+        const currentPrice = parseFloat(String(price || 0));
+        if (currentPrice > 0) {
+          setValue('liters', parseFloat((value / currentPrice).toFixed(3)), { shouldValidate: true });
         }
       }
   };
@@ -90,37 +93,48 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     onClose();
   }
 
+  const FloatingLabelInput = ({ name, label, ...props }: { name: any, label: string } & React.ComponentProps<typeof Input>) => (
+    <FormField control={form.control} name={name} render={({ field }) => (
+      <FormItem className="relative">
+        <FormControl>
+          <Input
+            {...field}
+            placeholder=" "
+            className="block px-2.5 pb-2.5 pt-4 w-full text-sm text-gray-900 bg-slate-50 rounded-lg border border-slate-200 appearance-none focus:outline-none focus:ring-0 focus:border-primary peer"
+            {...props}
+            onChange={(e) => {
+                field.onChange(e);
+                if (props.onChange) props.onChange(e);
+            }}
+          />
+        </FormControl>
+        <FormLabel
+          className="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-slate-50 px-2 peer-focus:px-2 peer-focus:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
+        >
+          {label}
+        </FormLabel>
+        <FormMessage className="px-2 text-xs"/>
+      </FormItem>
+    )} />
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="rounded-[2rem] p-6 border-slate-200 max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-600 to-green-400"></div>
-        <DialogHeader className="mt-2">
-          <DialogTitle className="text-2xl font-black uppercase text-slate-800 tracking-tighter flex items-center gap-2">
-            <Fuel className="text-green-600"/>
+      <DialogContent className="rounded-3xl p-6 sm:p-8 border-slate-200 shadow-2xl bg-white">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-black text-slate-800 tracking-tighter flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-green-100 flex items-center justify-center border border-green-200">
+                <Fuel className="text-green-600"/>
+            </div>
             {editingFuel ? 'Edit Fuel Log' : 'New Fuel Log'}
           </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 pt-4">
+          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-6 pt-4">
              <div className="grid grid-cols-2 gap-4">
-                <FormField control={form.control} name="date" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
-                        <FormControl>
-                            <Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )} />
-                <FormField control={form.control} name="odo" render={({ field }) => (
-                    <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
-                    <FormControl>
-                        <Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                    </FormControl><FormMessage />
-                    </FormItem>
-                )} />
+                <FloatingLabelInput name="date" label="Date" type="date" />
+                <FloatingLabelInput name="odo" label="Odometer (KM)" type="number" />
              </div>
             
             <FormField
@@ -130,24 +144,20 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
                 <FormItem className="space-y-2">
                   <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Tank Status</FormLabel>
                   <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="grid grid-cols-2 gap-4"
-                    >
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                    <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="grid grid-cols-2 gap-4">
+                      <FormItem>
                         <FormControl>
                           <RadioGroupItem value="full" id="full" className="peer sr-only" />
                         </FormControl>
-                        <FormLabel htmlFor="full" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary w-full cursor-pointer">
+                        <FormLabel htmlFor="full" className="flex flex-col items-center justify-between rounded-lg border-2 p-4 cursor-pointer peer-data-[state=checked]:border-primary hover:bg-slate-50">
                           Full Tank
                         </FormLabel>
                       </FormItem>
-                      <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormItem>
                         <FormControl>
                           <RadioGroupItem value="partial" id="partial" className="peer sr-only"/>
                         </FormControl>
-                        <FormLabel htmlFor="partial" className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary w-full cursor-pointer">
+                        <FormLabel htmlFor="partial" className="flex flex-col items-center justify-between rounded-lg border-2 p-4 cursor-pointer peer-data-[state=checked]:border-primary hover:bg-slate-50">
                           Partial Fill
                         </FormLabel>
                       </FormItem>
@@ -159,57 +169,21 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
             />
 
             {tankStatus === 'partial' && (
-                <FormField control={form.control} name="estimatedMileage" render={({ field }) => (
-                    <FormItem className="animate-in fade-in">
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Estimated Average (KM/L)</FormLabel>
-                        <FormControl>
-                            <Input type="number" placeholder="e.g. 35" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                        </FormControl>
-                        <p className="text-[11px] text-slate-500 mt-1 px-1">Provide an estimate if you know it. It helps in calculations when two consecutive full-tank logs aren't available.</p>
-                        <FormMessage />
-                    </FormItem>
-                )} />
+                <div className="animate-in fade-in">
+                    <FloatingLabelInput name="estimatedMileage" label="Estimated Average (KM/L)" type="number" />
+                    <p className="text-[11px] text-slate-500 mt-1 px-1">Helps calculate mileage when two consecutive full-tank logs aren't available.</p>
+                </div>
             )}
 
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 relative overflow-hidden">
-              <div className="absolute -bottom-8 -right-8 text-green-600/10">
-                <Droplets size={100} strokeWidth={1} />
-              </div>
-              <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-green-600 rounded-full"></div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculations</p>
-              </div>
-              <div className="space-y-3 relative z-10">
-                <FormField control={form.control} name="price" render={({ field }) => (
-                    <FormItem>
-                        <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Rate/Liter</FormLabel>
-                    <FormControl>
-                        <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'price'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                    </FormControl><FormMessage />
-                    </FormItem>
-                )} />
+            <div className="space-y-4">
+                <FloatingLabelInput name="price" label="Rate / Liter" type="number" step="0.01" />
                 <div className="grid grid-cols-2 gap-4">
-                    <FormField control={form.control} name="liters" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Liters</FormLabel>
-                          <FormControl>
-                            <Input type="number" step="0.01" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'liters'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-green-600 transition-all" />
-                          </FormControl><FormMessage />
-                        </FormItem>
-                      )} />
-                     <FormField control={form.control} name="amount" render={({ field }) => (
-                        <FormItem>
-                            <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</FormLabel>
-                            <FormControl>
-                            <Input type="number" {...field} onChange={e => { field.onChange(e.target.value); handleValueChange(e.target.value, 'amount'); }} className="w-full bg-card p-4 h-auto rounded-xl border-slate-200 font-black text-slate-800 text-lg focus:outline-none focus:border-green-600 transition-all" />
-                            </FormControl><FormMessage />
-                        </FormItem>
-                        )} />
+                    <FloatingLabelInput name="liters" label="Liters" type="number" step="0.01" onChange={(e) => handleValueChange(e.target.value, 'liters')} />
+                    <FloatingLabelInput name="amount" label="Total Cost (रू)" type="number" onChange={(e) => handleValueChange(e.target.value, 'amount')} />
                 </div>
-              </div>
             </div>
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-green-600 to-green-700 py-4 h-auto rounded-2xl font-black text-white text-lg shadow-lg shadow-green-600/20 hover:shadow-green-600/40 hover:scale-[1.02] transition-all active:scale-95 uppercase tracking-wide">
+            <Button type="submit" className="w-full h-12 text-base font-bold text-white bg-slate-800 rounded-xl shadow-none border-b-4 border-slate-900 active:border-b-0 active:translate-y-1 transition-all duration-150 hover:bg-slate-700">
               {editingFuel ? 'Update Fuel Log' : 'Add Fuel Log'}
             </Button>
           </form>
@@ -218,5 +192,3 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
     </Dialog>
   );
 }
-
-    
