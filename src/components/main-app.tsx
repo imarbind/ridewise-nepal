@@ -111,14 +111,19 @@ export function MainApp() {
   };
 
   const handleAddOrUpdateFuel = (fuelEntry: Omit<FuelLog, 'id'>, id?: string) => {
+    const cleanedEntry = { ...fuelEntry };
+    if (typeof cleanedEntry.estimatedMileage !== 'number' || isNaN(cleanedEntry.estimatedMileage)) {
+        delete cleanedEntry.estimatedMileage;
+    }
+
     if (id && logsCollectionRef) { // Editing existing
       const logRef = doc(logsCollectionRef, id);
-      updateDocumentNonBlocking(logRef, fuelEntry);
+      updateDocumentNonBlocking(logRef, cleanedEntry);
     } else if (logsCollectionRef) { // Adding new
-      addDocumentNonBlocking(logsCollectionRef, fuelEntry);
-      addExpenseToActiveTrip(`Fuel (${fuelEntry.liters}L)`, fuelEntry.amount);
+      addDocumentNonBlocking(logsCollectionRef, cleanedEntry);
+      addExpenseToActiveTrip(`Fuel (${cleanedEntry.liters}L)`, cleanedEntry.amount);
     }
-    syncOdometer(fuelEntry.odo);
+    syncOdometer(cleanedEntry.odo);
     setEditingFuel(null);
     setModalType(null);
   };
