@@ -1,14 +1,11 @@
 'use client';
-import { useState } from 'react';
 import { MainApp } from "@/components/main-app";
 import { useUser } from '@/firebase';
 import { LoginView } from '@/components/auth/login-view';
-import { SignupView } from '@/components/auth/signup-view';
 import { NepalBackground } from '@/components/layout/nepal-background';
 
 export default function Home() {
   const { user, isUserLoading } = useUser();
-  const [isLoginView, setIsLoginView] = useState(true);
 
   if (isUserLoading) {
     return (
@@ -22,11 +19,7 @@ export default function Home() {
     return (
       <>
         <NepalBackground />
-        {isLoginView ? (
-          <LoginView onSwitchToSignup={() => setIsLoginView(false)} />
-        ) : (
-          <SignupView onSwitchToLogin={() => setIsLoginView(true)} />
-        )}
+        <LoginView />
       </>
     );
   }
