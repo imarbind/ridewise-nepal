@@ -155,7 +155,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   const { control, reset, watch, setValue, handleSubmit } = form;
   const { fields, append, remove } = useFieldArray({
     control: control,
-    // @ts-ignore
     name: "parts",
   });
 
@@ -229,11 +228,8 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   }
   
   const calculatedTotal = useMemo(() => {
-      // @ts-ignore
       if (!parts) return labor || 0;
-      // @ts-ignore
       const partsTotal = (parts || []).reduce((sum, p) => sum + ((p.cost || 0) * (p.quantity || 1)), 0);
-      // @ts-ignore
       return (labor || 0) + partsTotal;
   }, [parts, labor]);
 
@@ -267,7 +263,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     <FormField control={form.control} name="date" render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Date</FormLabel>
-                            {/* @ts-ignore */}
                             <FormControl><Input type="date" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                             <FormMessage />
                         </FormItem>
@@ -275,7 +270,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                     <FormField control={form.control} name="odo" render={({ field }) => (
                         <FormItem>
                             <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Odometer (KM)</FormLabel>
-                             {/* @ts-ignore */}
                             <FormControl><Input type="number" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                             <FormMessage />
                         </FormItem>
@@ -304,7 +298,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <div className="space-y-3">
                 <div className="flex justify-between items-center">
                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Parts & Items</p>
-                    {/* @ts-ignore */}
                     <Button type="button" size="sm" variant="ghost" onClick={() => append({ id: String(Date.now()), name: '', cost: 0, quantity: 1, reminderType: 'none', reminderValue: '' })} className="text-primary text-[10px] font-bold flex items-center gap-1 bg-red-50 px-3 py-1.5 h-auto rounded-full hover:bg-red-100 transition-colors"><Plus size={12}/> ADD ITEM</Button>
                 </div>
                 {fields.map((field, index) => (
@@ -368,7 +361,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <FormField control={form.control} name="labor" render={({ field }) => (
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Labor Charge (रू)</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Input type="number" placeholder="e.g. 500" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -382,7 +374,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <FormField control={form.control} name="notes" render={({ field }) => (
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Notes</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Textarea placeholder="e.g., Chain was loose, tightened and lubed." {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-sm text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -391,7 +382,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <FormField control={form.control} name="invoiceUrl" render={({ field }) => (
                     <FormItem>
                         <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Invoice URL (optional)</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Input placeholder="https://example.com/invoice.jpg" {...field} className="w-full bg-slate-50 p-4 h-auto rounded-2xl border-slate-200 font-bold text-slate-800 focus:outline-none focus:border-primary" /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -410,7 +400,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                  <FormField control={form.control} name="date" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Next Service Date</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Input type="date" {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -425,7 +414,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <FormField control={form.control} name="odo" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Next Service at Odometer (KM)</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Input type="number" placeholder={`e.g., ${lastOdo + 5000}`} {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
@@ -434,7 +422,6 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 <FormField control={form.control} name="notes" render={({ field }) => (
                     <FormItem>
                         <FormLabel>Notes (Required)</FormLabel>
-                        {/* @ts-ignore */}
                         <FormControl><Textarea placeholder="e.g., General check-up, change oil..." {...field} /></FormControl>
                         <FormMessage />
                     </FormItem>
