@@ -73,6 +73,8 @@ export function FuelModal({ isOpen, onClose, onSubmit, lastOdo, lastPrice, editi
       const numericLiters = parseFloat(String(changedField === 'liters' ? changedValue : liters));
       const numericPrice = parseFloat(String(changedField === 'price' ? changedValue : price));
 
+      if (changedField === 'price') return; // Rate should not be auto-calculated
+
       if (!isNaN(numericPrice) && numericPrice > 0) {
         if (changedField === 'liters' && !isNaN(numericLiters) && numericLiters > 0) {
             setValue('amount', parseFloat((numericLiters * numericPrice).toFixed(2)), { shouldValidate: true });
