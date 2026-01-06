@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import type { FuelLog, ServiceRecord } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { HistoryView } from '@/components/history/history-view';
@@ -29,12 +29,17 @@ export function TimelineView({
 }: TimelineViewProps) {
   const [activeSubTab, setActiveSubTab] = useState<TimelineSubTab>('all');
 
+  const filteredFuelLogs = useMemo(() => {
+    // Filter out dummy logs created for odo sync
+    return fuelLogs.filter(log => log.liters > 0 || log.amount > 0);
+  }, [fuelLogs]);
+
   const renderContent = () => {
     switch (activeSubTab) {
       case 'all':
         return (
           <HistoryView
-            fuelLogs={fuelLogs}
+            fuelLogs={filteredFuelLogs}
             serviceLogs={serviceLogs}
             onEditFuel={onEditFuel}
             onDeleteFuel={onDeleteFuel}
@@ -43,7 +48,7 @@ export function TimelineView({
           />
         );
       case 'fuel':
-        return <FuelLogView logs={fuelLogs} onDelete={onDeleteFuel} onEdit={onEditFuel} />;
+        return <FuelLogView logs={filteredFuelLogs} onDelete={onDeleteFuel} onEdit={onEditFuel} />;
       case 'service':
         return <ServiceLogView logs={serviceLogs} onDelete={onDeleteService} onEdit={onEditService} />;
       default:
