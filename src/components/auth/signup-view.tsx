@@ -6,12 +6,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useAuth, useFirestore } from '@/firebase';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
+import { User, Lock, Mail } from 'lucide-react';
+
 
 interface SignupViewProps {
   onSwitchToLogin: () => void;
@@ -62,15 +64,22 @@ export function SignupView({ onSwitchToLogin }: SignupViewProps) {
       });
       setIsLoading(false);
     }
-    // On success, the main app view will appear.
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-black text-slate-800 tracking-tighter text-center">
-          Create an Account
-        </h1>
+    <div className="flex items-center justify-center min-h-screen bg-blue-500">
+      <div className="w-full max-w-sm p-8 space-y-6 bg-white rounded-2xl shadow-2xl transform transition-all hover:scale-[1.01]">
+        <div className="text-center">
+            <h1 className="text-3xl font-bold text-slate-800">
+                Create Account
+            </h1>
+            <p className="text-sm text-slate-500 mt-2">
+                Already registered?{' '}
+                <Button variant="link" onClick={onSwitchToLogin} className="p-0 text-blue-600">
+                    Click here to sign in
+                </Button>
+            </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -78,11 +87,13 @@ export function SignupView({ onSwitchToLogin }: SignupViewProps) {
               name="displayName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Display Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Your Name" {...field} />
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Input placeholder="Display Name" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="pl-4"/>
                 </FormItem>
               )}
             />
@@ -91,11 +102,13 @@ export function SignupView({ onSwitchToLogin }: SignupViewProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@email.com" {...field} />
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Input placeholder="Email" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="pl-4"/>
                 </FormItem>
               )}
             />
@@ -104,25 +117,21 @@ export function SignupView({ onSwitchToLogin }: SignupViewProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                     <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Input type="password" placeholder="Password" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="pl-4"/>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full h-12 rounded-full text-base font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20" disabled={isLoading}>
               {isLoading ? 'Creating Account...' : 'Sign Up'}
             </Button>
           </form>
         </Form>
-        <p className="text-sm text-center text-slate-600">
-          Already have an account?{' '}
-          <Button variant="link" onClick={onSwitchToLogin} className="p-0">
-            Log In
-          </Button>
-        </p>
       </div>
     </div>
   );

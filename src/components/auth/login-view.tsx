@@ -6,10 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { useAuth } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useToast } from '@/hooks/use-toast';
+import { User, Lock } from 'lucide-react';
+import { Checkbox } from '../ui/checkbox';
 
 interface LoginViewProps {
   onSwitchToSignup: () => void;
@@ -44,15 +46,22 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
       });
       setIsLoading(false);
     }
-    // No need to set isLoading to false on success, as the component will unmount
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-slate-50">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-black text-slate-800 tracking-tighter text-center">
-          Welcome to <span className="text-primary">Rydio</span>
-        </h1>
+    <div className="flex items-center justify-center min-h-screen bg-blue-500">
+      <div className="w-full max-w-sm p-8 space-y-6 bg-white rounded-2xl shadow-2xl transform transition-all hover:scale-[1.01]">
+        <div className="text-center">
+            <h1 className="text-3xl font-bold text-slate-800">
+            Sign in
+            </h1>
+            <p className="text-sm text-slate-500 mt-2">
+                Not registered?{' '}
+                <Button variant="link" onClick={onSwitchToSignup} className="p-0 text-blue-600">
+                    Click here to register
+                </Button>
+            </p>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -60,11 +69,13 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="you@email.com" {...field} />
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Input placeholder="Email" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="pl-4"/>
                 </FormItem>
               )}
             />
@@ -73,25 +84,28 @@ export function LoginView({ onSwitchToSignup }: LoginViewProps) {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                     <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                        <Input type="password" placeholder="Password" {...field} className="pl-10 h-12 rounded-full bg-slate-100 border-transparent focus:bg-white focus:border-blue-500" />
+                    </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="pl-4"/>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? 'Logging in...' : 'Log In'}
+            <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                    <Checkbox id="remember" />
+                    <label htmlFor="remember" className="text-slate-600 cursor-pointer">Remember me</label>
+                </div>
+                <Button variant="link" className="p-0 text-blue-600">Forgot Password?</Button>
+            </div>
+            <Button type="submit" className="w-full h-12 rounded-full text-base font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-600/20" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
         </Form>
-        <p className="text-sm text-center text-slate-600">
-          Don't have an account?{' '}
-          <Button variant="link" onClick={onSwitchToSignup} className="p-0">
-            Sign Up
-          </Button>
-        </p>
       </div>
     </div>
   );

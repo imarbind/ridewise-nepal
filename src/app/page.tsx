@@ -11,8 +11,8 @@ function AppContent() {
 
   if (isUserLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading...</p>
+      <div className="flex items-center justify-center min-h-screen bg-blue-500">
+        <p className="text-white">Loading...</p>
       </div>
     );
   }
