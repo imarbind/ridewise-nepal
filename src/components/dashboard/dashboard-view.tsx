@@ -1,7 +1,7 @@
 
 "use client";
 
-import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, TrendingUp, History, Award, Thermometer } from "lucide-react";
+import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, TrendingUp, History, Award, Thermometer, TrendingDown } from "lucide-react";
 import type { Stats, Reminder, EngineCc, BikeDetails, Trip, NextServiceInfo } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { ConditionRatingCard } from "./condition-rating-card";
 import { UpcomingTripCard } from "./upcoming-trip-card";
 import { NextServiceBar } from "./next-service-bar";
+import { Card, CardContent } from "../ui/card";
 
 interface DashboardViewProps {
   stats: Stats;
@@ -164,18 +165,40 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         </div>
       </div>
       
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-green-600" />
-        <StatCard delay={200} label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-primary" />
-        <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
+      <div className="space-y-4 mb-8">
+        {/* TOP SECTION */}
+        <div className="flex gap-4">
+          {/* Left Column */}
+          <div className="w-[45%] flex flex-col gap-4">
+            <StatCard isCompact label="Last km/l" value={stats.lastMileage} sub="km/l" icon={TrendingUp} />
+            <StatCard isCompact label="Best km/l" value={stats.bestMileage} sub="km/l" icon={Award} />
+            <StatCard isCompact label="Avg km/l" value={stats.avgMileage} sub="km/l" icon={TrendingDown} />
+          </div>
+          {/* Right Column */}
+          <div className="w-[55%]">
+            <Card className="h-full rounded-2xl shadow-xl border-slate-200 bg-card/90">
+              <CardContent className="p-4 flex flex-col justify-center items-center text-center h-full">
+                <p className="text-sm font-bold text-slate-500 uppercase tracking-tight">Total Cost</p>
+                <p className="text-4xl font-black text-primary tracking-tighter">रू {stats.totalOwnership.toLocaleString()}</p>
+                <p className="text-xs text-slate-400">Fuel + Service combined</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* MIDDLE SECTION */}
+        <div className="grid grid-cols-3 gap-4">
+          <StatCard label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} />
+          <StatCard label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} />
+          <StatCard label="Total Fuel" value={`${stats.totalFuelLiters.toFixed(1)}`} sub="Liters" icon={Thermometer} />
+        </div>
         
-        <StatCard delay={300} label="Last km/l" value={`${stats.lastMileage}`} sub="km/l" icon={TrendingUp} color="bg-blue-500" />
-        <StatCard delay={400} label="Best km/l" value={`${stats.bestMileage}`} sub="km/l" icon={Award} color="bg-yellow-500" />
-        <StatCard delay={600} label="Total Fuel" value={`${stats.totalFuelLiters.toFixed(1)}`} sub="Liters" icon={Thermometer} color="bg-orange-500" />
-        
-        <StatCard delay={700} label="Fuel Logs" value={`${stats.totalFuelLogs}`} icon={History} color="bg-green-600" colSpan="col-span-1" />
-        <StatCard delay={800} label="Services" value={`${stats.totalServices}`} icon={Wrench} color="bg-primary" colSpan="col-span-1" />
-        <StatCard delay={900} label="Parts/Oil" value={`${stats.totalPartsChanged}/${stats.totalOilChanges}`} icon={ListChecks} color="bg-purple-600" colSpan="col-span-1" />
+        {/* BOTTOM SECTION */}
+        <div className="grid grid-cols-3 gap-4">
+            <StatCard isCompact label="Fuel Logs" value={`${stats.totalFuelLogs}`} icon={History} />
+            <StatCard isCompact label="Services" value={`${stats.totalServices}`} icon={Wrench} />
+            <StatCard isCompact label="Parts/Oil" value={`${stats.totalPartsChanged}/${stats.totalOilChanges}`} icon={ListChecks} />
+        </div>
       </div>
 
       <MaintenanceStatus activeReminders={activeReminders} />
