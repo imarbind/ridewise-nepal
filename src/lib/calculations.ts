@@ -55,63 +55,70 @@ function calculateCpk(logs: FuelLog[], services: ServiceRecord[], engineCc: Engi
   };
 }
 
-function calculateAverageMileage(logs: FuelLog[]): number {
-  if (logs.length < 2) return 0;
+function calculateMileageStats(logs: FuelLog[]): { avg: number; last: number; best: number } {
+  if (logs.length < 2) return { avg: 0, last: 0, best: 0 };
 
   const sortedLogs = [...logs].sort((a, b) => a.odo - b.odo);
-  
-  // Find two most recent consecutive full tank logs
-  let firstFullIndex = -1;
-  let secondFullIndex = -1;
+  const allCalculatedMileages: number[] = [];
 
-  for (let i = sortedLogs.length - 1; i > 0; i--) {
-    if (sortedLogs[i].tankStatus === 'full') {
-      secondFullIndex = i;
-      for (let j = i - 1; j >= 0; j--) {
-        if (sortedLogs[j].tankStatus === 'full') {
-          firstFullIndex = j;
-          break;
-        }
-      }
-      break;
+  // Full-tank to full-tank calculations
+  const fullTankIndices: number[] = [];
+  sortedLogs.forEach((log, index) => {
+    if (log.tankStatus === 'full') {
+      fullTankIndices.push(index);
     }
-  }
+  });
 
-  if (firstFullIndex !== -1 && secondFullIndex !== -1) {
+  for (let i = 0; i < fullTankIndices.length - 1; i++) {
+    const firstFullIndex = fullTankIndices[i];
+    const secondFullIndex = fullTankIndices[i + 1];
+    
     const distance = sortedLogs[secondFullIndex].odo - sortedLogs[firstFullIndex].odo;
     let fuelConsumed = 0;
-    // Sum fuel from the log after the first full tank up to and including the second full tank
-    for (let i = firstFullIndex + 1; i <= secondFullIndex; i++) {
-      fuelConsumed += sortedLogs[i].liters;
+    for (let j = firstFullIndex + 1; j <= secondFullIndex; j++) {
+      fuelConsumed += sortedLogs[j].liters;
     }
-    
+
     if (distance > 0 && fuelConsumed > 0) {
-      return distance / fuelConsumed;
+      allCalculatedMileages.push(distance / fuelConsumed);
     }
   }
 
-  // Fallback: use the most recent estimated mileage if available
-  for (let i = sortedLogs.length - 1; i >= 0; i--) {
-      if (sortedLogs[i].estimatedMileage && sortedLogs[i].estimatedMileage! > 0) {
-          return sortedLogs[i].estimatedMileage!;
+  // Fallback to estimated mileages if no full-tank calculations are possible
+  if (allCalculatedMileages.length === 0) {
+    sortedLogs.forEach(log => {
+      if (log.estimatedMileage && log.estimatedMileage > 0) {
+        allCalculatedMileages.push(log.estimatedMileage);
       }
+    });
   }
-  
-  return 0; // No valid data to calculate
+
+  if (allCalculatedMileages.length === 0) return { avg: 0, last: 0, best: 0 };
+
+  const totalMileage = allCalculatedMileages.reduce((sum, m) => sum + m, 0);
+  const avg = totalMileage / allCalculatedMileages.length;
+  const last = allCalculatedMileages[allCalculatedMileages.length - 1];
+  const best = Math.max(...allCalculatedMileages);
+
+  return { avg, last, best };
 }
 
 
 export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engineCc: EngineCc): Stats {
+  const actualFuelLogs = logs.filter(log => log.liters > 0 || log.amount > 0);
+  
   const sortedLogs = [...logs].sort((a, b) => b.odo - a.odo);
   const lastFuelOdo = sortedLogs.length > 0 ? sortedLogs[0].odo : 0;
   const lastServiceOdo = services.length > 0 ? Math.max(...services.map(s => s.odo)) : 0;
   const lastOdo = Math.max(lastFuelOdo, lastServiceOdo);
 
-  const totalFuelCost = logs.reduce((sum, item) => sum + (parseFloat(String(item.amount)) || 0), 0);
+  const totalFuelCost = actualFuelLogs.reduce((sum, item) => sum + (parseFloat(String(item.amount)) || 0), 0);
   const totalServiceCost = services.reduce((sum, item) => sum + (parseFloat(String(item.totalCost)) || 0), 0);
   const totalOwnership = totalFuelCost + totalServiceCost;
+  
+  const totalFuelLiters = actualFuelLogs.reduce((sum, item) => sum + (parseFloat(String(item.liters)) || 0), 0);
 
-  const avgMileage = calculateAverageMileage(logs);
+  const { avg: avgMileage, last: lastMileage, best: bestMileage } = calculateMileageStats(actualFuelLogs);
 
   const allRecordsByOdo = [...logs.map(l => ({ odo: l.odo })), ...services.map(s => ({ odo: s.odo }))]
     .filter(r => r.odo)
@@ -152,7 +159,7 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engin
     });
   });
 
-  const cpk = calculateCpk(logs, services, engineCc);
+  const cpk = calculateCpk(actualFuelLogs, services, engineCc);
 
   return {
     lastOdo,
@@ -166,6 +173,11 @@ export function calculateStats(logs: FuelLog[], services: ServiceRecord[], engin
     totalPartsChanged,
     totalOilChanges,
     cpk,
+    totalServices: services.length,
+    totalFuelLiters,
+    lastMileage: lastMileage.toFixed(1),
+    bestMileage: bestMileage.toFixed(1),
+    totalFuelLogs: actualFuelLogs.length,
   };
 }
 

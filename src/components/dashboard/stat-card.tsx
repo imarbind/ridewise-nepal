@@ -25,16 +25,23 @@ export const StatCard = ({ label, value, sub, icon: Icon, color, delay, colSpan 
       bg-card/90 backdrop-blur-md border-b-4 border-r-4 border-slate-200 
       p-4 rounded-2xl shadow-xl transition-all duration-300 transform 
       group-hover:-translate-y-1 group-hover:shadow-2xl group-hover:border-blue-200/50
-      relative overflow-hidden h-full
+      relative overflow-hidden h-full flex flex-col justify-between
     `}>
       <div className={cn("absolute -right-4 -top-4 w-16 h-16 rounded-full opacity-10 blur-xl", color)} />
       
-      <div className={cn("p-2 rounded-xl inline-block mb-3 shadow-lg text-white", color)}>
-        <Icon size={16} />
+      <div>
+        <div className={cn("p-2 rounded-xl inline-block mb-2 shadow-lg text-white", color)}>
+          <Icon size={16} />
+        </div>
+        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight z-10 relative">{label}</p>
       </div>
-      <p className="text-slate-500 text-[10px] font-bold uppercase tracking-tight z-10 relative">{label}</p>
-      <h3 className="text-xl font-black text-slate-800 z-10 relative tracking-tight">{value}</h3>
-      {sub && <p className="text-[10px] text-slate-400 mt-1 z-10 relative">{sub}</p>}
+
+      <div>
+        <h3 className="text-xl font-black text-slate-800 z-10 relative tracking-tight">
+            {value}
+            {sub && <span className="text-xs font-bold text-slate-400 ml-1">{sub}</span>}
+        </h3>
+      </div>
     </div>
   </div>
 );

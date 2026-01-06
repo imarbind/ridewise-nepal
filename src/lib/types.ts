@@ -92,6 +92,11 @@ export type Stats = {
     totalPartsChanged: number;
     totalOilChanges: number;
     cpk: CpkData;
+    totalServices: number;
+    totalFuelLiters: number;
+    lastMileage: string;
+    bestMileage: string;
+    totalFuelLogs: number;
 }
 
 export type Reminder = {

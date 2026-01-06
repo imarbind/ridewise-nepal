@@ -1,7 +1,7 @@
 
 "use client";
 
-import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets } from "lucide-react";
+import { FileText, Edit, Fuel, Wrench, CircleDollarSign, ListChecks, Droplets, TrendingUp, History, Thermometer, Award } from "lucide-react";
 import type { Stats, Reminder, EngineCc, BikeDetails, Trip } from "@/lib/types";
 import { StatCard } from "./stat-card";
 import { MaintenanceStatus } from "./maintenance-status";
@@ -121,7 +121,7 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
                   </div>
                   <div className="space-y-2 text-right">
                       <div>
-                          <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Efficiency</p>
+                          <p className="text-[10px] font-bold text-white/70 uppercase tracking-widest">Avg Efficiency</p>
                           <p className="text-xl font-black text-white">{stats.avgMileage} <span className="text-xs font-normal opacity-70">km/l</span></p>
                       </div>
                       <div>
@@ -138,12 +138,18 @@ export function DashboardView({ stats, activeReminders, onNavigateDocs, bikeDeta
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-3 gap-4 mb-8">
         <StatCard delay={100} label="Fuel Spent" value={`रू ${stats.totalFuelCost.toLocaleString()}`} icon={Fuel} color="bg-green-600" />
         <StatCard delay={200} label="Service Cost" value={`रू ${stats.totalServiceCost.toLocaleString()}`} icon={Wrench} color="bg-primary" />
-        <StatCard delay={300} label="Oil Changes" value={`${stats.totalOilChanges}`} icon={Droplets} color="bg-orange-500" />
-        <StatCard delay={400} label="Parts Changed" value={`${stats.totalPartsChanged}`} icon={ListChecks} color="bg-green-600" />
-        <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" colSpan="col-span-2" />
+        <StatCard delay={500} label="Total Cost" value={`रू ${stats.totalOwnership.toLocaleString()}`} icon={CircleDollarSign} color="bg-red-800" />
+        
+        <StatCard delay={300} label="Last km/l" value={`${stats.lastMileage}`} sub="km/l" icon={TrendingUp} color="bg-blue-500" />
+        <StatCard delay={400} label="Best km/l" value={`${stats.bestMileage}`} sub="km/l" icon={Award} color="bg-yellow-500" />
+        <StatCard delay={600} label="Total Fuel" value={`${stats.totalFuelLiters.toFixed(1)}`} sub="Liters" icon={Thermometer} color="bg-orange-500" />
+        
+        <StatCard delay={700} label="Fuel Logs" value={`${stats.totalFuelLogs}`} icon={History} color="bg-green-600" colSpan="col-span-1" />
+        <StatCard delay={800} label="Services" value={`${stats.totalServices}`} icon={Wrench} color="bg-primary" colSpan="col-span-1" />
+        <StatCard delay={900} label="Parts/Oil" value={`${stats.totalPartsChanged}/${stats.totalOilChanges}`} icon={ListChecks} color="bg-purple-600" colSpan="col-span-1" />
       </div>
 
       <MaintenanceStatus activeReminders={activeReminders} />
