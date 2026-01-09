@@ -134,18 +134,13 @@ export function MainApp() {
     setModalType(null);
   };
   
-  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id' | 'work'> & { work?: string }, id?: string) => {
-    const finalServiceEntry = {
-        ...serviceEntry,
-        work: serviceEntry.parts[0]?.name || 'General Service',
-    };
-
+  const handleAddOrUpdateService = (serviceEntry: Omit<ServiceRecord, 'id'>, id?: string) => {
     if (id && servicesCollectionRef) {
        const serviceRef = doc(servicesCollectionRef, id);
-       updateDocumentNonBlocking(serviceRef, finalServiceEntry);
+       updateDocumentNonBlocking(serviceRef, serviceEntry);
     } else if (servicesCollectionRef) {
-      addDocumentNonBlocking(servicesCollectionRef, finalServiceEntry);
-      addExpenseToActiveTrip(`Service: ${finalServiceEntry.work}`, finalServiceEntry.totalCost);
+      addDocumentNonBlocking(servicesCollectionRef, serviceEntry);
+      addExpenseToActiveTrip(`Service: ${serviceEntry.work}`, serviceEntry.totalCost);
     }
     syncOdometer(serviceEntry.odo);
     // Mark manual reminders as complete if service is done

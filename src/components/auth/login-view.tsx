@@ -34,6 +34,11 @@ export function LoginView() {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
+      // First, sign out any existing user to ensure a fresh session
+      if (auth.currentUser) {
+        await auth.signOut();
+      }
+      
       const userCredential = await signInAnonymously(auth);
       const user = userCredential.user;
       
