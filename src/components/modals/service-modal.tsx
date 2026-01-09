@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -56,7 +55,6 @@ const reminderObjectSchema = z.object({
     notes: z.string().min(1, 'Reminder notes are required.'),
 });
 
-// Create the combined schema with the refinement logic at the top level
 const combinedSchema = z.discriminatedUnion("mode", [
   serviceObjectSchema,
   reminderObjectSchema,
@@ -106,8 +104,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   });
 
   const watchedMode = watch('mode');
-  const parts = watch('parts');
-  const labor = watch('labor');
+  const watchedValues = watch();
   const totalCost = watch('totalCost');
 
   useEffect(() => {
@@ -175,11 +172,14 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   
   useEffect(() => {
     if (watchedMode === 'service') {
+      const { labor, parts } = watchedValues as Extract<ServiceFormData, { mode: 'service' }>;
       const partsTotal = (parts || []).reduce((sum, p) => sum + ((p.cost || 0) * (p.quantity || 1)), 0);
       const newTotal = (labor || 0) + partsTotal;
-      setValue('totalCost', newTotal);
+      if (totalCost !== newTotal) {
+          setValue('totalCost', newTotal);
+      }
     }
-  }, [parts, labor, watchedMode, setValue]);
+  }, [watchedValues, watchedMode, setValue, totalCost]);
 
 
   return (
