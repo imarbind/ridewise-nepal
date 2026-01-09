@@ -1,4 +1,3 @@
-
 import type { FuelLog, ServiceRecord, Trip } from './types';
 
 // This file is intentionally left empty to remove demo data from the application.
