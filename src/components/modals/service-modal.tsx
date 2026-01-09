@@ -108,6 +108,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
   const watchedMode = watch('mode');
   const parts = watch('parts');
   const labor = watch('labor');
+  const totalCost = watch('totalCost');
 
   useEffect(() => {
     if (isOpen) {
@@ -159,8 +160,8 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     setValue('mode', mode);
     if (data.mode === 'service') {
         const partsTotal = data.parts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
-        const totalCost = (data.labor || 0) + partsTotal;
-        const finalData = { ...data, totalCost };
+        const finalTotalCost = (data.labor || 0) + partsTotal;
+        const finalData = { ...data, totalCost: finalTotalCost };
         onSubmitService(finalData, editingService?.id);
     } else if (data.mode === 'reminder') {
         onSubmitReminder({
@@ -172,11 +173,14 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
     onClose();
   }
   
-  const calculatedTotal = useMemo(() => {
-      if (watchedMode !== 'service' || !parts) return labor || 0;
+  useEffect(() => {
+    if (watchedMode === 'service') {
       const partsTotal = (parts || []).reduce((sum, p) => sum + ((p.cost || 0) * (p.quantity || 1)), 0);
-      return (labor || 0) + partsTotal;
-  }, [parts, labor, watchedMode]);
+      const newTotal = (labor || 0) + partsTotal;
+      setValue('totalCost', newTotal);
+    }
+  }, [parts, labor, watchedMode, setValue]);
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -311,7 +315,7 @@ export function ServiceModal({ isOpen, onClose, onSubmitService, onSubmitReminde
                 )} />
                 <div className="text-right">
                     <p className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Total Cost (रू)</p>
-                    <p className="font-black text-3xl text-primary mt-1">{calculatedTotal.toLocaleString()}</p>
+                    <p className="font-black text-3xl text-primary mt-1">{(totalCost || 0).toLocaleString()}</p>
                 </div>
                 </div>
 
