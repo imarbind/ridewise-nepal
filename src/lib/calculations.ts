@@ -76,13 +76,17 @@ function calculateMileageStats(logs: FuelLog[]): { avg: number; last: number; be
     const secondFullIndex = fullTankIndices[i + 1];
     
     const distance = sortedLogs[secondFullIndex].odo - sortedLogs[firstFullIndex].odo;
+    // Sum fuel from the fill *after* the first full one, up to and including the second full one.
     let fuelConsumed = 0;
     for (let j = firstFullIndex + 1; j <= secondFullIndex; j++) {
       fuelConsumed += sortedLogs[j].liters;
     }
 
     if (distance > 0 && fuelConsumed > 0) {
-      allCalculatedMileages.push(distance / fuelConsumed);
+      const mileage = distance / fuelConsumed;
+      if (mileage > 0 && mileage < 150) { // Filter out extreme outliers
+        allCalculatedMileages.push(mileage);
+      }
     }
   }
 
@@ -264,10 +268,15 @@ export function getActiveReminders(services: ServiceRecord[], manualReminders: M
       if (reminder.date) {
         const dueDate = new Date(reminder.date);
         const lastServiceRecord = sortedServices.length > 0 ? sortedServices[0] : null;
-        const lastServiceDate = lastServiceRecord ? new Date(lastServiceRecord.date) : new Date(0);
-        
-        const totalDuration = differenceInDays(dueDate, lastServiceDate);
-        const usedDays = differenceInDays(now, lastServiceDate);
+        // If there's a last service, the "start" date for the duration is that service date. Otherwise, it's today.
+        const lastRelevantDate = lastServiceRecord ? new Date(lastServiceRecord.date) : new Date();
+
+        if (dueDate < lastRelevantDate) { // The reminder is for a date before the last service, so it's moot.
+           return;
+        }
+
+        const totalDuration = differenceInDays(dueDate, lastRelevantDate);
+        const usedDays = differenceInDays(now, lastRelevantDate);
         const progress = totalDuration > 0 ? (usedDays / totalDuration) * 100 : (now >= dueDate ? 100 : 0);
         const remainingDays = differenceInDays(dueDate, now);
 
@@ -278,7 +287,7 @@ export function getActiveReminders(services: ServiceRecord[], manualReminders: M
           isDue: now >= dueDate,
           remainingDays: Math.max(0, remainingDays),
           estimatedDueDate: dueDate,
-          rawData: { lastOdo: lastServiceRecord?.odo || 0, lastDate: lastServiceRecord?.date || new Date(0).toISOString(), reminderType: 'days', reminderValue: totalDuration, currentUsed: usedDays }
+          rawData: { lastOdo: lastServiceRecord?.odo || 0, lastDate: lastRelevantDate.toISOString(), reminderType: 'days', reminderValue: totalDuration, currentUsed: usedDays }
         };
       }
 
@@ -287,6 +296,11 @@ export function getActiveReminders(services: ServiceRecord[], manualReminders: M
         const dueOdo = reminder.odo;
         const lastServiceRecord = sortedServices.length > 0 ? sortedServices[0] : null;
         const lastServiceOdo = lastServiceRecord ? lastServiceRecord.odo : 0;
+        
+        if (dueOdo < lastServiceOdo) { // The reminder is for an odo reading before the last service, so it's moot.
+            return;
+        }
+        
         const totalKm = dueOdo - lastServiceOdo;
         const usedKm = lastOdo - lastServiceOdo;
         const progress = totalKm > 0 ? (usedKm / totalKm) * 100 : (lastOdo >= dueOdo ? 100 : 0);
